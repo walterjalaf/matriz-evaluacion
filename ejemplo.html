@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Evaluación · MAS SRL · Veladero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#0E1F33',
+                        brand: '#1E4A82',
+                        'brand-2': '#2D6CB8',
+                        pearl: '#E8EAEC',
+                        paper: '#F5F6F8',
+                        soft: '#1A1A1A',
+                        accent: '#F26522',
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        :root {
+            --ink: #0E1F33;
+            --brand: #1E4A82;
+            --brand-2: #2D6CB8;
+            --pearl: #E8EAEC;
+            --paper: #F5F6F8;
+            --soft: #1A1A1A;
+            --accent: #F26522;
+            --line: rgba(255,255,255,.12);
+            --line-dark: rgba(14,31,51,.10);
+        }
+        body { font-family: 'Open Sans', system-ui, sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; }
+        .accordion-content { transition: max-height 0.3s ease-out, padding 0.3s ease-out; max-height: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 8000px; }
+        .custom-checkbox:checked + div { background-color: var(--brand); border-color: var(--brand); }
+        .custom-checkbox:checked + div svg { opacity: 1; }
+        .led-green { background-color: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.8); }
+        .led-yellow { background-color: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.8); }
+        .led-red { background-color: #dc2626; box-shadow: 0 0 8px rgba(220,38,38,0.8); }
+        .gate-item { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(242,101,34,0.05), transparent 12%); }
+        .gate-n2-item { border-left: 3px solid var(--brand-2); background: linear-gradient(90deg, rgba(45,108,184,0.05), transparent 12%); }
+        .toggle-sm { width: 34px; height: 20px; }
+        .toggle-sm-dot { width: 14px; height: 14px; transition: transform 0.15s ease; }
+        .cascade-step { position: relative; padding-left: 2.25rem; }
+        .cascade-step:not(:last-child)::before {
+            content: ''; position: absolute; left: 0.6rem; top: 1.6rem; bottom: -0.5rem; width: 2px; background: var(--line-dark);
+        }
+        .cascade-dot { position: absolute; left: 0; top: 0.15rem; width: 1.35rem; height: 1.35rem; border-radius: 9999px; display:flex; align-items:center; justify-content:center; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 md:p-8">
+
+    <!-- Encabezado de contexto -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="bg-gradient-to-r from-ink to-brand text-white rounded-2xl shadow-lg p-6 md:p-8 mb-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <p class="text-white/70 text-xs font-bold uppercase tracking-widest mb-1">MAS SRL · Mina Veladero · Iglesia y Jáchal, San Juan</p>
+                    <h1 class="text-2xl md:text-3xl font-black">Matriz Integral de Evaluación — v4.1</h1>
+                    <p class="text-slate-300 text-sm mt-1 max-w-2xl">27 subcriterios en 7 dimensiones (100 pts) + Gate HSE de 33 ítems en dos niveles. Marcá evidencia para simular una evaluación y trazar de punta a punta por qué se llega a cada dictamen.</p>
+                </div>
+                <div class="flex gap-4 text-center flex-shrink-0">
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">27</div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Subcriterios</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">24<span class="text-slate-400 text-sm">+9</span></div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Gate N1 + N2</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">100</div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Puntos totales</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-center justify-between gap-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-800">Casos de prueba reales</h2>
+                <p class="text-xs text-slate-500">Cargá el perfil completo de una de las 4 empresas de la sesión de datos de prueba.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 w-full xl:w-auto" id="empresa-buttons"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200 flex flex-col lg:flex-row">
+
+        <!-- Columna Izquierda: Checklist Granular -->
+        <div class="w-full lg:w-2/3 p-6 border-b lg:border-b-0 lg:border-r border-slate-200">
+            <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <h2 class="text-2xl font-bold text-slate-800">Revisión de evidencia</h2>
+                <div class="flex items-center gap-3 text-xs">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-accent inline-block"></span>Gate N1 (excluyente)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-2 inline-block"></span>Gate N2 (brecha)</span>
+                </div>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Los ítems del Gate tienen dos estados — <strong>declarado</strong> (lo que dijo la empresa en el Intake) y <strong>verificado</strong> (lo que confirma el evaluador en sitio). Si no coinciden, queda marcado como discrepancia, igual que en la Matriz post verificación real.</p>
+
+            <!-- Consentimiento y elegibilidad: paso 0 y 0b del dictamen real -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 space-y-3">
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm font-semibold text-slate-700">¿La empresa acepta ser sujeto de auditoría (financiera, técnica y de flota)?</span>
+                    <input type="checkbox" id="chk-auditoria" checked onchange="recalcular()" class="w-5 h-5 accent-brand">
+                </label>
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm font-semibold text-slate-700">¿La empresa está domiciliada dentro del área del programa (Iglesia / Jáchal)?</span>
+                    <input type="checkbox" id="chk-elegibilidad" checked onchange="recalcular()" class="w-5 h-5 accent-brand">
+                </label>
+            </div>
+
+            <div id="accordion-container" class="space-y-4"></div>
+        </div>
+
+        <!-- Columna Derecha: Tablero -->
+        <div class="w-full lg:w-1/3 p-6 bg-slate-50 flex flex-col sticky top-0 h-screen overflow-y-auto">
+            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">Tablero de evaluación</h2>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center mb-4">
+                <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Puntaje global</h3>
+                <div class="text-6xl font-black mono text-slate-800 mb-1" id="puntaje-total">0.0</div>
+                <div class="text-xs text-slate-400 mb-4 border-b border-slate-100 pb-4">sobre 100 puntos</div>
+                <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Dictamen</h3>
+                <div id="dictamen-badge" class="px-4 py-3 rounded-lg text-base font-bold w-full bg-slate-100 text-slate-600 border border-slate-300">Pendiente de carga...</div>
+                <div id="discrepancias-resumen" class="mt-3 text-xs"></div>
+            </div>
+
+            <!-- Cascada de decisión: elemento distintivo de trazabilidad -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-4">
+                <h3 class="font-bold text-sm text-slate-700 mb-4 flex items-center gap-2">
+                    <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i> Cascada de decisión
+                </h3>
+                <div id="cascada-container" class="space-y-3 text-xs"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <h3 class="font-bold text-sm text-slate-700 mb-4 border-b pb-2">Puntuación por dimensión</h3>
+                <div id="dimensiones-scores" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel explicativo de pisos -->
+    <div class="max-w-7xl mx-auto mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-600"></i> ¿Qué es un piso?</h2>
+        <p class="text-sm text-slate-500 mb-4 max-w-3xl">Un <strong>piso</strong> es una condición excluyente: si no se cumple, el dictamen es No-Go sin importar qué tan alto sea el puntaje global. Son 5 subcriterios "0 = No-Go", más el bloque de Salud Financiera (promedio &lt; 2) y los 3 subcriterios SSMA excluyentes (≤ 1 = No-Go), que en conjunto viven dentro del Gate Nivel 1.</p>
+        <div id="pisos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"></div>
+    </div>
+
+    <p class="max-w-7xl mx-auto text-center text-xs text-slate-400 mt-6 pb-4">Herramienta de simulación — refleja la estructura y los pesos reales de la Matriz Unificada v4.1. El cálculo de puntaje por evidencia (checkbox → 0-5) es una simplificación pedagógica; el archivo real usa fórmulas y tablas de conversión propias por subcriterio.</p>
+
+    <script>
+        const DATA = {"dimensiones":{"I":{"nombre":"GOBERNANZA, CUMPLIMIENTO E INTEGRIDAD","peso":10,"subs":[{"id":"1.1","nombre":"Conformación legal, radicación y arraigo provincial","peso":4,"piso":null,"items":[{"id":"J.1","texto":"¿Presenta el Estatuto o contrato social inscripto?","gate":null,"entregable":"contrato social/estatuto inscripto"},{"id":"J.2","texto":"¿Presenta el acta de designación de autoridades vigente + DNI de los socios?","gate":null,"entregable":"acta de designación de socios + DNI"},{"id":"J.3","texto":"¿Presenta constancia de inscripción ante AFIP?","gate":null,"entregable":"constancia de inscripción AFIP"},{"id":"J.35","texto":"¿Tiene domicilio legal, fiscal y un establecimiento operativo habilitado en San Juan, con una antigüedad mínima de 12 meses?","gate":null,"entregable":"constancia de domicilio fiscal AFIP y habilitación municipal/provincial del establecimiento"},{"id":"J.36","texto":"¿Está inscripto en el RE.PRO.MIN. (Registro Provincial de Proveedores Mineros) y, si corresponde por la actividad, en el Registro Provincial de Constructores?","gate":null,"entregable":"constancia de inscripción vigente en el/los registro(s) que correspondan"}]},{"id":"1.2","nombre":"Estructura de gobierno, roles y decisión","peso":3,"piso":null,"items":[{"id":"J.4","texto":"¿Cuenta con organigrama institucional o de la empresa?","gate":null,"entregable":"organigrama institucional"},{"id":"J.5","texto":"¿Cuenta con Matriz de Contactos y Puntos de Escalamiento del proyecto?","gate":null,"entregable":"listado formal de contactos"},{"id":"J.6","texto":"¿Cuenta con Poder de Representación o matriz de asignación de responsabilidades?","gate":null,"entregable":"declaración jurada, anexo técnico o copia de poderes firmados"}]},{"id":"1.3","nombre":"Integridad, cumplimiento laboral-sindical y libre conflictividad","peso":3,"piso":"0 = No-Go","items":[{"id":"J.7","texto":"¿Presenta Certificado de Libre Deuda Previsional emitido por AFIP?","gate":null,"entregable":"Certificado de Libre Deuda Previsional"},{"id":"J.8","texto":"¿Presenta Certificado de Libre Conflictividad de la Subsecretaría de Trabajo de San Juan?","gate":null,"entregable":"certificado original"},{"id":"J.9","texto":"¿Presenta el último Formulario 931 con constancia de pago?","gate":null,"entregable":"último pago del F.931"},{"id":"J.37","texto":"¿Presenta Certificado de Libre Deuda Sindical (distinto del previsional)?","gate":null,"entregable":"Certificado de Libre Deuda Sindical vigente"},{"id":"J.38","texto":"¿Presenta DDJJ de antecedentes de huelgas o bloqueos en contratos previos (últimos 2 años) y confirma encuadre sindical (UOCRA/Camioneros según corresponda) al día?","gate":null,"entregable":"declaración jurada de antecedentes de huelgas/bloqueos de los últimos 2 años + constancia de encuadre sindical al día"}]}]},"II":{"nombre":"SALUD FINANCIERA","peso":15,"subs":[{"id":"2.1","nombre":"Solvencia, liquidez y capital de trabajo","peso":5,"piso":null,"items":[{"id":"J.10","texto":"¿Presenta los últimos 2 estados contables legalizados por el Consejo Profesional de Ciencias Económicas?","gate":null,"entregable":"últimos 2 EECC legalizados por el CPCE"},{"id":"J.11","texto":"¿Presenta el detalle de ventas y compras post-balance (según libro IVA)?","gate":null,"entregable":"detalle de ventas y compras post-balance"},{"id":"J.12","texto":"¿Presenta las últimas 6 declaraciones juradas de IVA e IIBB?","gate":null,"entregable":"6 DDJJ de IVA e IIBB"}]},{"id":"2.2","nombre":"Capacidad de endeudamiento / financiamiento de flota","peso":6,"piso":"0 = No-Go","items":[{"id":"J.13","texto":"Situación BCRA (Central de Deudores) de la empresa y de los socios individualmente — indicar la peor situación (1 a 5).","gate":null,"entregable":"informe del BCRA de la empresa y los socios individualmente"},{"id":"J.14","texto":"¿Presenta manifestación de bienes de los socios, certificada por el CPCE?","gate":null,"entregable":"manifestación de bienes de los socios"}]},{"id":"2.3","nombre":"Comportamiento de pago e historial crediticio","peso":4,"piso":null,"items":[{"id":"J.15","texto":"¿Presenta el último informe comercial tipo VERAZ o NOSIS de la firma?","gate":null,"entregable":"informe tipo Veraz o Nosis"},{"id":"J.33","texto":"¿Acepta ser sujeto de auditoría financiera, técnica y de flota por la consultora designada?","gate":null,"entregable":"Aceptación expresa de auditoría financiera, técnica y de flota"}]}]},"III":{"nombre":"RRHH Y RÉGIMEN LABORAL","peso":15,"subs":[{"id":"3.1","nombre":"Dotación, estabilidad y escalabilidad a 45/17","peso":4,"piso":null,"items":[{"id":"J.16","texto":"Cantidad de empleados en relación de dependencia, según el último F.931.","gate":null,"entregable":"Nómina del personal declarada en el último F.931"},{"id":"J.17","texto":"¿Presenta libro de sueldo digital o planilla de altas tempranas de AFIP?","gate":null,"entregable":"libro de sueldo digital del último mes"}]},{"id":"3.2","nombre":"Experiencia y habilitaciones del personal operativo","peso":4,"piso":null,"items":[{"id":"J.18","texto":"¿Presenta CV de los operarios clave?","gate":null,"entregable":"Curriculum Vitae de los operarios clave"},{"id":"J.19","texto":"¿Presenta carnet de conducir profesional / Tarjeta de IERIC del personal?","gate":null,"entregable":"Carnet de conducir profesional / Tarjeta de IERIC"}]},{"id":"3.3","nombre":"Liderazgo operativo en campo","peso":3,"piso":null,"items":[{"id":"J.20","texto":"¿Presenta CV del jefe de obra, capataces y supervisor fijo en sitio?","gate":null,"entregable":"CV del jefe de obra, capataces y supervisor que está fijo en sitio"}]},{"id":"3.4","nombre":"Roster 14x7 UOCRA y reemplazo en 24 h","peso":4,"piso":"0 = No-Go","items":[{"id":"J.21","texto":"Esquema de Roster 14x7 / diagrama de turnos propuesto (describir).","gate":null,"entregable":"Plan de Roster / diagrama de turnos propuestos"},{"id":"J.22","texto":"¿Presenta procedimiento logístico de transporte del personal?","gate":null,"entregable":"Procedimiento logístico de transporte"},{"id":"J.23","texto":"¿Presenta listado de personal de back-up vigente, listo para ingresar?","gate":null,"entregable":"Listado de Personal de Back-up vigentes listos para ingresar"},{"id":"J.32","texto":"Tiempo estimado de cobertura de una vacante (horas).","gate":null,"entregable":"Registro del tiempo de cobertura de una vacante (horas)"}]}]},"IV":{"nombre":"EXPERIENCIA TÉCNICA","peso":18,"subs":[{"id":"4.1","nombre":"Mantenimiento de caminos no pavimentados","peso":7,"piso":null,"items":[{"id":"Q4.1","texto":"¿Cuántos años de experiencia en mantenimiento vial de caminos no pavimentados posee la empresa?","gate":null,"entregable":"Contratos o actas de recepción de mantenimiento vial o similar"},{"id":"Q4.2","texto":"¿Posee experiencia en estabilización de suelos (bischofita, cloruro de calcio/sodio, cal, enzimas, etc.)? Indique cantidad de proyectos.","gate":null,"entregable":"Contratos y fichas técnicas del producto o tratamiento aplicado"},{"id":"Q4.3","texto":"¿Cuántos km de caminos no pavimentados mantuvo la empresa en los últimos 5 años?","gate":null,"entregable":"Contratos con detalle de tramos y kilometraje"},{"id":"Q4.4","texto":"¿Posee experiencia en perfilado o conformación con motoniveladora y control de polvo (riego o supresores)?","gate":null,"entregable":"Registros de obra, fotos, informes técnicos"}]},{"id":"4.2","nombre":"Industria minera y alta montaña","peso":5,"piso":"0 = No-Go","items":[{"id":"Q4.5","texto":"¿La empresa posee experiencia trabajando para la industria minera? Indique antigüedad.","gate":null,"entregable":"Contratos u órdenes de compra con empresas mineras"},{"id":"Q4.6","texto":"¿A qué altitud máxima (msnm) ha operado la empresa de forma sostenida?","gate":null,"entregable":"Contratos, ubicación de obras, informes de operación"},{"id":"Q4.7","texto":"¿Cuántos contratos con empresas mineras ejecutó en los últimos 5 años?","gate":null,"entregable":"Listado de contratos con referencias verificables"}]},{"id":"4.3","nombre":"Vialidad invernal y operativos nocturnos","peso":2,"piso":null,"items":[{"id":"Q4.8","texto":"¿Posee experiencia en vialidad invernal (despeje de nieve y/o control de hielo)?","gate":null,"entregable":"Contratos o actas de servicios invernales"},{"id":"Q4.9","texto":"¿Ha operado en condiciones de nieve/hielo y temperaturas bajo cero, con esquema de respuesta (guardias 24/7)?","gate":null,"entregable":"Registros de operación invernal, planillas de guardia"}]},{"id":"4.4","nombre":"Experiencia del equipo humano (operadores y personal clave)","peso":4,"piso":null,"items":[{"id":"Q4.10","texto":"¿Cuántos años de experiencia promedio tienen los operadores de equipos de movimiento de suelo?","gate":null,"entregable":"Legajos/CV de operadores, constancias laborales"},{"id":"Q4.11","texto":"¿Cuántos operadores certificados/habilitados para equipos de movimiento de suelo posee?","gate":null,"entregable":"Certificados/licencias de habilitación vigentes"},{"id":"Q4.12","texto":"¿Cuántos años de experiencia tiene el responsable técnico / jefe de obra en caminos no pavimentados?","gate":null,"entregable":"CV + matrícula profesional (si aplica)"},{"id":"Q4.13","texto":"¿Cuenta con programa de capacitación/inducción del personal (seguridad y técnica) documentado?","gate":null,"entregable":"Programa de capacitación + registros de asistencia"}]}]},"V":{"nombre":"FLOTA, CAPACIDAD MECÁNICA Y REPUESTOS","peso":20,"subs":[{"id":"5.1","nombre":"Flota disponible vs. flota mínima","peso":8,"piso":"0 = No-Go","items":[{"id":"Q5.2","texto":"¿Posee equipos para mantenimiento de camino en operativo estival?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo estival"},{"id":"Q5.36","texto":"¿Posee equipos para mantenimiento de camino en operativo invierno?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo invernal"}]},{"id":"5.2","nombre":"Estado técnico, antigüedad y radicación de la flota","peso":5,"piso":null,"items":[{"id":"Q5.1","texto":"¿El 100% de la flota (propia o alquilada) está registrada y tributando en San Juan?","gate":null,"entregable":"Constancia de registro y tributación provincial de cada unidad"},{"id":"Q5.43","texto":"¿Bajo qué modalidad realiza el mantenimiento de sus equipos?","gate":null,"entregable":"Registro de mantenimiento de los vehículos"}]},{"id":"5.3","nombre":"Taller, repuestos en zona y respuesta 48 h","peso":5,"piso":null,"items":[{"id":"Q5.44","texto":"Disponibilidad de taller en zona — cantidad de presupuestos de proveedores presentados.","gate":null,"entregable":"Presupuesto de taller en zona"},{"id":"Q5.45","texto":"Disponibilidad de repuestos en zona — cantidad de presupuestos de proveedores presentados.","gate":null,"entregable":"Presupuesto de repuestos en zona"},{"id":"Q5.46","texto":"Disponibilidad de piezas de desgaste en zona (neumáticos, cuchillas, uñas, tren de rodaje) — cantidad de presupuestos de proveedores presentados.","gate":null,"entregable":"Presupuesto de piezas de desgaste en zona (neumáticos, cuchillas, orugas)"},{"id":"Q5.47","texto":"Disponibilidad de filtros y lubricantes en zona — cantidad de presupuestos de proveedores presentados.","gate":null,"entregable":"Presupuesto de filtros y lubricantes en zona"}]},{"id":"5.4","nombre":"Capacidad técnica-mecánica propia","peso":2,"piso":null,"items":[{"id":"Q5.48","texto":"¿Cuenta con servicio mecánico propio o banco de mecánicos a disposición para el primer diagnóstico ante fallas o roturas?","gate":null,"entregable":"Legajos/CV de mecánicos, constancias laborales"}]}]},"VI":{"nombre":"SSMA OPERACIONAL","peso":14,"subs":[{"id":"6.1","nombre":"Responsabilidad profesional SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.3","texto":"¿Cuenta con Profesional de Higiene y Seguridad matriculado en la provincia de San Juan?","gate":"n1","entregable":"matrícula profesional vigente emitida por el Consejo de Profesionales de Higiene y Seguridad en el Trabajo de San Juan"},{"id":"G.4","texto":"¿El profesional de Higiene y Seguridad posee experiencia mínima de cuatro (4) años en minería, obras viales o alta montaña?","gate":"n1","entregable":"CV y antecedentes laborales"},{"id":"G.5","texto":"¿Cuenta con técnicos de Higiene y Seguridad disponibles para supervisión en campo, de acuerdo con la magnitud, duración, cantidad de frentes de trabajo, cantidad de personal y riesgos de la obra?","gate":"n1","entregable":"nómina del equipo HSE disponible y CV"},{"id":"G.6","texto":"Si no cuenta actualmente con la totalidad del equipo técnico requerido, ¿presenta compromiso formal de contratación o disponibilidad de técnicos de Higiene y Seguridad antes del inicio de las tareas?","gate":"n1","entregable":"nota de compromiso, propuesta de servicio, cotización, preacuerdo o planificación de incorporación del personal técnico"},{"id":"G.7","texto":"¿Cuenta con Legajo Técnico de Obra actualizado y disponible para consulta?","gate":"n1","entregable":"índice del Legajo Técnico o evidencia de disponibilidad documental"}]},{"id":"6.2","nombre":"Sistema de gestión SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.1","texto":"¿La empresa cuenta con cobertura vigente de ART para el 100% del personal afectado al servicio?","gate":"n1","entregable":"póliza o constancia de afiliación vigente de ART"},{"id":"G.2","texto":"¿La empresa cuenta con seguros vigentes aplicables a la actividad (Responsabilidad Civil, automotor, equipos y otros según corresponda)?","gate":"n1","entregable":"pólizas vigentes y comprobantes de cobertura"},{"id":"G.8","texto":"¿La empresa cuenta con Programa de Seguridad aprobado o vigente, acorde al alcance de las tareas a ejecutar?","gate":"n1","entregable":"Programa de Seguridad y constancia de presentación/aprobación si corresponde"},{"id":"G.9","texto":"¿Cuenta con Política de Higiene, Seguridad, Salud Ocupacional y Ambiente?","gate":"n1","entregable":"política vigente, firmada y difundida"},{"id":"G.10","texto":"¿Cuenta con procedimientos de trabajo seguro aplicables a las tareas (mínimo tres), incluyendo aspectos de ambiente, higiene y seguridad?","gate":"n1","entregable":"como mínimo tres procedimientos aplicables a las actividades declaradas"},{"id":"G.11","texto":"¿Cuenta con checklist preoperacional diario para vehículos, maquinaria vial y equipos auxiliares?","gate":"n1","entregable":"modelos de checklist preoperacional y registros disponibles"},{"id":"G.12","texto":"¿La empresa cuenta con Matriz IPERC, IPER u otra metodología documentada de identificación de peligros, evaluación de riesgos y determinación de controles?","gate":"n1","entregable":"matriz de riesgos vigente"},{"id":"G.13","texto":"¿Cuenta con procedimiento de señalización, delimitación y control de tránsito durante tareas de mantenimiento vial?","gate":"n1","entregable":"procedimiento, croquis tipo, cartelería, conos, balizas, banderilleros y sistema de comunicación"},{"id":"G.14","texto":"¿Cuenta con protocolo de trabajo ante condiciones climáticas adversas?","gate":"n1","entregable":"protocolo por viento, nieve, hielo, tormenta eléctrica, baja visibilidad, frío extremo o crecidas"},{"id":"G.15","texto":"¿Cuenta con plan de mantenimiento preventivo de vehículos, maquinaria vial y equipos críticos?","gate":"n1","entregable":"plan de mantenimiento, registros de servicios, inspecciones técnicas y control de fallas críticas"},{"id":"G.16","texto":"¿Cuenta con documentación habilitante de vehículos, maquinaria y operadores/conductores?","gate":"n1","entregable":"licencia de conducir, habilitaciones, RTO/RTO minera si aplica, seguro, cédula, certificados de operador y aptos médicos"},{"id":"G.21","texto":"¿Cuenta con Plan Anual de Capacitación en seguridad, salud y ambiente?","gate":"n1","entregable":"plan anual de capacitación"},{"id":"G.22","texto":"¿Cuenta con Plan de Contingencias para incendio, derrame, sismo, accidente vehicular, clima adverso u otras emergencias?","gate":"n1","entregable":"Plan de Contingencia"},{"id":"G.23","texto":"¿La empresa cuenta con sistema de traslado médico-sanitario o cobertura de asistencia ante emergencias?","gate":"n1","entregable":"contrato, convenio, cobertura médica, servicio de ambulancia o cotización vigente"},{"id":"G.25","texto":"¿La empresa cuenta con Servicio de Medicina Laboral vigente o cobertura equivalente acorde a su actividad y dotación?","gate":"n1","entregable":"contrato de servicio de Medicina Laboral o cotización del servicio"},{"id":"G.28","texto":"¿Cuenta con evaluación de aptitud médica del personal expuesto a tareas en alta montaña, conducción u operación de equipos?","gate":"n1","entregable":"certificado de aptitud médica del personal expuesto"}]},{"id":"6.3","nombre":"Índice de siniestralidad","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.24","texto":"¿Cuenta con Índice de Siniestralidad de los últimos tres años emitido por la ART?","gate":"n1","entregable":"índice emitido por la ART"},{"id":"G.26","texto":"¿Cuenta con Nómina de Trabajadores Expuestos a Agentes de Riesgo (RAR) vigente?","gate":"n1","entregable":"RAR/NTE vigente o constancia de presentación ante la ART"},{"id":"G.27","texto":"Si cuenta con personal expuesto declarado en el RAR, ¿se realizan los monitoreos, estudios o controles correspondientes?","gate":"n1","entregable":"mediciones o monitoreos"}]},{"id":"6.4","nombre":"Gestión ambiental y legalidad de suministros","peso":3,"piso":null,"items":[{"id":"G.29","texto":"¿Cuenta con Profesional Ambiental o asesoramiento ambiental competente?","gate":"n2","entregable":"CV, contrato o cotización del servicio"},{"id":"G.30","texto":"¿Cuenta con plan de gestión de residuos, incluyendo residuos peligrosos generados?","gate":"n2","entregable":"procedimiento de gestión de residuos, manifiestos, registros de retiro o contrato con operador habilitado, si corresponde"},{"id":"G.33","texto":"¿El ripio y los áridos utilizados en los caminos provienen de fuentes 100% legales (canteras habilitadas), evitando la exposición a multas solidarias y garantizando la sustentabilidad legal de los suministros?","gate":"n2","entregable":"Listado de canteras habilitadas utilizadas y constancia de habilitación de cada una"}]},{"id":"6.5","nombre":"Equipamiento (EPP, extintores, kit antiderrame, operativo invierno)","peso":2,"piso":null,"items":[{"id":"G.17","texto":"¿Cuenta con registros de entrega de Elementos de Protección Personal?","gate":"n2","entregable":"registros de entrega de EPP"},{"id":"G.18","texto":"¿Los Elementos de Protección Personal cuentan con certificación, declaración de conformidad, ficha técnica o respaldo del fabricante/proveedor?","gate":"n2","entregable":"certificados, declaraciones de conformidad, fichas técnicas o documentación del proveedor"},{"id":"G.19","texto":"¿Cuenta con EPP y ropa de trabajo adecuados para operativo invierno en alta montaña?","gate":"n2","entregable":"stock, registros de entrega, fichas técnicas o cotización de EPP y ropa de invierno"},{"id":"G.20","texto":"¿Valora la compra de EPP y ropa de trabajo a proveedores locales?","gate":"n2","entregable":"cotización de dos proveedores locales"},{"id":"G.31","texto":"¿La empresa cuenta con equipamiento disponible para respuesta ante contingencias (kit antiderrame, extintores, botiquín, elementos de señalización y otros según riesgo)?","gate":"n2","entregable":"inventario, registro de inspección o evidencia del equipamiento"},{"id":"G.32","texto":"¿Dispone de medios de comunicación vehicular y operativa para zonas de alta montaña (radio, VHF, Starlink, telefonía satelital u otros)?","gate":"n2","entregable":"registro de equipos de comunicación disponibles"}]}]},"VII":{"nombre":"DESARROLLO COMUNITARIO Y ASOCIATIVISMO","peso":8,"subs":[{"id":"7.1","nombre":"Empleo local y plan de calificación","peso":3,"piso":null,"items":[{"id":"J.24","texto":"¿Presenta declaración jurada de la nómina de personal asignado al proyecto, detallando domicilio real y lugar de residencia?","gate":null,"entregable":"DDJJ de la nómina con domicilio real, para validar el % de mano de obra comunitaria/departamental"},{"id":"J.34","texto":"% del personal domiciliado en Iglesia/Jáchal.","gate":null,"entregable":"Declaración del % de personal domiciliado en Iglesia/Jáchal"},{"id":"J.39","texto":"¿Garantiza que al menos el 80% de la nómina afectada al servicio sean trabajadores radicados en la provincia de San Juan (DNI y residencia efectiva ≥12 meses)?","gate":null,"entregable":"DNI y constancia de residencia efectiva (≥12 meses) del personal afectado"},{"id":"J.40","texto":"¿Aplica un orden de preferencia geográfica que priorice, en primer lugar, a las comunidades del área de influencia directa (Iglesia/Jáchal) al momento de contratar?","gate":null,"entregable":"procedimiento o política de contratación que documente el orden de prioridad geográfica declarado"},{"id":"J.25","texto":"¿Presenta plan anual de capacitación o programa de formación/calificación técnica para personal de la comunidad?","gate":null,"entregable":"Plan anual de capacitación o programa de formación/calificación técnica destinado al personal de la comunidad o zonas de influencia directa"}]},{"id":"7.2","nombre":"Compre local y subproveedores","peso":1,"piso":null,"items":[{"id":"J.26","texto":"¿Presenta política interna o procedimiento documentado de abastecimiento y contratación de bienes/servicios locales?","gate":null,"entregable":"Política interna o procedimiento documentado de abastecimiento y contratación de bienes/servicios locales"},{"id":"J.27","texto":"¿Presenta listado de subproveedores, talleres, comercios o servicios logísticos de la zona a integrar?","gate":null,"entregable":"Listado de subproveedores, talleres, comercios o servicios logísticos de la zona que planea integrar en su cadena de suministro"}]},{"id":"7.3","nombre":"Asociativismo / UTE","peso":2,"piso":null,"items":[{"id":"J.28","texto":"En caso de consorcio o alianza: ¿presenta Contrato de Unión Transitoria (UT) o acuerdo de colaboración inscripto, con el % de participación de cada firma?","gate":null,"entregable":"Contrato de Unión Transitoria (UT) o acuerdo de colaboración empresarial inscripto"},{"id":"J.29","texto":"En caso de empresa individual: ¿presenta registro de convenios vigentes con cámaras comerciales, cooperativas, universidades u organizaciones de la comunidad?","gate":null,"entregable":"Registro de convenios vigentes con cámaras comerciales locales, cooperativas de trabajo, universidades u organizaciones de la comunidad"}]},{"id":"7.4","nombre":"Apertura al acompañamiento y velocidad de mejora","peso":2,"piso":null,"items":[{"id":"J.30","texto":"¿Presenta historial de auditorías o evaluaciones de desempeño previas, con los Planes de Acción o Mejora implementados ante desvíos?","gate":null,"entregable":"Historial de auditorías o evaluaciones de desempeño previas y los correspondientes Planes de Acción o Planes de Mejora implementados"},{"id":"J.31","texto":"¿Presenta carta de compromiso gerencial firmada aceptando los procesos de auditoría social, ambiental y operativa?","gate":null,"entregable":"Carta de compromiso gerencial firmada donde acepte los procesos de auditoría social, ambiental y operativa que disponga la organización"}]}]}},"empresas":{"vialidad":{"nombre":"Vialidad Cuyana SRL","cuit":"30-71234567-8","localidad":"Rodeo, Iglesia","resultado_real":"GO — 86,2 pts (Sesión de datos de prueba)","regularUnchecked":[],"gateN2Unchecked":[],"gateDiscrepancias":{}},"transportes":{"nombre":"Transportes del Norte SA","cuit":"30-70987654-3","localidad":"Jáchal","resultado_real":"GO CON PLAN DE ACCIÓN — 57,8 pts (Sesión de datos de prueba)","regularUnchecked":["J.35","J.36","J.37","J.11","J.12","J.14","J.15","J.17","J.19","J.22","J.23","Q4.2","Q4.3","Q4.6","Q4.8","Q4.11","Q4.12","Q5.36","Q5.43","Q5.44","Q5.45","J.34","J.39","J.40","J.27","J.29","J.31"],"gateN2Unchecked":["G.19","G.31","G.33"],"gateDiscrepancias":{}},"cordillera":{"nombre":"Constructora Cordillera SRL","cuit":"30-69123456-1","localidad":"Las Flores, Jáchal","resultado_real":"NO-GO — Gate HSE, ART vencida (Sesión de datos de prueba)","regularUnchecked":[],"gateN2Unchecked":[],"gateDiscrepancias":{"G.1":"Declaró ART vigente; en la visita la póliza exhibida estaba vencida 40 días."}},"oeste":{"nombre":"Servicios Viales del Oeste SA","cuit":"30-68456789-2","localidad":"Angualasto, Iglesia","resultado_real":"NO-GO — Flota mínima, 5.1 = 0 (Sesión de datos de prueba)","regularUnchecked":["Q5.2","Q5.36"],"gateN2Unchecked":[],"gateDiscrepancias":{}}}};
+
+        const DIM_ORDER = ["I","II","III","IV","V","VI","VII"];
+
+        // Estado de cada ítem: { declarado: bool, verificado: bool }. Para ítems no-Gate, ambos valores se mantienen iguales.
+        const state = {};
+        function inicializarEstado() {
+            DIM_ORDER.forEach(dim => {
+                DATA.dimensiones[dim].subs.forEach(sub => {
+                    sub.items.forEach(it => {
+                        state[it.id] = { declarado: true, verificado: true };
+                    });
+                });
+            });
+        }
+
+        const PISOS_INFO = [
+            { id: "1.3", label: "1.3 · Integridad y libre conflictividad", regla: "Puntaje = 0", detalle: "Dimensión I. Sin certificados de conflictividad/deuda sindical en regla." },
+            { id: "2.2", label: "2.2 · Endeudamiento / financiamiento de flota", regla: "Puntaje = 0", detalle: "Dimensión II. Sin capacidad demostrable de financiar la flota exigida." },
+            { id: "3.4", label: "3.4 · Roster 14x7 y reemplazo 24 h", regla: "Puntaje = 0", detalle: "Dimensión III. Sin esquema de turnos ni back-up ante ausencias." },
+            { id: "4.2", label: "4.2 · Industria minera y alta montaña", regla: "Puntaje = 0", detalle: "Dimensión IV. Sin experiencia previa en minería o alta montaña." },
+            { id: "5.1", label: "5.1 · Flota disponible vs. mínima", regla: "Puntaje = 0", detalle: "Dimensión V. No alcanza la flota mínima exigida por el pliego." },
+            { id: "FIN", label: "Salud Financiera (2.1–2.3)", regla: "Promedio < 2", detalle: "Dimensión II completa. Insolvencia estructural, no un único documento." },
+            { id: "SSMA", label: "SSMA excluyente (6.1 / 6.2 / 6.3)", regla: "Puntaje ≤ 1", detalle: "Dimensión VI, alimentados por el Gate Nivel 1. Higiene y seguridad por debajo del mínimo aceptable." },
+            { id: "GATE1", label: "Gate Nivel 1 completo (24 ítems)", regla: "1 solo 'No' verificado", detalle: "Cualquier ítem de los 24 excluyentes produce No-Go inmediato, sin promediar con nada." },
+        ];
+
+        // Definición ordenada de la cascada real del dictamen (16 pasos del archivo, resumidos)
+        function evaluarCascada() {
+            const auditoria = document.getElementById("chk-auditoria").checked;
+            const elegible = document.getElementById("chk-elegibilidad").checked;
+
+            const gateN1Items = itemsGate("n1");
+            const gateN1Fail = gateN1Items.some(it => !state[it.id].verificado);
+
+            const finProm = promedioFinanciero();
+            const ssmaMin = Math.min(getScoreSub("6.1"), getScoreSub("6.2"), getScoreSub("6.3"));
+
+            const s51 = getScoreSub("5.1"), s42 = getScoreSub("4.2"), s34 = getScoreSub("3.4"),
+                  s22 = getScoreSub("2.2"), s13 = getScoreSub("1.3");
+
+            const global = getPuntajeGlobal();
+
+            const pasos = [
+                { label: "Gate Nivel 1 (24 ítems)", ok: !gateN1Fail, detalle: gateN1Fail ? "Al menos 1 ítem verificado en 'No'" : "24/24 verificados en 'Sí'", detiene: gateN1Fail },
+                { label: "Consentimiento de auditoría", ok: auditoria, detalle: auditoria ? "Aceptado" : "Rechazado → No-Go", detiene: !auditoria },
+                { label: "Elegibilidad geográfica", ok: elegible, detalle: elegible ? "Dentro del área" : "Fuera de Iglesia/Jáchal → No-Go", detiene: !elegible },
+                { label: "Salud Financiera (prom. 2.1–2.3)", ok: finProm >= 2, detalle: `Promedio ${finProm.toFixed(1)} / 5 (piso: 2,0)`, detiene: finProm < 2 },
+                { label: "SSMA excluyente (6.1/6.2/6.3)", ok: ssmaMin > 1, detalle: `Mínimo de los 3: ${ssmaMin} pts (piso: >1)`, detiene: ssmaMin <= 1 },
+                { label: "5.1 Flota mínima", ok: s51 > 0, detalle: `${s51} / 5 pts`, detiene: s51 === 0 },
+                { label: "4.2 Alta montaña", ok: s42 > 0, detalle: `${s42} / 5 pts`, detiene: s42 === 0 },
+                { label: "3.4 Roster 14x7", ok: s34 > 0, detalle: `${s34} / 5 pts`, detiene: s34 === 0 },
+                { label: "2.2 Endeudamiento", ok: s22 > 0, detalle: `${s22} / 5 pts`, detiene: s22 === 0 },
+                { label: "1.3 Integridad", ok: s13 > 0, detalle: `${s13} / 5 pts`, detiene: s13 === 0 },
+                { label: "Puntaje global ≥ 55", ok: global >= 55, detalle: `${global.toFixed(1)} / 100`, detiene: global < 55 },
+                { label: "Puntaje global ≥ 70", ok: global >= 70, detalle: global >= 70 ? "Sin brechas de puntaje" : "Banda 55–69,9 → Plan de Acción", detiene: false, informativo: global < 70 },
+            ];
+
+            let resultado, tipo;
+            for (const p of pasos) {
+                if (p.detiene) { resultado = p.label; tipo = "nogo"; break; }
+            }
+            if (!resultado) {
+                if (global < 55) { resultado = "Puntaje global insuficiente"; tipo = "nogo"; }
+                else if (global < 70) { resultado = "GO CON PLAN DE ACCIÓN"; tipo = "pai"; }
+                else { resultado = "GO"; tipo = "go"; }
+            }
+            return { pasos, resultado, tipo, global };
+        }
+
+        function findSub(subId) {
+            for (const dim of DIM_ORDER) {
+                const s = DATA.dimensiones[dim].subs.find(x => x.id === subId);
+                if (s) return s;
+            }
+            return null;
+        }
+
+        function itemsGate(tipo) {
+            let out = [];
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => {
+                sub.items.forEach(it => { if (it.gate === tipo) out.push(it); });
+            }));
+            return out;
+        }
+
+        function getScoreSub(subId) {
+            const sub = findSub(subId);
+            if (!sub || sub.items.length === 0) return 0;
+            const checked = sub.items.filter(it => state[it.id].verificado).length;
+            return Math.round((checked / sub.items.length) * 5);
+        }
+
+        function promedioFinanciero() {
+            return (getScoreSub("2.1") + getScoreSub("2.2") + getScoreSub("2.3")) / 3;
+        }
+
+        function getScoreDimension(dim) {
+            const subs = DATA.dimensiones[dim].subs;
+            const suma = subs.reduce((acc, s) => acc + getScoreSub(s.id), 0);
+            return suma / subs.length;
+        }
+
+        function getPuntajeGlobal() {
+            let total = 0;
+            DIM_ORDER.forEach(dim => {
+                total += (getScoreDimension(dim) / 5) * DATA.dimensiones[dim].peso;
+            });
+            return total;
+        }
+
+        function contarDiscrepancias() {
+            let n = 0;
+            [...itemsGate("n1"), ...itemsGate("n2")].forEach(it => {
+                if (state[it.id].declarado !== state[it.id].verificado) n++;
+            });
+            return n;
+        }
+
+        function colorScore(v) {
+            if (v >= 4) return "text-green-600";
+            if (v >= 2) return "text-yellow-600";
+            return "text-red-600";
+        }
+        function bgScore(v) {
+            if (v >= 4) return ["bg-green-50", "border-green-300"];
+            if (v >= 2) return ["bg-yellow-50", "border-yellow-300"];
+            return ["bg-red-50", "border-red-300"];
+        }
+        function ledClass(v) {
+            if (v >= 4) return "led-green";
+            if (v >= 2) return "led-yellow";
+            return "led-red";
+        }
+
+        function recalcular() {
+            // 1) Refrescar cada caja de puntaje por subcriterio + discrepancias visibles
+            DIM_ORDER.forEach(dim => {
+                DATA.dimensiones[dim].subs.forEach(sub => {
+                    const score = getScoreSub(sub.id);
+                    const val = document.getElementById(`val-${sub.id}`);
+                    const box = document.getElementById(`box-${sub.id}`);
+                    if (val) val.innerText = score;
+                    if (box) {
+                        const [bg, border] = bgScore(score);
+                        box.className = `p-3 rounded-xl border text-center w-full md:w-28 flex-shrink-0 flex flex-col justify-center transition-colors duration-300 ${bg} ${border}`;
+                        val.className = `text-2xl font-black mono transition-colors duration-300 ${colorScore(score)}`;
+                    }
+                    // Chequear discrepancia por item dentro de este subcriterio
+                    sub.items.forEach(it => {
+                        const badge = document.getElementById(`disc-${it.id}`);
+                        if (badge) {
+                            const disc = state[it.id].declarado !== state[it.id].verificado;
+                            badge.classList.toggle("hidden", !disc);
+                        }
+                    });
+                });
+
+                const scoreDim = getScoreDimension(dim);
+                const elDim = document.getElementById(`score-dim-${dim}`);
+                if (elDim) { elDim.innerText = scoreDim.toFixed(1); elDim.className = `font-black mono transition-colors ${colorScore(scoreDim)}`; }
+                const led = document.getElementById(`dim-led-${dim}`);
+                if (led) led.className = `w-3.5 h-3.5 rounded-full mr-2 transition-colors duration-300 flex-shrink-0 ${ledClass(scoreDim)}`;
+            });
+
+            // 2) Cascada + dictamen
+            const { pasos, resultado, tipo, global } = evaluarCascada();
+            document.getElementById("puntaje-total").innerText = global.toFixed(1);
+            document.getElementById("puntaje-total").className = `text-6xl font-black mono mb-1 transition-colors duration-500 ${tipo === "go" ? "text-green-600" : tipo === "pai" ? "text-yellow-600" : "text-red-700"}`;
+
+            const badge = document.getElementById("dictamen-badge");
+            const cfgBadge = {
+                go: ["bg-green-600 text-white border border-green-700", "GO — " + global.toFixed(1) + " PTS"],
+                pai: ["bg-yellow-500 text-white border border-yellow-600", "GO CON PLAN DE ACCIÓN — " + global.toFixed(1) + " PTS"],
+                nogo: ["bg-red-700 text-white", "NO-GO — " + resultado.toUpperCase()],
+            }[tipo];
+            badge.className = `px-4 py-3 rounded-lg text-base font-bold w-full shadow-inner transition-all duration-300 ${cfgBadge[0]}`;
+            badge.innerText = cfgBadge[1];
+
+            const nDisc = contarDiscrepancias();
+            const discBox = document.getElementById("discrepancias-resumen");
+            discBox.innerHTML = nDisc === 0
+                ? `<span class="text-slate-400">Sin discrepancias declarado/verificado.</span>`
+                : `<span class="text-amber-700 font-bold">⚠ ${nDisc} discrepancia(s) declarado ≠ verificado</span>`;
+
+            // 3) Cascada visual
+            const casc = document.getElementById("cascada-container");
+            let yaDetuvo = false;
+            casc.innerHTML = pasos.map(p => {
+                let estado = "pend";
+                if (!yaDetuvo) {
+                    estado = p.ok ? "ok" : "fail";
+                    if (p.detiene) yaDetuvo = true;
+                } else {
+                    estado = "skip";
+                }
+                const iconos = {
+                    ok: '<div class="cascade-dot bg-green-100 text-green-600"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>',
+                    fail: '<div class="cascade-dot bg-red-100 text-red-600"><i data-lucide="x" class="w-3.5 h-3.5"></i></div>',
+                    skip: '<div class="cascade-dot bg-slate-100 text-slate-300"><i data-lucide="minus" class="w-3.5 h-3.5"></i></div>',
+                };
+                const textCls = estado === "skip" ? "text-slate-300" : "text-slate-700";
+                return `<div class="cascade-step">${iconos[estado]}
+                    <div class="font-semibold ${textCls}">${p.label}</div>
+                    <div class="text-slate-400 ${estado === 'skip' ? 'text-slate-300' : ''}">${p.detalle}</div>
+                </div>`;
+            }).join("");
+
+            lucide.createIcons();
+        }
+
+        function toggleAccordion(dim) {
+            const content = document.getElementById('content-' + dim);
+            const icon = document.getElementById('icon-' + dim);
+            const open = content.classList.contains('open');
+            content.classList.toggle('open', !open);
+            icon.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function onToggleRegular(id) {
+            const v = document.getElementById(`chk-${id}`).checked;
+            state[id].declarado = v; state[id].verificado = v;
+            recalcular();
+        }
+        function onToggleGate(id, field) {
+            const v = document.getElementById(`chk-${id}-${field}`).checked;
+            state[id][field] = v;
+            recalcular();
+        }
+
+        function renderItem(it) {
+            if (it.gate) {
+                const cls = it.gate === "n1" ? "gate-item" : "gate-n2-item";
+                const tagTxt = it.gate === "n1" ? "N1 · excluyente" : "N2 · brecha";
+                const tagCls = it.gate === "n1" ? "bg-accent/10 text-accent" : "bg-brand-2/10 text-brand-2";
+                return `
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 py-2.5 px-3 rounded-lg mb-2 ${cls}">
+                    <div class="flex-1 flex items-start gap-2">
+                        <span class="mono text-[10px] font-bold text-slate-400 mt-0.5">${it.id}</span>
+                        <span class="text-sm text-slate-700">${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
+                    </div>
+                    <div class="flex items-center gap-4 flex-shrink-0 pl-6 sm:pl-0">
+                        <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${tagCls} hidden md:inline-block">${tagTxt}</span>
+                        <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                            <span class="text-[9px] uppercase text-slate-400 font-bold">Declarado</span>
+                            <input type="checkbox" id="chk-${it.id}-declarado" checked class="w-4 h-4 accent-brand-2" onchange="onToggleGate('${it.id}','declarado')">
+                        </label>
+                        <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                            <span class="text-[9px] uppercase text-slate-400 font-bold">Verificado</span>
+                            <input type="checkbox" id="chk-${it.id}-verificado" checked class="w-4 h-4 accent-emerald-600" onchange="onToggleGate('${it.id}','verificado')">
+                        </label>
+                        <span id="disc-${it.id}" class="hidden text-[10px] font-bold text-amber-600 whitespace-nowrap">⚠ discrepancia</span>
+                    </div>
+                </div>`;
+            }
+            return `
+            <label class="flex items-start cursor-pointer group mb-1.5 p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                <input type="checkbox" id="chk-${it.id}" checked class="w-4 h-4 mt-0.5 mr-2.5 accent-brand flex-shrink-0" onchange="onToggleRegular('${it.id}')">
+                <span class="text-sm text-slate-700 leading-tight"><span class="mono text-[10px] text-slate-400 font-bold mr-1">${it.id}</span>${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
+            </label>`;
+        }
+
+        function renderSub(sub) {
+            const pisoBadge = sub.piso
+                ? `<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-black tracking-widest rounded uppercase">${sub.piso}</span>`
+                : "";
+            return `
+            <div class="mb-4 bg-white border border-slate-200 shadow-sm rounded-xl p-5">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div class="w-full">
+                        <div class="flex items-center mb-3 flex-wrap gap-y-1">
+                            <h4 class="font-bold text-slate-800 text-base"><span class="mono">${sub.id}</span> ${sub.nombre}</h4>
+                            <span class="ml-2 px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-md border border-slate-200 mono">${sub.peso} pts</span>
+                            ${pisoBadge}
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            ${sub.items.map(renderItem).join("")}
+                        </div>
+                    </div>
+                    <div id="box-${sub.id}" class="p-3 rounded-xl border border-red-300 bg-red-50 text-center w-full md:w-28 flex-shrink-0 flex flex-col justify-center">
+                        <span class="uppercase tracking-widest text-[9px] font-bold text-slate-500">Puntaje</span>
+                        <span class="text-2xl font-black mono text-red-700" id="val-${sub.id}">0</span>
+                        <span class="text-[9px] text-slate-400 font-bold">SOBRE 5</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderAcordeon() {
+            const cont = document.getElementById("accordion-container");
+            cont.innerHTML = DIM_ORDER.map(dim => {
+                const d = DATA.dimensiones[dim];
+                return `
+                <div class="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
+                    <button class="w-full px-5 py-3.5 text-left font-black text-slate-800 bg-white hover:bg-slate-50 flex justify-between items-center transition-colors" onclick="toggleAccordion('${dim}')">
+                        <div class="flex items-center flex-wrap gap-2">
+                            <div id="dim-led-${dim}" class="w-3.5 h-3.5 rounded-full bg-slate-300 mr-1 flex-shrink-0"></div>
+                            <span class="text-base tracking-tight font-display">${dim}. ${d.nombre}</span>
+                            <span class="px-2 py-0.5 bg-brand/10 text-brand text-xs font-bold rounded-md border border-brand/20 mono">${d.peso} pts</span>
+                        </div>
+                        <i data-lucide="chevron-down" id="icon-${dim}" class="w-5 h-5 text-slate-400 transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div id="content-${dim}" class="accordion-content bg-slate-50/50 border-t border-slate-100">
+                        <div class="p-4">${d.subs.map(renderSub).join("")}</div>
+                    </div>
+                </div>`;
+            }).join("");
+
+            document.getElementById("dimensiones-scores").innerHTML = DIM_ORDER.map(dim => {
+                const d = DATA.dimensiones[dim];
+                return `
+                <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2.5">
+                    <span class="text-slate-600 font-semibold truncate pr-2">${dim}. ${d.nombre}</span>
+                    <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-md border border-slate-200 flex-shrink-0">
+                        <span class="font-black mono text-red-600" id="score-dim-${dim}">0.0</span>
+                        <span class="text-[10px] text-slate-400 font-bold">/5</span>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        function renderPisosGrid() {
+            document.getElementById("pisos-grid").innerHTML = PISOS_INFO.map(p => `
+                <div class="border border-slate-200 rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-bold text-slate-700 text-xs">${p.label}</span>
+                        <span class="text-[10px] font-black text-red-600 bg-red-50 px-1.5 py-0.5 rounded">${p.regla}</span>
+                    </div>
+                    <p class="text-slate-500 text-xs">${p.detalle}</p>
+                </div>`).join("");
+        }
+
+        function renderEmpresaButtons() {
+            const keys = { vialidad: ["bg-green-600 hover:bg-green-700", "check-circle"], transportes: ["bg-yellow-500 hover:bg-yellow-600", "alert-triangle"], cordillera: ["bg-red-800 hover:bg-red-900", "ban"], oeste: ["bg-red-500 hover:bg-red-600", "trending-down"] };
+            const html = Object.entries(DATA.empresas).map(([key, e]) => {
+                const [cls, icon] = keys[key];
+                return `<button onclick="cargarEmpresa('${key}')" class="flex-1 md:flex-none px-3 py-2 ${cls} text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-1.5" title="${e.resultado_real}">
+                    <i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${e.nombre.split(" ")[0]}
+                </button>`;
+            }).join("");
+            document.getElementById("empresa-buttons").innerHTML = html +
+                `<button onclick="cargarEmpresa(null)" class="flex-1 md:flex-none px-3 py-2 bg-slate-500 hover:bg-slate-600 text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-1.5">
+                    <i data-lucide="square" class="w-3.5 h-3.5"></i> Vaciar todo
+                </button>`;
+        }
+
+        function cargarEmpresa(key) {
+            inicializarEstado();
+            document.getElementById("chk-auditoria").checked = true;
+            document.getElementById("chk-elegibilidad").checked = true;
+
+            if (key === null) {
+                // Vaciar: todo en false
+                Object.keys(state).forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+            } else {
+                const e = DATA.empresas[key];
+                e.regularUnchecked.forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+                e.gateN2Unchecked.forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+                Object.keys(e.gateDiscrepancias).forEach(id => { state[id].declarado = true; state[id].verificado = false; });
+            }
+
+            // Sincronizar checkboxes del DOM con el estado
+            Object.keys(state).forEach(id => {
+                const reg = document.getElementById(`chk-${id}`);
+                if (reg) reg.checked = state[id].verificado;
+                const d = document.getElementById(`chk-${id}-declarado`);
+                const v = document.getElementById(`chk-${id}-verificado`);
+                if (d) d.checked = state[id].declarado;
+                if (v) v.checked = state[id].verificado;
+            });
+
+            recalcular();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ---------- Arranque ----------
+        inicializarEstado();
+        renderAcordeon();
+        renderPisosGrid();
+        renderEmpresaButtons();
+        lucide.createIcons();
+        recalcular();
+    </script>
+</body>
+</html>
