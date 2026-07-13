@@ -113,7 +113,7 @@
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-2 inline-block"></span>Gate N2 (brecha)</span>
                 </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Los ítems del Gate tienen dos estados — <strong>declarado</strong> (lo que dijo la empresa en el Intake) y <strong>verificado</strong> (lo que confirma el evaluador en sitio). Si no coinciden, queda marcado como discrepancia, igual que en la Matriz post verificación real.</p>
+            <p class="text-sm text-slate-500 mb-4">Todos los ítems tienen dos estados — <strong>declarado</strong> (lo que dijo la empresa en el Intake) y <strong>verificado</strong> (lo que confirma el evaluador en sitio). Si no coinciden, queda marcado como discrepancia, igual que en la Matriz post verificación real.</p>
 
             <!-- Consentimiento y elegibilidad: paso 0 y 0b del dictamen real -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 space-y-3">
@@ -281,9 +281,9 @@
 
         function contarDiscrepancias() {
             let n = 0;
-            [...itemsGate("n1"), ...itemsGate("n2")].forEach(it => {
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => sub.items.forEach(it => {
                 if (state[it.id].declarado !== state[it.id].verificado) n++;
-            });
+            })));
             return n;
         }
 
@@ -387,47 +387,35 @@
             icon.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
-        function onToggleRegular(id) {
-            const v = document.getElementById(`chk-${id}`).checked;
-            state[id].declarado = v; state[id].verificado = v;
-            recalcular();
-        }
-        function onToggleGate(id, field) {
+        function onToggleItem(id, field) {
             const v = document.getElementById(`chk-${id}-${field}`).checked;
             state[id][field] = v;
             recalcular();
         }
 
         function renderItem(it) {
-            if (it.gate) {
-                const cls = it.gate === "n1" ? "gate-item" : "gate-n2-item";
-                const tagTxt = it.gate === "n1" ? "N1 · excluyente" : "N2 · brecha";
-                const tagCls = it.gate === "n1" ? "bg-accent/10 text-accent" : "bg-brand-2/10 text-brand-2";
-                return `
-                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 py-2.5 px-3 rounded-lg mb-2 ${cls}">
-                    <div class="flex-1 flex items-start gap-2">
-                        <span class="mono text-[10px] font-bold text-slate-400 mt-0.5">${it.id}</span>
-                        <span class="text-sm text-slate-700">${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
-                    </div>
-                    <div class="flex items-center gap-4 flex-shrink-0 pl-6 sm:pl-0">
-                        <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${tagCls} hidden md:inline-block">${tagTxt}</span>
-                        <label class="flex flex-col items-center gap-0.5 cursor-pointer">
-                            <span class="text-[9px] uppercase text-slate-400 font-bold">Declarado</span>
-                            <input type="checkbox" id="chk-${it.id}-declarado" checked class="w-4 h-4 accent-brand-2" onchange="onToggleGate('${it.id}','declarado')">
-                        </label>
-                        <label class="flex flex-col items-center gap-0.5 cursor-pointer">
-                            <span class="text-[9px] uppercase text-slate-400 font-bold">Verificado</span>
-                            <input type="checkbox" id="chk-${it.id}-verificado" checked class="w-4 h-4 accent-emerald-600" onchange="onToggleGate('${it.id}','verificado')">
-                        </label>
-                        <span id="disc-${it.id}" class="hidden text-[10px] font-bold text-amber-600 whitespace-nowrap">⚠ discrepancia</span>
-                    </div>
-                </div>`;
-            }
+            const cls = it.gate === "n1" ? "gate-item" : it.gate === "n2" ? "gate-n2-item" : "";
+            const tagTxt = it.gate === "n1" ? "N1 · excluyente" : it.gate === "n2" ? "N2 · brecha" : "";
+            const tagCls = it.gate === "n1" ? "bg-accent/10 text-accent" : "bg-brand-2/10 text-brand-2";
             return `
-            <label class="flex items-start cursor-pointer group mb-1.5 p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                <input type="checkbox" id="chk-${it.id}" checked class="w-4 h-4 mt-0.5 mr-2.5 accent-brand flex-shrink-0" onchange="onToggleRegular('${it.id}')">
-                <span class="text-sm text-slate-700 leading-tight"><span class="mono text-[10px] text-slate-400 font-bold mr-1">${it.id}</span>${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
-            </label>`;
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 py-2.5 px-3 rounded-lg mb-2 ${cls}">
+                <div class="flex-1 flex items-start gap-2">
+                    <span class="mono text-[10px] font-bold text-slate-400 mt-0.5">${it.id}</span>
+                    <span class="text-sm text-slate-700">${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
+                </div>
+                <div class="flex items-center gap-4 flex-shrink-0 pl-6 sm:pl-0">
+                    ${it.gate ? `<span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${tagCls} hidden md:inline-block">${tagTxt}</span>` : ""}
+                    <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                        <span class="text-[9px] uppercase text-slate-400 font-bold">Declarado</span>
+                        <input type="checkbox" id="chk-${it.id}-declarado" checked class="w-4 h-4 accent-brand-2" onchange="onToggleItem('${it.id}','declarado')">
+                    </label>
+                    <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                        <span class="text-[9px] uppercase text-slate-400 font-bold">Verificado</span>
+                        <input type="checkbox" id="chk-${it.id}-verificado" checked class="w-4 h-4 accent-emerald-600" onchange="onToggleItem('${it.id}','verificado')">
+                    </label>
+                    <span id="disc-${it.id}" class="hidden text-[10px] font-bold text-amber-600 whitespace-nowrap">⚠ discrepancia</span>
+                </div>
+            </div>`;
         }
 
         function renderSub(sub) {
@@ -531,8 +519,6 @@
 
             // Sincronizar checkboxes del DOM con el estado
             Object.keys(state).forEach(id => {
-                const reg = document.getElementById(`chk-${id}`);
-                if (reg) reg.checked = state[id].verificado;
                 const d = document.getElementById(`chk-${id}-declarado`);
                 const v = document.getElementById(`chk-${id}-verificado`);
                 if (d) d.checked = state[id].declarado;
