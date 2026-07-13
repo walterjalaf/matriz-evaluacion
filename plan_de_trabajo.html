@@ -119,7 +119,7 @@ td.col-label { padding: 5px 8px 5px 14px; }
 </div>
 
 <div class="footer">
-  <strong>Hitos (◆):</strong> E-01 Plan de Trabajo · Presentación de matriz a BEASA · Convocatoria BEASA · E-02 Matriz Mejorada · E-03 Relevamiento · E-04 Matrices por Empresas · E-05 Informe Final · E-06 Presentación Ejecutiva &nbsp;|&nbsp;
+  <strong>Hitos (◆):</strong> E-01 Plan de Trabajo · Presentación de matriz a BEASA · Convocatoria BEASA · E-02 Matriz Mejorada · E-03 Relevamiento · E-04 Matrices por Empresas · E-05 Informe Final · W-01 Workshop · E-06 Presentación Ejecutiva &nbsp;|&nbsp;
   Hacé clic en cualquier fila para tildar. El progreso se guarda en este navegador.
 </div>
 
@@ -177,9 +177,8 @@ const FASES = [
     ],
   },
   {
-    id:'f2', num:'Fase 2', name:'Relevamiento, Evaluación y Cierre', dias:[9,21], color:'#059669', informe:'→ E-02 · E-03 · E-04 · E-05 · E-06',
+    id:'f2', num:'Fase 2', name:'Relevamiento, Evaluación y Cierre', dias:[9,21], color:'#059669', informe:'→ E-02 · E-03 · E-04 · E-05 · W-01 · E-06',
     tareas:[
-      {id:'h06',rol:'coord', label:'📄 E-05 — Informe Final entregado (15/07)', hito:true, dia:8},
       {id:'h04',rol:'coord', label:'📄 E-02 — Matriz Mejorada (definitiva y aprobada) recibida (16/07)', hito:true, dia:9},
       {id:'t08',rol:'campo', label:'Creación del formulario para la recolección de datos', dias:[10]},
       {id:'t09',rol:'campo', label:'Envío del formulario a las empresas de comunidades', dias:[11,12]},
@@ -188,6 +187,8 @@ const FASES = [
       {id:'t11',rol:'campo', label:'Análisis de la ponderación (aplicación de la matriz)', dias:[16,17]},
       {id:'t12',rol:'campo', label:'Visita y validación de legajos', dias:[18]},
       {id:'h05b',rol:'coord', label:'📄 E-04 — Matrices por Empresas entregadas (29/07)', hito:true, dia:18},
+      {id:'h06',rol:'coord', label:'📄 E-05 — Informe Final entregado (30/07)', hito:true, dia:19},
+      {id:'h03',rol:'coord', label:'📄 W-01 — Presentación del workshop al equipo de BEASA (31/07)', hito:true, dia:20},
       {id:'h07',rol:'coord', label:'📄 E-06 — Presentación ejecutiva · servicio cerrado (03/08)', hito:true, dia:21},
     ],
   },
