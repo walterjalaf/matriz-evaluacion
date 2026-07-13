@@ -6,7 +6,7 @@ Referencia técnica del simulador `ejemplo.html` — versión actualizada a part
 
 `ejemplo.html` es un simulador interactivo de la Matriz Integral de Evaluación de proveedores para el servicio de mantenimiento del camino de acceso a Mina Veladero (MAS SRL). Permite marcar evidencia ítem por ítem y ver, en vivo, cómo se llega al puntaje global y al dictamen (Go / Go con Plan de Acción / No-Go).
 
-**Qué SÍ hace con precisión:** reproduce la estructura real — 7 dimensiones, 27 subcriterios, sus pesos exactos, el Gate HSE de 33 ítems en dos niveles, los 6 pisos excluyentes, y el orden exacto de la cascada de decisión (verificado contra la fórmula viva de la planilla real, no contra una descripción).
+**Qué SÍ hace con precisión:** reproduce la estructura real — 7 dimensiones, 27 subcriterios, sus pesos exactos, el Gate HSE de 33 ítems en dos niveles, y el orden exacto de la cascada de decisión (verificado contra la fórmula viva de la planilla real, no contra una descripción). Además aplica una regla de piso universal: **cualquiera de los 27 subcriterios en 0/5 puntos produce No-Go**, no solo los 6 destacados históricamente (ver Sección 5).
 
 **Qué NO hace:** el puntaje 0-5 de cada subcriterio se calcula como una simple proporción de checkboxes marcados (`verificados / total × 5`), mientras que la matriz real usa, para 6 de los 27 subcriterios, tablas de conversión propias (T1-T8) a partir de un dato numérico declarado (situación BCRA, cantidad de empleados, horas de cobertura, etc.). Esas tablas se documentan en la Sección 8, pero **no están activas en el motor de cálculo** (con la excepción parcial de 5.1, ver Sección 7). Esto ya estaba aclarado en el pie de página del simulador y sigue siendo así en esta versión.
 
@@ -69,16 +69,20 @@ Todos los ítems del simulador (Gate y no-Gate) tienen dos estados — **declara
 
 ## 5. Pisos
 
-Subcriterio cuyo puntaje en 0 produce No-Go aunque el promedio global sea alto:
+**Regla general (vigente desde esta versión): cualquiera de los 27 subcriterios que llegue a 0/5 puntos produce No-Go**, sin importar cuán alto sea el puntaje global. No es una lista cerrada de excepciones — es un chequeo que recorre los 27 subcriterios de las 7 dimensiones (`subcriteriosEnCero()` en el motor) y detiene la cascada si encuentra al menos uno en 0.
+
+Antes de este cambio, solo 6 subcriterios estaban marcados explícitamente como piso "0 = No-Go" en `DATA` (se mantienen destacados por ser los históricamente más frecuentes / los que trae la planilla de referencia con ese atributo):
 
 | Subcriterio | Regla | Motivo |
 |---|---|---|
-| 2.1 · Solvencia, liquidez y capital de trabajo | Puntaje = 0 | Sin estados contables ni información contable verificable (nuevo en esta versión) |
+| 2.1 · Solvencia, liquidez y capital de trabajo | Puntaje = 0 | Sin estados contables ni información contable verificable |
 | 1.3 · Integridad y libre conflictividad | Puntaje = 0 | Sin certificados de conflictividad/deuda sindical en regla |
 | 2.2 · Endeudamiento / financiamiento de flota | Puntaje = 0 | Sin capacidad demostrable de financiar la flota exigida |
 | 3.4 · Roster 14x7 y reemplazo 24 h | Puntaje = 0 | Sin esquema de turnos ni back-up ante ausencias |
 | 4.2 · Industria minera y alta montaña | Puntaje = 0 | Sin experiencia previa en minería o alta montaña |
 | 5.1 · Flota disponible vs. mínima | Puntaje = 0 | No alcanza la flota mínima exigida por el pliego |
+
+Pero con la regla general, los otros 21 subcriterios (1.1, 1.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.3, 4.4, 5.2, 5.3, 5.4, 6.1-6.5, 7.1-7.4) también producen No-Go si su puntaje cae a 0 — algo que antes NO ocurría (antes solo diluían el puntaje global, no cortaban la cascada).
 
 Más dos pisos "de bloque" (no de un solo subcriterio):
 - **Salud Financiera** (promedio de 2.1, 2.2, 2.3) < 2 → No-Go.
@@ -97,19 +101,16 @@ Orden real (verificado contra la fórmula de la celda `D95` de `Matriz E1 (GO)`,
 3. Gate Nivel 1 (24 ítems — un "No" → No-Go)
 4. Salud Financiera (promedio 2.1-2.3 < 2 → No-Go)
 5. SSMA excluyente (mínimo de 6.1/6.2/6.3 ≤ 1 → No-Go)
-6. 5.1 Flota mínima = 0 → No-Go
-7. 4.2 Alta montaña = 0 → No-Go
-8. 3.4 Roster 14x7 = 0 → No-Go
-9. 2.2 Endeudamiento = 0 → No-Go
-10. 2.1 Solvencia = 0 → No-Go
-11. 1.3 Integridad = 0 → No-Go
-12. Puntaje global < 55 → No-Go
-13. Puntaje global 55 a 69,9 → Go con Plan de Acción
-14. Puntaje global ≥ 70 → Go
+6. **Cualquiera de los 27 subcriterios en 0 puntos → No-Go** (paso único que reemplaza los 6 chequeos individuales de la versión anterior — ver sección 5)
+7. Puntaje global < 55 → No-Go
+8. Puntaje global 55 a 69,9 → Go con Plan de Acción
+9. Puntaje global ≥ 70 → Go
 
 El proceso se detiene en la primera condición que aplique — una empresa puede tener puntaje global alto y aun así recibir un No-Go si incumple una condición anterior en el orden.
 
 > **Cambio de orden respecto de una versión anterior**: en una revisión previa de este simulador, el orden se había puesto como "Gate → Auditoría → Elegibilidad", siguiendo la tabla descriptiva de la Sección 7 del Marco Metodológico. Al leer la fórmula real de la planilla, se confirmó que el orden verdadero es "Auditoría → Elegibilidad → Gate", así que se revirtió. Para los 4 casos de prueba precargados esto no cambia el dictamen final (ninguno falla simultáneamente en más de una de estas tres condiciones), pero sí determina cuál motivo se muestra como "el que frena" cuando hay más de un problema.
+
+> **Cambio de regla (esta versión)**: el paso 6 antes verificaba individualmente 6 subcriterios (5.1, 4.2, 3.4, 2.2, 2.1, 1.3). Ahora es un único chequeo genérico (`subcriteriosEnCero()`) que recorre los 27 subcriterios de las 7 dimensiones — cualquiera en 0 detiene la cascada, no solo esos 6. El mensaje de resultado nombra el/los subcriterio(s) puntual(es) que causaron el corte (p. ej. "Subcriterio(s) en 0 pts: 5.1"), igual que antes.
 
 ## 7. Sección V — Flota en detalle
 
@@ -218,6 +219,7 @@ Esto se implementó dejando el `state` único por `id` de pregunta (una sola fue
 - Motor de cálculo corregido (ponderación por subcriterio, no por promedio de dimensión).
 - Orden de la cascada revertido a Auditoría → Elegibilidad → Gate.
 - Los 4 casos de prueba (Vialidad, Transportes, Cordillera, Oeste) se reajustaron para que sigan demostrando las 4 categorías de dictamen (GO / PAI / No-Go por Gate / No-Go por piso) con la nueva estructura — sin este reajuste, la expansión de Flota diluía el puntaje de 5.1/5.2 con las 37 preguntas nuevas (todas "sí" por defecto) y rompía el resultado esperado de "Transportes" y "Oeste".
+- **Regla de piso generalizada a los 27 subcriterios**: antes solo 6 subcriterios (5.1, 4.2, 3.4, 2.2, 2.1, 1.3) frenaban la cascada al llegar a 0 puntos; ahora cualquiera de los 27 lo hace (`subcriteriosEnCero()`), a pedido explícito del usuario.
 
 ## 11. Limitaciones conocidas
 

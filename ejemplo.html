@@ -161,7 +161,7 @@
     <!-- Panel explicativo de pisos -->
     <div class="max-w-7xl mx-auto mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-600"></i> ¿Qué es un piso?</h2>
-        <p class="text-sm text-slate-500 mb-4 max-w-3xl">Un <strong>piso</strong> es una condición excluyente: si no se cumple, el dictamen es No-Go sin importar qué tan alto sea el puntaje global. Son 6 subcriterios "0 = No-Go" (2.1, 1.3, 2.2, 3.4, 4.2, 5.1), más el bloque de Salud Financiera (promedio &lt; 2) y los 3 subcriterios SSMA excluyentes (≤ 1 = No-Go), que en conjunto viven dentro del Gate Nivel 1.</p>
+        <p class="text-sm text-slate-500 mb-4 max-w-3xl">Un <strong>piso</strong> es una condición excluyente: si no se cumple, el dictamen es No-Go sin importar qué tan alto sea el puntaje global. <strong>Regla general: cualquiera de los 27 subcriterios que llegue a 0/5 puntos produce No-Go</strong>, no solo los 6 destacados históricamente (2.1, 1.3, 2.2, 3.4, 4.2, 5.1). A esto se suma el bloque de Salud Financiera (promedio &lt; 2) y los 3 subcriterios SSMA excluyentes (≤ 1 = No-Go), que en conjunto viven dentro del Gate Nivel 1.</p>
         <div id="pisos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"></div>
     </div>
 
@@ -185,6 +185,7 @@
         }
 
         const PISOS_INFO = [
+            { id: "ANY0", label: "Cualquier subcriterio (27/27)", regla: "Puntaje = 0", detalle: "Regla general: si CUALQUIER subcriterio de la Matriz —no solo los 6 destacados abajo— llega a 0/5, el dictamen es No-Go automático." },
             { id: "1.3", label: "1.3 · Integridad y libre conflictividad", regla: "Puntaje = 0", detalle: "Dimensión I. Sin certificados de conflictividad/deuda sindical en regla." },
             { id: "2.1", label: "2.1 · Solvencia, liquidez y capital de trabajo", regla: "Puntaje = 0", detalle: "Dimensión II. Sin estados contables ni información contable verificable." },
             { id: "2.2", label: "2.2 · Endeudamiento / financiamiento de flota", regla: "Puntaje = 0", detalle: "Dimensión II. Sin capacidad demostrable de financiar la flota exigida." },
@@ -207,8 +208,10 @@
             const finProm = promedioFinanciero();
             const ssmaMin = Math.min(getScoreSub("6.1"), getScoreSub("6.2"), getScoreSub("6.3"));
 
-            const s51 = getScoreSub("5.1"), s42 = getScoreSub("4.2"), s34 = getScoreSub("3.4"),
-                  s22 = getScoreSub("2.2"), s21 = getScoreSub("2.1"), s13 = getScoreSub("1.3");
+            const enCero = subcriteriosEnCero();
+            const enCeroTxt = enCero.length > 3
+                ? `${enCero.slice(0, 3).map(x => x.id).join(", ")} y ${enCero.length - 3} más`
+                : enCero.map(x => x.id).join(", ");
 
             const global = getPuntajeGlobal();
 
@@ -218,12 +221,7 @@
                 { label: "Gate Nivel 1 (24 ítems)", ok: !gateN1Fail, detalle: gateN1Fail ? "Al menos 1 ítem verificado en 'No'" : "24/24 verificados en 'Sí'", detiene: gateN1Fail },
                 { label: "Salud Financiera (prom. 2.1–2.3)", ok: finProm >= 2, detalle: `Promedio ${finProm.toFixed(1)} / 5 (piso: 2,0)`, detiene: finProm < 2 },
                 { label: "SSMA excluyente (6.1/6.2/6.3)", ok: ssmaMin > 1, detalle: `Mínimo de los 3: ${ssmaMin} pts (piso: >1)`, detiene: ssmaMin <= 1 },
-                { label: "5.1 Flota mínima", ok: s51 > 0, detalle: `${s51} / 5 pts`, detiene: s51 === 0 },
-                { label: "4.2 Alta montaña", ok: s42 > 0, detalle: `${s42} / 5 pts`, detiene: s42 === 0 },
-                { label: "3.4 Roster 14x7", ok: s34 > 0, detalle: `${s34} / 5 pts`, detiene: s34 === 0 },
-                { label: "2.2 Endeudamiento", ok: s22 > 0, detalle: `${s22} / 5 pts`, detiene: s22 === 0 },
-                { label: "2.1 Solvencia", ok: s21 > 0, detalle: `${s21} / 5 pts`, detiene: s21 === 0 },
-                { label: "1.3 Integridad", ok: s13 > 0, detalle: `${s13} / 5 pts`, detiene: s13 === 0 },
+                { label: enCero.length ? `Subcriterio(s) en 0 pts: ${enCeroTxt}` : "Ningún subcriterio en 0 puntos (27/27)", ok: enCero.length === 0, detalle: enCero.length ? enCero.map(x => `${x.id} ${x.nombre}`).join(" | ") : "Los 27 subcriterios de la Matriz tienen puntaje > 0", detiene: enCero.length > 0 },
                 { label: "Puntaje global ≥ 55", ok: global >= 55, detalle: `${global.toFixed(1)} / 100`, detiene: global < 55 },
                 { label: "Puntaje global ≥ 70", ok: global >= 70, detalle: global >= 70 ? "Sin brechas de puntaje" : "Banda 55–69,9 → Plan de Acción", detiene: false, informativo: global < 70 },
             ];
@@ -267,6 +265,15 @@
 
         function promedioFinanciero() {
             return (getScoreSub("2.1") + getScoreSub("2.2") + getScoreSub("2.3")) / 3;
+        }
+
+        // Regla general: CUALQUIER subcriterio (de los 27) con puntaje 0/5 es piso → No-Go.
+        function subcriteriosEnCero() {
+            const out = [];
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => {
+                if (getScoreSub(sub.id) === 0) out.push({ id: sub.id, nombre: sub.nombre });
+            }));
+            return out;
         }
 
         // Ponderado real: cada subcriterio aporta (puntaje/5)*peso_propio — no un promedio simple por dimensión.
