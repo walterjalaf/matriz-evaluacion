@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma — Consultoría Diagnóstico de Empresas de Comunidades</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f5f7; color: #1a1a2e; padding: 24px 18px; }
+
+.header { margin-bottom: 18px; }
+.header h1 { font-size: 18px; font-weight: 700; }
+.badge { display: inline-block; background: #1d4ed8; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin-left: 10px; vertical-align: middle; }
+.header p { font-size: 12px; color: #6b7280; margin-top: 3px; }
+.save-status { font-size: 11px; min-width: 80px; text-align: right; }
+
+.progress-wrap { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
+.progress-bar-bg { flex: 1; background: #e5e7eb; border-radius: 8px; height: 10px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #2563eb; border-radius: 8px; transition: width .3s; }
+.progress-pct { font-size: 13px; font-weight: 700; color: #2563eb; min-width: 44px; }
+.progress-count { font-size: 12px; color: #6b7280; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; }
+.legend strong { font-size: 12px; color: #374151; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #374151; }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.grid-wrap { overflow-x: auto; }
+table { border-collapse: collapse; min-width: 1500px; width: 100%; }
+thead th { padding: 5px 2px; font-size: 10px; font-weight: 600; color: #6b7280; border-bottom: 2px solid #e5e7eb; text-align: center; min-width: 44px; }
+thead th .dow { display:block; font-size: 9px; font-weight: 400; color: #9ca3af; text-transform: uppercase; }
+thead th.col-label { text-align: left; min-width: 340px; padding: 6px 8px; }
+.fase-bar-row td { padding: 3px 0; background: #f3f4f6; }
+.fase-bar { height: 6px; opacity: .7; margin: 0 1px; }
+
+tr { border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background .15s; }
+tr:hover { background: #f9fafb; }
+tr.done-row { background: #f0fdf4 !important; }
+tr.done-row:hover { background: #dcfce7 !important; }
+tr.header-row { background: #f9fafb !important; cursor: default; }
+tr.sep-row { height: 8px; cursor: default; background: transparent !important; }
+td { padding: 4px 2px; vertical-align: middle; }
+td.col-label { padding: 5px 8px 5px 14px; }
+
+.task-label { display: flex; align-items: center; gap: 7px; }
+.checkbox { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; border: 2px solid #d1d5db; background: #fff; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.checkbox.checked { border: none; background: #22c55e; }
+.checkbox-tick { color: #fff; font-size: 10px; font-weight: 700; display: none; }
+.checkbox.checked .checkbox-tick { display: block; }
+.role-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.task-text { font-size: 11.5px; color: #374151; }
+.task-text.hito { font-size: 11px; font-weight: 700; color: #1d4ed8; }
+.task-text.done { color: #9ca3af; text-decoration: line-through; }
+.task-text.hito.done { text-decoration: none; }
+
+.fase-header-cell { padding: 0 !important; cursor: default; }
+.fase-header-inner { display: flex; align-items: center; gap: 8px; padding: 9px 10px 5px; flex-wrap: wrap; }
+.fase-pill { font-size: 11px; font-weight: 700; color: #fff; border-radius: 12px; padding: 2px 10px; flex-shrink: 0; }
+.fase-title { font-size: 13px; font-weight: 700; color: #111827; }
+.fase-informe { font-size: 10px; color: #9ca3af; font-style: italic; }
+.fase-count { margin-left: auto; font-size: 11px; font-weight: 600; color: #6b7280; }
+.fase-count.all-done { color: #059669; }
+
+.gantt-cell { text-align: center; }
+.bar-wrap { position: relative; height: 24px; }
+.gantt-bar { position: absolute; top: 4px; bottom: 4px; left: 2px; right: 2px; border-radius: 4px; opacity: .85; transition: background .2s, opacity .2s; }
+.gantt-bar.done { opacity: .6; background: #22c55e !important; }
+.hito-diamond { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(45deg); width: 11px; height: 11px; border: 2px solid #1a1a2e; border-radius: 2px; background: #1d4ed8; transition: background .2s; }
+.hito-diamond.done { background: #22c55e; }
+
+.footer { margin-top: 18px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+.footer strong { color: #6b7280; }
+.callout { background:#eff6ff; border-left:3px solid #2563eb; padding:8px 12px; font-size:12px; color:#1e3a8a; margin-bottom:14px; border-radius:0 6px 6px 0; }
+
+@media print {
+  .gantt-bar, .hito-diamond, .checkbox, .progress-bar-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <h1>Consultoría de Diagnóstico de Empresas de Comunidades <span class="badge">Cronograma día por día</span></h1>
+      <p>Minera Andina del Sol (MAS SRL) · BEASA · Licitación de Caminos · Kick-off: 03/07/2026 · Cierre: 03/08/2026</p>
+    </div>
+    <div class="save-status" id="save-status"></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+    <span class="progress-count" id="progress-count">0/20 tareas</span>
+  </div>
+</div>
+
+<div class="legend">
+  <strong>Referente:</strong>
+  <div class="leg"><div class="leg-dot" style="background:#1d4ed8"></div>Coordinador/a de Proyecto</div>
+  <div class="leg"><div class="leg-dot" style="background:#d97706"></div>Esp. HyS</div>
+  <div class="leg"><div class="leg-dot" style="background:#7c3aed"></div>Abogado/a</div>
+  <div class="leg"><div class="leg-dot" style="background:#0891b2"></div>Ing. en Minas</div>
+  <div class="leg"><div class="leg-dot" style="background:#059669"></div>Analista de Campo</div>
+  <div class="leg"><div class="leg-dot" style="background:#dc2626"></div>BEASA (cliente)</div>
+</div>
+
+<div class="grid-wrap">
+<table id="cronograma">
+<thead>
+  <tr id="header-row">
+    <th class="col-label">Actividad / Responsable</th>
+  </tr>
+  <tr class="fase-bar-row" id="fase-bar-row">
+    <td></td>
+  </tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+<div class="footer">
+  <strong>Hitos (◆):</strong> E-01 Plan de Trabajo · Presentación de matriz a BEASA · Convocatoria BEASA · E-02 Matriz Mejorada · E-03 Relevamiento · E-04 Matrices por Empresas · E-05 Informe Final · E-06 Presentación Ejecutiva &nbsp;|&nbsp;
+  Hacé clic en cualquier fila para tildar. El progreso se guarda en este navegador.
+</div>
+
+<script>
+const STORAGE_KEY = 'diagnostico-comunidades-cronograma-dias-v1';
+
+const ROLES = {
+  coord: { label: 'Coordinador/a de Proyecto', color: '#1d4ed8' },
+  hys:   { label: 'Esp. HyS',                  color: '#d97706' },
+  legal: { label: 'Abogado/a',                 color: '#7c3aed' },
+  minas: { label: 'Ing. en Minas',             color: '#0891b2' },
+  campo: { label: 'Analista de Campo',         color: '#059669' },
+  beasa: { label: 'BEASA (cliente)',           color: '#dc2626' },
+};
+
+// Días (columnas) del cronograma
+const DIAS = [
+  {n:1,  f:'03/07', dow:'vie'},
+  {n:2,  f:'06/07', dow:'lun'},
+  {n:3,  f:'07/07', dow:'mar'},
+  {n:4,  f:'08/07', dow:'mié'},
+  {n:5,  f:'10/07', dow:'vie'},
+  {n:6,  f:'13/07', dow:'lun'},
+  {n:7,  f:'14/07', dow:'mar'},
+  {n:8,  f:'15/07', dow:'mié'},
+  {n:9,  f:'16/07', dow:'jue'},
+  {n:10, f:'17/07', dow:'vie'},
+  {n:11, f:'20/07', dow:'lun'},
+  {n:12, f:'21/07', dow:'mar'},
+  {n:13, f:'22/07', dow:'mié'},
+  {n:14, f:'23/07', dow:'jue'},
+  {n:15, f:'24/07', dow:'vie'},
+  {n:16, f:'27/07', dow:'lun'},
+  {n:17, f:'28/07', dow:'mar'},
+  {n:18, f:'29/07', dow:'mié'},
+  {n:19, f:'30/07', dow:'jue'},
+  {n:20, f:'31/07', dow:'vie'},
+  {n:21, f:'03/08', dow:'lun'},
+];
+
+const FASES = [
+  {
+    id:'f1', num:'Fase 1', name:'Diseño y Validación de la Matriz', dias:[1,8], color:'#2563eb', informe:'→ E-01',
+    tareas:[
+      {id:'t01',rol:'coord', label:'Kick-off interno del equipo consultor', dias:[1]},
+      {id:'t02',rol:'coord', label:'Plan de Trabajo (E-01) + pedido de base de datos a MAS SRL + borrador de matriz + plan de comunicación', dias:[2]},
+      {id:'h01',rol:'coord', label:'📄 E-01 — Plan de Trabajo entregado (06/07)', hito:true, dia:2},
+      {id:'t03',rol:'hys',   label:'Revisión de la matriz — panel de Higiene y Seguridad', dias:[3,4]},
+      {id:'t04',rol:'legal', label:'Revisión de la matriz — panel Legal', dias:[3,4]},
+      {id:'t05',rol:'minas', label:'Revisión de la matriz — panel Ingeniería de Minas', dias:[3,4]},
+      {id:'t06',rol:'coord', label:'Incorporación de las correcciones de los especialistas a la matriz', dias:[5]},
+      {id:'h02',rol:'coord', label:'📄 Presentación de la matriz a BEASA (13/07)', hito:true, dia:6},
+      {id:'t07',rol:'coord', label:'Armado del workshop (agenda y materiales)', dias:[7]},
+      {id:'h08',rol:'beasa', label:'📄 BEASA debe lanzar la convocatoria (15/07)', hito:true, dia:8},
+    ],
+  },
+  {
+    id:'f2', num:'Fase 2', name:'Relevamiento, Evaluación y Cierre', dias:[9,21], color:'#059669', informe:'→ E-02 · E-03 · E-04 · E-05 · E-06',
+    tareas:[
+      {id:'h06',rol:'coord', label:'📄 E-05 — Informe Final entregado (15/07)', hito:true, dia:8},
+      {id:'h04',rol:'coord', label:'📄 E-02 — Matriz Mejorada (definitiva y aprobada) recibida (16/07)', hito:true, dia:9},
+      {id:'t08',rol:'campo', label:'Creación del formulario para la recolección de datos', dias:[10]},
+      {id:'t09',rol:'campo', label:'Envío del formulario a las empresas de comunidades', dias:[11,12]},
+      {id:'t10',rol:'campo', label:'Visita a las empresas seleccionadas y entrevistas', dias:[13,14]},
+      {id:'h05',rol:'coord', label:'📄 E-03 — Relevamiento (informe y legajos) entregado (24/07)', hito:true, dia:15},
+      {id:'t11',rol:'campo', label:'Análisis de la ponderación (aplicación de la matriz)', dias:[16,17]},
+      {id:'t12',rol:'campo', label:'Visita y validación de legajos', dias:[18]},
+      {id:'h05b',rol:'coord', label:'📄 E-04 — Matrices por Empresas entregadas (29/07)', hito:true, dia:18},
+      {id:'h07',rol:'coord', label:'📄 E-06 — Presentación ejecutiva · servicio cerrado (03/08)', hito:true, dia:21},
+    ],
+  },
+];
+
+const N = DIAS.map(d=>d.n);
+
+let checked = { t01:true, t02:true, h01:true, t03:true, t04:true, t05:true, t06:true, h02:true };
+try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) checked = Object.assign(checked, JSON.parse(saved));
+} catch(_) {}
+
+function saveState() {
+  const status = document.getElementById('save-status');
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
+    status.textContent = '✓ Guardado';
+    status.style.color = '#059669';
+    setTimeout(() => { status.textContent = ''; }, 2000);
+  } catch(_) {
+    status.textContent = '⚠ Error al guardar';
+    status.style.color = '#dc2626';
+  }
+}
+
+function toggle(id) {
+  checked[id] = !checked[id];
+  saveState();
+  updateRow(id);
+  updateProgress();
+  updateFaseCounts();
+}
+
+function buildHeader() {
+  const tr = document.getElementById('header-row');
+  DIAS.forEach(d => {
+    const th = document.createElement('th');
+    th.innerHTML = d.f + '<span class="dow">' + d.dow + '</span>';
+    tr.appendChild(th);
+  });
+}
+
+function buildFaseBars() {
+  const row = document.getElementById('fase-bar-row');
+  N.forEach(n => {
+    const fase = FASES.find(f => n >= f.dias[0] && n <= f.dias[1]);
+    const td = document.createElement('td');
+    if (fase) {
+      const isFirst = fase.dias[0] === n;
+      const isLast  = fase.dias[1] === n;
+      const bar = document.createElement('div');
+      bar.className = 'fase-bar';
+      bar.style.background = fase.color;
+      bar.style.borderRadius = isFirst && isLast ? '4px' : isFirst ? '4px 0 0 4px' : isLast ? '0 4px 4px 0' : '0';
+      td.appendChild(bar);
+    }
+    row.appendChild(td);
+  });
+}
+
+function buildRow(tarea, faseColor) {
+  const isDone = !!checked[tarea.id];
+  const isHito = !!tarea.hito;
+  const rolColor = (ROLES[tarea.rol] || {}).color || '#6b7280';
+
+  const tr = document.createElement('tr');
+  tr.id = 'row-' + tarea.id;
+  if (isDone) tr.classList.add('done-row');
+  if (!isHito) tr.addEventListener('click', () => toggle(tarea.id));
+  else tr.style.cursor = 'default';
+
+  const td = document.createElement('td');
+  td.className = 'col-label';
+  td.innerHTML = `
+    <div class="task-label">
+      <div class="checkbox${isDone ? ' checked' : ''}" id="cb-${tarea.id}">
+        <span class="checkbox-tick">✓</span>
+      </div>
+      <div class="role-dot" style="background:${rolColor}"></div>
+      <span class="task-text${isHito?' hito':''}${isDone && !isHito?' done':''}" id="txt-${tarea.id}">${tarea.label}</span>
+    </div>`;
+  if (!isHito) {
+    td.style.cursor = 'pointer';
+    td.addEventListener('click', (e) => { e.stopPropagation(); toggle(tarea.id); });
+  }
+  tr.appendChild(td);
+
+  N.forEach(n => {
+    const cell = document.createElement('td');
+    cell.className = 'gantt-cell';
+    const active = isHito ? tarea.dia === n : (tarea.dias || []).includes(n);
+    if (active) {
+      const wrap = document.createElement('div');
+      wrap.className = 'bar-wrap';
+      if (isHito) {
+        const diamond = document.createElement('div');
+        diamond.className = 'hito-diamond' + (isDone ? ' done' : '');
+        diamond.id = 'diamond-' + tarea.id;
+        wrap.appendChild(diamond);
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', () => toggle(tarea.id));
+      } else {
+        const bar = document.createElement('div');
+        bar.className = 'gantt-bar' + (isDone ? ' done' : '');
+        bar.style.background = isDone ? '#22c55e' : faseColor;
+        bar.id = 'bar-' + tarea.id + '-d' + n;
+        wrap.appendChild(bar);
+      }
+      cell.appendChild(wrap);
+    }
+    tr.appendChild(cell);
+  });
+
+  return tr;
+}
+
+function buildFaseHeader(fase) {
+  const fDone = fase.tareas.filter(t => checked[t.id]).length;
+  const fTotal = fase.tareas.length;
+  const tr = document.createElement('tr');
+  tr.className = 'header-row';
+  tr.id = 'hdr-' + fase.id;
+  const td = document.createElement('td');
+  td.colSpan = DIAS.length + 1;
+  td.className = 'fase-header-cell';
+  td.innerHTML = `
+    <div class="fase-header-inner">
+      <span class="fase-pill" style="background:${fase.color}">${fase.num}</span>
+      <span class="fase-title">${fase.name}</span>
+      <span class="fase-informe">${fase.informe}</span>
+      <span class="fase-count${fDone===fTotal?' all-done':''}" id="count-${fase.id}">${fDone}/${fTotal}</span>
+    </div>`;
+  tr.appendChild(td);
+  return tr;
+}
+
+function buildTable() {
+  buildHeader();
+  buildFaseBars();
+  const tbody = document.getElementById('tbody');
+  FASES.forEach(fase => {
+    tbody.appendChild(buildFaseHeader(fase));
+    fase.tareas.forEach(t => tbody.appendChild(buildRow(t, fase.color)));
+    const sep = document.createElement('tr');
+    sep.className = 'sep-row';
+    tbody.appendChild(sep);
+  });
+}
+
+function updateRow(id) {
+  const isDone = !!checked[id];
+  const tr = document.getElementById('row-' + id);
+  if (!tr) return;
+  if (isDone) tr.classList.add('done-row');
+  else tr.classList.remove('done-row');
+
+  const cb = document.getElementById('cb-' + id);
+  if (cb) {
+    if (isDone) cb.classList.add('checked');
+    else cb.classList.remove('checked');
+  }
+
+  const txt = document.getElementById('txt-' + id);
+  if (txt) {
+    const isHito = txt.classList.contains('hito');
+    if (!isHito) {
+      if (isDone) txt.classList.add('done');
+      else txt.classList.remove('done');
+    }
+  }
+
+  N.forEach(n => {
+    const bar = document.getElementById('bar-' + id + '-d' + n);
+    if (bar) {
+      if (isDone) { bar.classList.add('done'); bar.style.background = '#22c55e'; }
+      else { bar.classList.remove('done'); }
+    }
+  });
+  const diamond = document.getElementById('diamond-' + id);
+  if (diamond) {
+    if (isDone) diamond.classList.add('done');
+    else diamond.classList.remove('done');
+  }
+}
+
+function allTareas() {
+  return FASES.flatMap(f=>f.tareas);
+}
+function updateProgress() {
+  const all = allTareas();
+  const total = all.length;
+  const done = all.filter(t=>checked[t.id]).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-fill').style.background = pct===100 ? '#059669' : '#2563eb';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-pct').style.color = pct===100 ? '#059669' : '#2563eb';
+  document.getElementById('progress-count').textContent = done + '/' + total + ' tareas';
+}
+
+function updateFaseCounts() {
+  FASES.forEach(fase => {
+    const fDone = fase.tareas.filter(t=>checked[t.id]).length;
+    const fTotal = fase.tareas.length;
+    const el = document.getElementById('count-' + fase.id);
+    if (el) {
+      el.textContent = fDone + '/' + fTotal;
+      if (fDone === fTotal) el.classList.add('all-done');
+      else el.classList.remove('all-done');
+    }
+  });
+}
+
+buildTable();
+updateProgress();
+</script>
+</body>
+</html>
