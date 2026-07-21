@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Evaluación · MAS SRL · Veladero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#0E1F33',
+                        brand: '#1E4A82',
+                        'brand-2': '#2D6CB8',
+                        pearl: '#E8EAEC',
+                        paper: '#F5F6F8',
+                        soft: '#1A1A1A',
+                        accent: '#F26522',
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        :root {
+            --ink: #0E1F33;
+            --brand: #1E4A82;
+            --brand-2: #2D6CB8;
+            --pearl: #E8EAEC;
+            --paper: #F5F6F8;
+            --soft: #1A1A1A;
+            --accent: #F26522;
+            --line: rgba(255,255,255,.12);
+            --line-dark: rgba(14,31,51,.10);
+        }
+        body { font-family: 'Open Sans', system-ui, sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; }
+        .accordion-content { transition: max-height 0.3s ease-out, padding 0.3s ease-out; max-height: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 8000px; }
+        .custom-checkbox:checked + div { background-color: var(--brand); border-color: var(--brand); }
+        .custom-checkbox:checked + div svg { opacity: 1; }
+        .led-green { background-color: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.8); }
+        .led-yellow { background-color: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.8); }
+        .led-red { background-color: #dc2626; box-shadow: 0 0 8px rgba(220,38,38,0.8); }
+        .gate-item { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(242,101,34,0.05), transparent 12%); }
+        .gate-n2-item { border-left: 3px solid var(--brand-2); background: linear-gradient(90deg, rgba(45,108,184,0.05), transparent 12%); }
+        .toggle-sm { width: 34px; height: 20px; }
+        .toggle-sm-dot { width: 14px; height: 14px; transition: transform 0.15s ease; }
+        .cascade-step { position: relative; padding-left: 2.25rem; }
+        .cascade-step:not(:last-child)::before {
+            content: ''; position: absolute; left: 0.6rem; top: 1.6rem; bottom: -0.5rem; width: 2px; background: var(--line-dark);
+        }
+        .cascade-dot { position: absolute; left: 0; top: 0.15rem; width: 1.35rem; height: 1.35rem; border-radius: 9999px; display:flex; align-items:center; justify-content:center; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 md:p-8">
+
+    <!-- Encabezado de contexto -->
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="bg-gradient-to-r from-ink to-brand text-white rounded-2xl shadow-lg p-6 md:p-8 mb-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <p class="text-white/70 text-xs font-bold uppercase tracking-widest mb-1">MAS SRL · Mina Veladero · Iglesia y Jáchal, San Juan</p>
+                    <h1 class="text-2xl md:text-3xl font-black">Matriz Integral de Evaluación — v4.1</h1>
+                    <p class="text-slate-300 text-sm mt-1 max-w-2xl">27 subcriterios en 7 dimensiones (100 pts) + Gate HSE de 33 ítems en dos niveles. Marcá evidencia para simular una evaluación y trazar de punta a punta por qué se llega a cada dictamen.</p>
+                </div>
+                <div class="flex gap-4 text-center flex-shrink-0">
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">27</div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Subcriterios</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">24<span class="text-slate-400 text-sm">+9</span></div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Gate N1 + N2</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl px-4 py-2">
+                        <div class="text-2xl font-black mono">100</div>
+                        <div class="text-[10px] uppercase tracking-wide text-slate-300">Puntos totales</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-center justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="cloud" class="w-4 h-4 text-brand-2"></i> Respuestas del formulario (Google Sheets, en vivo)
+                </h2>
+                <p class="text-xs text-slate-500" id="sheet-status">Conectando con "Respuestas de formulario 1"…</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+                <select id="sheet-empresa-select" onchange="aplicarRespuestaSheet(this.value)" disabled
+                    class="text-sm border border-slate-300 rounded-lg px-3 py-2 flex-1 xl:flex-none xl:w-72 bg-white disabled:bg-slate-50 disabled:text-slate-400">
+                    <option value="">Cargando…</option>
+                </select>
+                <button onclick="cargarHojaFormulario()" class="px-3 py-2 bg-brand hover:bg-brand-2 text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center gap-1.5">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
+                </button>
+                <a href="https://docs.google.com/spreadsheets/d/1SOW-lAOopw7hddfG4R_Ii8SC42BLQvafqtBDeput5g4/edit?resourcekey=&gid=1393221337#gid=1393221337" target="_blank" rel="noopener"
+                    class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver hoja
+                </a>
+                <button onclick="descargarChecklistVisita()" id="btn-descargar-pdf"
+                    class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center gap-1.5">
+                    <i data-lucide="file-down" class="w-3.5 h-3.5"></i> Descargar checklist de visita (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div id="empresa-actual-wrap" class="hidden bg-brand/5 border border-brand/20 rounded-xl px-4 py-2.5 text-xs text-slate-600 mb-4">
+            <span id="empresa-actual"></span>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-center justify-between gap-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-800">Casos de prueba reales</h2>
+                <p class="text-xs text-slate-500">Cargá el perfil completo de una de las 4 empresas de la sesión de datos de prueba.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 w-full xl:w-auto" id="empresa-buttons"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200 flex flex-col lg:flex-row">
+
+        <!-- Columna Izquierda: Checklist Granular -->
+        <div class="w-full lg:w-2/3 p-6 border-b lg:border-b-0 lg:border-r border-slate-200">
+            <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <h2 class="text-2xl font-bold text-slate-800">Revisión de evidencia</h2>
+                <div class="flex items-center gap-3 text-xs">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-accent inline-block"></span>Gate N1 (excluyente)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-2 inline-block"></span>Gate N2 (brecha)</span>
+                </div>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Todos los ítems tienen dos estados — <strong>declarado</strong> (lo que dijo la empresa en el Intake) y <strong>verificado</strong> (lo que confirma el evaluador en sitio). Si no coinciden, queda marcado como discrepancia, igual que en la Matriz post verificación real.</p>
+
+            <!-- Consentimiento y elegibilidad: paso 0 y 0b del dictamen real -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 space-y-3">
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm font-semibold text-slate-700">¿La empresa acepta ser sujeto de auditoría (financiera, técnica y de flota)?</span>
+                    <input type="checkbox" id="chk-auditoria" checked onchange="recalcular()" class="w-5 h-5 accent-brand">
+                </label>
+                <label class="flex items-center justify-between cursor-pointer">
+                    <span class="text-sm font-semibold text-slate-700">¿La empresa está domiciliada dentro del área del programa (Iglesia / Jáchal)?</span>
+                    <input type="checkbox" id="chk-elegibilidad" checked onchange="recalcular()" class="w-5 h-5 accent-brand">
+                </label>
+            </div>
+
+            <div id="accordion-container" class="space-y-4"></div>
+        </div>
+
+        <!-- Columna Derecha: Tablero -->
+        <div class="w-full lg:w-1/3 p-6 bg-slate-50 flex flex-col sticky top-0 h-screen overflow-y-auto">
+            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">Tablero de evaluación</h2>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center mb-4">
+                <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Puntaje global</h3>
+                <div class="text-6xl font-black mono text-slate-800 mb-1" id="puntaje-total">0.0</div>
+                <div class="text-xs text-slate-400 mb-4 border-b border-slate-100 pb-4">sobre 100 puntos</div>
+                <h3 class="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Dictamen</h3>
+                <div id="dictamen-badge" class="px-4 py-3 rounded-lg text-base font-bold w-full bg-slate-100 text-slate-600 border border-slate-300">Pendiente de carga...</div>
+                <div id="discrepancias-resumen" class="mt-3 text-xs"></div>
+            </div>
+
+            <!-- Cascada de decisión: elemento distintivo de trazabilidad -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-4">
+                <h3 class="font-bold text-sm text-slate-700 mb-4 flex items-center gap-2">
+                    <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i> Cascada de decisión
+                </h3>
+                <div id="cascada-container" class="space-y-3 text-xs"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <h3 class="font-bold text-sm text-slate-700 mb-4 border-b pb-2">Puntuación por dimensión</h3>
+                <div id="dimensiones-scores" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel explicativo de pisos -->
+    <div class="max-w-7xl mx-auto mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-600"></i> ¿Qué es un piso?</h2>
+        <p class="text-sm text-slate-500 mb-4 max-w-3xl">Un <strong>piso</strong> es una condición excluyente: si no se cumple, el dictamen es No-Go sin importar qué tan alto sea el puntaje global. <strong>Regla general: cualquiera de los 27 subcriterios que llegue a 0/5 puntos produce No-Go</strong>, no solo los 6 destacados históricamente (2.1, 1.3, 2.2, 3.4, 4.2, 5.1). A esto se suma el bloque de Salud Financiera (promedio &lt; 2) y los 3 subcriterios SSMA excluyentes (≤ 1 = No-Go), que en conjunto viven dentro del Gate Nivel 1.</p>
+        <div id="pisos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"></div>
+    </div>
+
+    <p class="max-w-7xl mx-auto text-center text-xs text-slate-400 mt-6 pb-4">Herramienta de simulación — refleja la estructura y los pesos reales de la Matriz Unificada v4.1. El cálculo de puntaje por evidencia (checkbox → 0-5) es una simplificación pedagógica; el archivo real usa fórmulas y tablas de conversión propias por subcriterio.</p>
+
+    <script>
+        const DATA = {"dimensiones":{"I":{"nombre":"GOBERNANZA, CUMPLIMIENTO E INTEGRIDAD","peso":10,"subs":[{"id":"1.1","nombre":"Conformación legal, radicación y arraigo provincial","peso":4,"piso":null,"items":[{"id":"J.1","texto":"¿Presenta el estatuto o contrato social inscripto?","gate":null,"entregable":"contrato social/estatuto inscripto"},{"id":"J.2","texto":"¿Presenta el acta de designación de autoridades vigente y el DNI de los socios?","gate":null,"entregable":"acta de designación de socios + DNI"},{"id":"J.3","texto":"¿Presenta la constancia de inscripción ante ARCA (ex AFIP)?","gate":null,"entregable":"constancia de inscripción AFIP"},{"id":"J.35","texto":"¿Tiene domicilio legal, fiscal y establecimiento operativo habilitado en San Juan, con al menos 12 meses de antigüedad?","gate":null,"entregable":"constancia de domicilio fiscal AFIP y habilitación municipal/provincial del establecimiento"},{"id":"J.36","texto":"¿Está inscripto en el RE.PRO.MIN. (Registro Provincial de Proveedores Mineros)?","gate":null,"entregable":"constancia de inscripción vigente en el/los registro(s) que correspondan"}]},{"id":"1.2","nombre":"Estructura de gobierno, roles y decisión","peso":3,"piso":null,"items":[{"id":"J.4","texto":"¿Cuenta con un organigrama de la empresa?","gate":null,"entregable":"organigrama institucional"},{"id":"J.5","texto":"¿Tiene definida una matriz de contactos y puntos de escalamiento para el proyecto?","gate":null,"entregable":"listado formal de contactos"},{"id":"J.6","texto":"¿Tiene un poder de representación o una matriz de responsabilidades?","gate":null,"entregable":"declaración jurada, anexo técnico o copia de poderes firmados"}]},{"id":"1.3","nombre":"Integridad, cumplimiento laboral-sindical y libre conflictividad","peso":3,"piso":"0 = No-Go","items":[{"id":"J.7","texto":"¿Presenta el Certificado de Libre Deuda Previsional emitido por ARCA?","gate":null,"entregable":"Certificado de Libre Deuda Previsional"},{"id":"J.8","texto":"¿Presenta el Certificado de Libre Conflictividad de la Subsecretaría de Trabajo de San Juan?","gate":null,"entregable":"certificado original"},{"id":"J.9","texto":"¿Presenta el último Formulario 931 con su constancia de pago?","gate":null,"entregable":"último pago del F.931"},{"id":"J.37","texto":"¿Presenta el Certificado de Libre Deuda Sindical?","gate":null,"entregable":"Certificado de Libre Deuda Sindical vigente"},{"id":"J.38","texto":"¿Presenta una declaración jurada de antecedentes de huelgas o bloqueos de los últimos 2 años, con el encuadre sindical al día?","gate":null,"entregable":"declaración jurada de antecedentes de huelgas/bloqueos de los últimos 2 años + constancia de encuadre sindical al día"},{"id":"J.39","texto":"¿Garantiza que al menos el 80% del personal del servicio esté radicado en San Juan (con DNI y residencia efectiva de 12 meses o más)?","gate":null,"entregable":"DNI y constancia de residencia efectiva (≥12 meses) del personal afectado"},{"id":"J.40","texto":"¿Da prioridad a contratar, en primer lugar, a personas de las comunidades de Iglesia y Jáchal?","gate":null,"entregable":"procedimiento o política de contratación que documente el orden de prioridad geográfica declarado"}]}]},"II":{"nombre":"SALUD FINANCIERA","peso":15,"subs":[{"id":"2.1","nombre":"Solvencia, liquidez y capital de trabajo","peso":5,"piso":"0 = No-Go","items":[{"id":"J.10","texto":"¿Presenta los últimos 2 estados contables legalizados por el Consejo Profesional de Ciencias Económicas?","gate":null,"entregable":"últimos 2 EECC legalizados por el CPCE"},{"id":"J.11","texto":"¿Presenta el detalle de ventas y compras posteriores al último balance (según libro IVA)?","gate":null,"entregable":"detalle de ventas y compras post-balance"},{"id":"J.12","texto":"¿Presenta las últimas 6 declaraciones juradas de IVA e IIBB?","gate":null,"entregable":"6 DDJJ de IVA e IIBB"}]},{"id":"2.2","nombre":"Capacidad de endeudamiento / financiamiento de flota","peso":6,"piso":"0 = No-Go","items":[{"id":"J.13","texto":"Situación en el BCRA (Central de Deudores) de la empresa y de los socios: indique la peor situación (del 1 al 5)","gate":null,"entregable":"informe del BCRA de la empresa y los socios individualmente"}]},{"id":"2.3","nombre":"Comportamiento de pago e historial crediticio","peso":4,"piso":null,"items":[{"id":"J.15","texto":"¿Presenta el último informe comercial tipo VERAZ o NOSIS de la empresa?","gate":null,"entregable":"informe tipo Veraz o Nosis"},{"id":"J.33","texto":"¿Acepta ser auditada (financiera, técnica y de flota) por la consultora designada?","gate":null,"entregable":"Aceptación expresa de auditoría financiera, técnica y de flota"}]}]},"III":{"nombre":"RRHH Y RÉGIMEN LABORAL","peso":15,"subs":[{"id":"3.1","nombre":"Dotación, estabilidad y escalabilidad a 45/17","peso":4,"piso":null,"items":[{"id":"J.16","texto":"¿Cuántos empleados tiene en relación de dependencia (según el último F.931)?","gate":null,"entregable":"Nómina del personal declarada en el último F.931"},{"id":"J.17","texto":"¿Presenta el libro de sueldos digital o la planilla de altas tempranas de ARCA?","gate":null,"entregable":"libro de sueldo digital del último mes"}]},{"id":"3.2","nombre":"Experiencia y habilitaciones del personal operativo","peso":4,"piso":null,"items":[{"id":"J.18","texto":"¿Tiene los CV de los operarios clave de maquinaria (motoniveladora, topadora, cargadora)?","gate":null,"entregable":"Curriculum Vitae de los operarios clave"},{"id":"J.19","texto":"¿Tiene el carnet de conducir profesional o la tarjeta IERIC del personal?","gate":null,"entregable":"Carnet de conducir profesional / Tarjeta de IERIC"}]},{"id":"3.3","nombre":"Liderazgo operativo en campo","peso":3,"piso":null,"items":[{"id":"J.20","texto":"¿Tiene los CV del jefe de obra, capataces y del supervisor que estará fijo en el lugar?","gate":null,"entregable":"CV del jefe de obra, capataces y supervisor que está fijo en sitio"}]},{"id":"3.4","nombre":"Roster 14x7 UOCRA y reemplazo en 24 h","peso":4,"piso":"0 = No-Go","items":[{"id":"J.21","texto":"Describa el esquema de turnos 14x7 y el sistema de relevos que propone","gate":null,"entregable":"Plan de Roster / diagrama de turnos propuestos"},{"id":"J.22","texto":"¿Tiene un procedimiento para trasladar al personal hasta el lugar de trabajo?","gate":null,"entregable":"Procedimiento logístico de transporte"},{"id":"J.23","texto":"¿Tiene un listado de personal de reemplazo (back-up) listo para ingresar?","gate":null,"entregable":"Listado de Personal de Back-up vigentes listos para ingresar"},{"id":"J.32","texto":"¿En cuántas horas puede cubrir una vacante de personal?","gate":null,"entregable":"Registro del tiempo de cobertura de una vacante (horas)"}]}]},"IV":{"nombre":"EXPERIENCIA TÉCNICA","peso":18,"subs":[{"id":"4.1","nombre":"Mantenimiento de caminos no pavimentados","peso":7,"piso":null,"items":[{"id":"Q4.1","texto":"¿Cuántos años de experiencia tiene la empresa en mantenimiento de caminos no pavimentados (de ripio/tierra)?","gate":null,"entregable":"Contratos o actas de recepción de mantenimiento vial o similar"},{"id":"Q4.2","texto":"¿Tiene experiencia en estabilización de suelos (bischofita, cloruro de calcio/sodio, cal, enzimas)? Indique cuántos proyectos.","gate":null,"entregable":"Contratos y fichas técnicas del producto o tratamiento aplicado"},{"id":"Q4.3","texto":"¿Cuántos kilómetros de caminos no pavimentados mantuvo en los últimos 5 años?","gate":null,"entregable":"Contratos con detalle de tramos y kilometraje"},{"id":"Q4.4","texto":"¿Tiene experiencia en perfilado con motoniveladora y control de polvo (riego o supresores)?","gate":null,"entregable":"Registros de obra, fotos, informes técnicos"}]},{"id":"4.2","nombre":"Industria minera y alta montaña","peso":5,"piso":"0 = No-Go","items":[{"id":"Q4.5","texto":"¿Tiene experiencia trabajando para la industria minera? Indique la antigüedad.","gate":null,"entregable":"Contratos u órdenes de compra con empresas mineras"},{"id":"Q4.6","texto":"¿A qué altura máxima (metros sobre el nivel del mar) operó la empresa de forma sostenida?","gate":null,"entregable":"Contratos, ubicación de obras, informes de operación"},{"id":"Q4.7","texto":"¿Cuántos contratos con empresas mineras ejecutó en los últimos 5 años?","gate":null,"entregable":"Listado de contratos con referencias verificables"}]},{"id":"4.3","nombre":"Vialidad invernal y operativos nocturnos","peso":2,"piso":null,"items":[{"id":"Q4.8","texto":"¿Tiene experiencia en vialidad invernal (despeje de nieve o control de hielo)?","gate":null,"entregable":"Contratos o actas de servicios invernales"},{"id":"Q4.9","texto":"¿Operó en nieve/hielo y temperaturas bajo cero, con guardias las 24 horas?","gate":null,"entregable":"Registros de operación invernal, planillas de guardia"}]},{"id":"4.4","nombre":"Experiencia del equipo humano (operadores y personal clave)","peso":4,"piso":null,"items":[{"id":"Q4.10","texto":"¿Cuántos años de experiencia promedio tienen sus operadores de equipos de movimiento de suelo?","gate":null,"entregable":"Legajos/CV de operadores, constancias laborales"},{"id":"Q4.11","texto":"¿Cuántos operadores certificados o habilitados para equipos de movimiento de suelo tiene?","gate":null,"entregable":"Certificados/licencias de habilitación vigentes"},{"id":"Q4.12","texto":"¿Cuántos años de experiencia tiene su responsable técnico o jefe de obra en caminos no pavimentados?","gate":null,"entregable":"CV + matrícula profesional (si aplica)"},{"id":"Q4.13","texto":"¿Tiene un programa de capacitación e inducción del personal (seguridad y técnica) documentado?","gate":null,"entregable":"Programa de capacitación + registros de asistencia"}]}]},"V":{"nombre":"FLOTA, CAPACIDAD MECÁNICA Y REPUESTOS","peso":20,"subs":[{"id":"5.1","nombre":"Flota disponible vs. flota mínima","peso":8,"piso":"0 = No-Go","items":[{"id":"Q5.2","texto":"¿Posee equipos para el mantenimiento del camino en la temporada estival (verano)?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo estival","scoreable":false},{"id":"Q5.36","texto":"¿Posee equipos para el mantenimiento del camino en la temporada invernal?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo invernal","scoreable":false},{"id":"F.1-cant","texto":"Cargadora tipo CAT 938K — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."},{"id":"F.2-cant","texto":"Motoniveladora tipo CAT 140K — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."},{"id":"F.3-cant","texto":"Retroexcavadora tipo CAT 416E — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.4-cant","texto":"Vibrocompactador tipo CAT CS54B — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.5-cant","texto":"Camión volcador tipo IVECO 410 (14 m³) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.6-cant","texto":"Minicargadora tipo BobCat — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.7-cant","texto":"Camión regador tipo IVECO 410 (18 m³) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.8-cant","texto":"Camioneta 4x4 tipo Toyota Hilux — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 5 unidad(es)."},{"id":"F.9-cant","texto":"Camión capilar/lubricador (4.000 l) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.10-cant","texto":"Barredora tipo Fracchia N337 — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.12-cant","texto":"Topadora tipo CAT D8T — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."}]},{"id":"5.2","nombre":"Estado técnico, antigüedad y radicación de la flota","peso":5,"piso":null,"items":[{"id":"Q5.1","texto":"¿El 100% de su flota (propia o alquilada) está registrada y tributando en San Juan?","gate":null,"entregable":"Constancia de registro y tributación provincial de cada unidad"},{"id":"Q5.43","texto":"¿Bajo qué modalidad realiza el mantenimiento de sus equipos?","gate":null,"entregable":"Registro de mantenimiento de los vehículos"},{"id":"F.1-horas","texto":"Cargadora tipo CAT 938K — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.1-mant","texto":"Cargadora tipo CAT 938K — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.2-horas","texto":"Motoniveladora tipo CAT 140K — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.2-mant","texto":"Motoniveladora tipo CAT 140K — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.3-horas","texto":"Retroexcavadora tipo CAT 416E — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.3-mant","texto":"Retroexcavadora tipo CAT 416E — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.4-horas","texto":"Vibrocompactador tipo CAT CS54B — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.4-mant","texto":"Vibrocompactador tipo CAT CS54B — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.5-horas","texto":"Camión volcador tipo IVECO 410 (14 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.5-mant","texto":"Camión volcador tipo IVECO 410 (14 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.6-horas","texto":"Minicargadora tipo BobCat — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.6-mant","texto":"Minicargadora tipo BobCat — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.7-horas","texto":"Camión regador tipo IVECO 410 (18 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.7-mant","texto":"Camión regador tipo IVECO 410 (18 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.8-horas","texto":"Camioneta 4x4 tipo Toyota Hilux — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.8-mant","texto":"Camioneta 4x4 tipo Toyota Hilux — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.9-horas","texto":"Camión capilar/lubricador (4.000 l) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.9-mant","texto":"Camión capilar/lubricador (4.000 l) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.10-horas","texto":"Barredora tipo Fracchia N337 — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.10-mant","texto":"Barredora tipo Fracchia N337 — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.11-horas","texto":"Camión volcador tipo Scania 440 XT (20 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.11-mant","texto":"Camión volcador tipo Scania 440 XT (20 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.12-horas","texto":"Topadora tipo CAT D8T — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.12-mant","texto":"Topadora tipo CAT D8T — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.13-horas","texto":"Camión barrenieve — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.13-mant","texto":"Camión barrenieve — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."}]},{"id":"5.3","nombre":"Taller, repuestos en zona y respuesta 48 h","peso":5,"piso":null,"items":[{"id":"Q5.44","texto":"Disponibilidad de taller en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de taller en zona"},{"id":"Q5.45","texto":"Disponibilidad de repuestos en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de repuestos en zona"},{"id":"Q5.46","texto":"Disponibilidad de piezas de desgaste en zona (neumáticos, cuchillas, uñas, tren de rodaje): ¿cuántos presupuestos presenta?","gate":null,"entregable":"Presupuesto de piezas de desgaste en zona (neumáticos, cuchillas, orugas)"},{"id":"Q5.47","texto":"Disponibilidad de filtros y lubricantes en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de filtros y lubricantes en zona"}]},{"id":"5.4","nombre":"Capacidad técnica-mecánica propia","peso":2,"piso":null,"items":[{"id":"Q5.48","texto":"¿Tiene servicio mecánico propio o un banco de mecánicos para el primer diagnóstico ante una falla?","gate":null,"entregable":"Legajos/CV de mecánicos, constancias laborales"}]}]},"VI":{"nombre":"SSMA OPERACIONAL","peso":14,"subs":[{"id":"6.1","nombre":"Responsabilidad profesional SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.3","texto":"¿Cuenta con un Profesional de Higiene y Seguridad matriculado en la provincia de San Juan?","gate":"n1","entregable":"matrícula profesional vigente emitida por el Consejo de Profesionales de Higiene y Seguridad en el Trabajo de San Juan"},{"id":"G.4","texto":"¿Ese profesional tiene al menos 4 años de experiencia en minería, obras viales o alta montaña?","gate":"n1","entregable":"CV y antecedentes laborales"},{"id":"G.5","texto":"¿Dispone de técnicos de Higiene y Seguridad para supervisión en el lugar de trabajo?","gate":"n1","entregable":"nómina del equipo HSE disponible y CV"},{"id":"G.6","texto":"Si hoy no tiene el equipo técnico completo, ¿se compromete formalmente a contratarlo antes de empezar?","gate":"n1","entregable":"nota de compromiso, propuesta de servicio, cotización, preacuerdo o planificación de incorporación del personal técnico"},{"id":"G.7","texto":"¿Tiene un Legajo Técnico de Obra actualizado y disponible?","gate":"n1","entregable":"índice del Legajo Técnico o evidencia de disponibilidad documental"}]},{"id":"6.2","nombre":"Sistema de gestión SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.1","texto":"¿Tiene cobertura de ART vigente para el 100% del personal que trabajará en el servicio?","gate":"n1","entregable":"póliza o constancia de afiliación vigente de ART"},{"id":"G.2","texto":"¿Tiene los seguros vigentes que corresponden a la actividad (Responsabilidad Civil, automotor, equipos)?","gate":"n1","entregable":"pólizas vigentes y comprobantes de cobertura"},{"id":"G.8","texto":"¿Cuenta con un Programa de Seguridad acorde a las tareas a realizar?","gate":"n1","entregable":"Programa de Seguridad y constancia de presentación/aprobación si corresponde"},{"id":"G.9","texto":"¿Tiene una Política de Higiene, Seguridad, Salud Ocupacional y Ambiente?","gate":"n1","entregable":"política vigente, firmada y difundida"},{"id":"G.10","texto":"¿Tiene procedimientos de trabajo seguro para las tareas (al menos tres)?","gate":"n1","entregable":"como mínimo tres procedimientos aplicables a las actividades declaradas"},{"id":"G.11","texto":"¿Usa un checklist diario para revisar vehículos, maquinaria y equipos antes de operar?","gate":"n1","entregable":"modelos de checklist preoperacional y registros disponibles"},{"id":"G.12","texto":"¿Tiene una matriz de identificación de peligros y evaluación de riesgos (IPERC, IPER u otra)?","gate":"n1","entregable":"matriz de riesgos vigente"},{"id":"G.13","texto":"¿Tiene un procedimiento de señalización y control de tránsito para las tareas de mantenimiento vial?","gate":"n1","entregable":"procedimiento, croquis tipo, cartelería, conos, balizas, banderilleros y sistema de comunicación"},{"id":"G.14","texto":"¿Tiene un protocolo de trabajo para condiciones climáticas adversas?","gate":"n1","entregable":"protocolo por viento, nieve, hielo, tormenta eléctrica, baja visibilidad, frío extremo o crecidas"},{"id":"G.15","texto":"¿Tiene un plan de mantenimiento preventivo de vehículos, maquinaria y equipos críticos?","gate":"n1","entregable":"plan de mantenimiento, registros de servicios, inspecciones técnicas y control de fallas críticas"},{"id":"G.16","texto":"¿Tiene la documentación habilitante de vehículos, maquinaria y conductores/operadores?","gate":"n1","entregable":"licencia de conducir, habilitaciones, RTO/RTO minera si aplica, seguro, cédula, certificados de operador y aptos médicos"},{"id":"G.21","texto":"¿Tiene un Plan Anual de Capacitación en seguridad, salud y ambiente?","gate":"n1","entregable":"plan anual de capacitación"},{"id":"G.22","texto":"¿Tiene un Plan de Contingencias para emergencias (incendio, derrame, sismo, accidente, clima)?","gate":"n1","entregable":"Plan de Contingencia"},{"id":"G.23","texto":"¿Tiene un sistema de traslado médico o cobertura de asistencia ante emergencias?","gate":"n1","entregable":"contrato, convenio, cobertura médica, servicio de ambulancia o cotización vigente"},{"id":"G.25","texto":"¿Tiene un Servicio de Medicina Laboral vigente o cobertura equivalente?","gate":"n1","entregable":"contrato de servicio de Medicina Laboral o cotización del servicio"},{"id":"G.28","texto":"¿Realiza evaluaciones de aptitud médica al personal que trabaja en altura, conduce u opera equipos?","gate":"n1","entregable":"certificado de aptitud médica del personal expuesto"}]},{"id":"6.3","nombre":"Índice de siniestralidad","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.24","texto":"¿Tiene el Índice de Siniestralidad de los últimos 3 años emitido por la ART?","gate":"n1","entregable":"índice emitido por la ART"},{"id":"G.26","texto":"¿Tiene vigente la Nómina de Trabajadores Expuestos a Agentes de Riesgo (RAR)?","gate":"n1","entregable":"RAR/NTE vigente o constancia de presentación ante la ART"},{"id":"G.27","texto":"Si tiene personal expuesto en el RAR, ¿le realiza los monitoreos o estudios correspondientes?","gate":"n1","entregable":"mediciones o monitoreos"}]},{"id":"6.4","nombre":"Gestión ambiental y legalidad de suministros","peso":3,"piso":null,"items":[{"id":"G.29","texto":"¿Cuenta con un Profesional Ambiental o asesoramiento ambiental competente?","gate":"n2","entregable":"CV, contrato o cotización del servicio"},{"id":"G.30","texto":"¿Tiene un plan de gestión de residuos, incluidos los peligrosos?","gate":"n2","entregable":"procedimiento de gestión de residuos, manifiestos, registros de retiro o contrato con operador habilitado, si corresponde"},{"id":"G.33","texto":"¿El ripio y los áridos que usa provienen de canteras habilitadas (fuentes 100% legales)?","gate":"n2","entregable":"Listado de canteras habilitadas utilizadas y constancia de habilitación de cada una"}]},{"id":"6.5","nombre":"Equipamiento (EPP, extintores, kit antiderrame, operativo invierno)","peso":2,"piso":null,"items":[{"id":"G.17","texto":"¿Tiene registros de entrega de Elementos de Protección Personal (EPP)?","gate":"n2","entregable":"registros de entrega de EPP"},{"id":"G.18","texto":"¿Los EPP cuentan con certificación, ficha técnica o respaldo del fabricante?","gate":"n2","entregable":"certificados, declaraciones de conformidad, fichas técnicas o documentación del proveedor"},{"id":"G.19","texto":"¿Tiene EPP y ropa de trabajo adecuados para operar en invierno en alta montaña?","gate":"n2","entregable":"stock, registros de entrega, fichas técnicas o cotización de EPP y ropa de invierno"},{"id":"G.20","texto":"¿Valora comprar EPP y ropa de trabajo a proveedores locales?","gate":"n2","entregable":"cotización de dos proveedores locales"},{"id":"G.31","texto":"¿Tiene equipamiento para responder a contingencias (kit antiderrame, extintores, botiquín, señalización)?","gate":"n2","entregable":"inventario, registro de inspección o evidencia del equipamiento"},{"id":"G.32","texto":"¿Dispone de medios de comunicación para zonas de alta montaña (radio, VHF, Starlink, satelital)?","gate":"n2","entregable":"registro de equipos de comunicación disponibles"}]}]},"VII":{"nombre":"DESARROLLO COMUNITARIO Y ASOCIATIVISMO","peso":8,"subs":[{"id":"7.1","nombre":"Empleo local y plan de calificación","peso":3,"piso":null,"items":[{"id":"J.39","texto":"¿Garantiza que al menos el 80% del personal del servicio esté radicado en San Juan (con DNI y residencia efectiva de 12 meses o más)?","gate":null,"entregable":"DNI y constancia de residencia efectiva (≥12 meses) del personal afectado"},{"id":"J.40","texto":"¿Da prioridad a contratar, en primer lugar, a personas de las comunidades de Iglesia y Jáchal?","gate":null,"entregable":"procedimiento o política de contratación que documente el orden de prioridad geográfica declarado"},{"id":"J.25","texto":"¿Tiene un plan de capacitación o formación técnica para personal de la comunidad?","gate":null,"entregable":"Plan anual de capacitación o programa de formación/calificación técnica destinado al personal de la comunidad o zonas de influencia directa"}]},{"id":"7.2","nombre":"Compre local y subproveedores","peso":1,"piso":null,"items":[{"id":"J.26","texto":"¿Tiene una política o procedimiento de compra y contratación de bienes y servicios locales?","gate":null,"entregable":"Política interna o procedimiento documentado de abastecimiento y contratación de bienes/servicios locales"},{"id":"J.27","texto":"¿Tiene un listado de subproveedores, talleres o comercios locales que planea integrar?","gate":null,"entregable":"Listado de subproveedores, talleres, comercios o servicios logísticos de la zona que planea integrar en su cadena de suministro"}]},{"id":"7.3","nombre":"Asociativismo / UTE","peso":2,"piso":null,"items":[{"id":"J.28","texto":"Si se presenta como consorcio o alianza, ¿tiene el contrato de Unión Transitoria o acuerdo inscripto, con el % de cada firma?","gate":null,"entregable":"Contrato de Unión Transitoria (UT) o acuerdo de colaboración empresarial inscripto"},{"id":"J.29","texto":"Si se presenta como empresa individual, ¿tiene convenios vigentes con cámaras, cooperativas, universidades u organizaciones de la comunidad?","gate":null,"entregable":"Registro de convenios vigentes con cámaras comerciales locales, cooperativas de trabajo, universidades u organizaciones de la comunidad"}]},{"id":"7.4","nombre":"Apertura al acompañamiento y velocidad de mejora","peso":2,"piso":null,"items":[{"id":"J.30","texto":"¿Presenta historial de auditorías o evaluaciones de desempeño previas, con los Planes de Acción o Mejora implementados ante desvíos?","gate":null,"entregable":"Historial de auditorías o evaluaciones de desempeño previas y los correspondientes Planes de Acción o Planes de Mejora implementados"},{"id":"J.31","texto":"¿Presenta carta de compromiso gerencial firmada aceptando los procesos de auditoría social, ambiental y operativa?","gate":null,"entregable":"Carta de compromiso gerencial firmada donde acepte los procesos de auditoría social, ambiental y operativa que disponga la organización"}]}]}},"empresas":{"vialidad":{"nombre":"Vialidad Cuyana SRL","cuit":"30-71234567-8","localidad":"Rodeo, Iglesia","resultado_real":"GO — 86,2 pts (Sesión de datos de prueba)","regularUnchecked":[],"gateN2Unchecked":[],"gateDiscrepancias":{}},"transportes":{"nombre":"Transportes del Norte SA","cuit":"30-70987654-3","localidad":"Jáchal","resultado_real":"GO CON PLAN DE ACCIÓN — 57,8 pts (Sesión de datos de prueba)","regularUnchecked":["J.35","J.36","J.37","J.11","J.12","J.15","J.17","J.19","J.22","J.23","Q4.2","Q4.3","Q4.6","Q4.8","Q4.11","Q4.12","Q5.36","Q5.43","Q5.44","Q5.45","J.39","J.40","J.27","J.29","J.31","F.1-cant","F.2-cant","F.3-cant","F.4-cant","F.5-cant","F.1-horas","F.1-mant","F.2-horas","F.2-mant","F.3-horas","F.3-mant","F.4-horas","F.4-mant","F.5-horas"],"gateN2Unchecked":["G.19","G.31","G.33"],"gateDiscrepancias":{}},"cordillera":{"nombre":"Constructora Cordillera SRL","cuit":"30-69123456-1","localidad":"Las Flores, Jáchal","resultado_real":"NO-GO — Gate HSE, ART vencida (Sesión de datos de prueba)","regularUnchecked":[],"gateN2Unchecked":[],"gateDiscrepancias":{"G.1":"Declaró ART vigente; en la visita la póliza exhibida estaba vencida 40 días."}},"oeste":{"nombre":"Servicios Viales del Oeste SA","cuit":"30-68456789-2","localidad":"Angualasto, Iglesia","resultado_real":"NO-GO — Flota mínima, 5.1 = 0 (Sesión de datos de prueba)","regularUnchecked":["Q5.2","Q5.36","F.1-cant","F.2-cant","F.3-cant","F.4-cant","F.5-cant","F.6-cant","F.7-cant","F.8-cant","F.9-cant","F.10-cant","F.12-cant"],"gateN2Unchecked":[],"gateDiscrepancias":{}}}};
+
+        // ---------- Conexión con Google Sheets ("Respuestas de formulario 1") ----------
+        // La hoja está compartida como "cualquiera con el enlace" — se lee vía el endpoint
+        // público gviz (JSONP), que no requiere API key ni login de Google.
+        const GOOGLE_SHEET_ID = "1SOW-lAOopw7hddfG4R_Ii8SC42BLQvafqtBDeput5g4";
+        const GOOGLE_SHEET_GID = "1393221337";
+        const GOOGLE_SHEET_NAME = "Respuestas de formulario 1";
+
+        // Mapea el texto EXACTO de cada columna de "Respuestas de formulario 1" a su ítem de la Matriz
+        // (o a un campo de metadata de la empresa). Generado por correspondencia 1:1 contra
+        // DATA — cubre 127 de los 129 subcriterios; J.30 y J.31 no tienen pregunta en el
+        // formulario actual y quedan sin evidencia declarada (ver ITEMS_SIN_PREGUNTA_EN_FORM).
+        const FORM_ITEM_MAP = {"Marca temporal":{"meta":"timestamp"},"Razón social":{"meta":"nombre"},"CUIT":{"meta":"cuit"},"Departamento donde está radicada la empresa":{"meta":"departamento"},"Localidad donde está ubicada la empresa.":{"meta":"localidad"},"Representante legal - Indique nombre completo.":{"meta":"representante"},"Email del Representante Legal. ":{"meta":"email"},"Fecha de presentación del formulario (":{"meta":"fechaPresentacion"},"Antigüedad de la empresa (en años)":{"meta":"antiguedad"},"¿Cuenta con un Profesional de Higiene y Seguridad matriculado en la provincia de San Juan?":{"id":"G.3","kind":"bool"},"¿Ese profesional tiene al menos 4 años de experiencia en minería, obras viales o alta montaña?":{"id":"G.4","kind":"bool"},"¿Dispone de técnicos de Higiene y Seguridad para supervisión en campo?":{"id":"G.5","kind":"bool"},"Si hoy no tiene el equipo técnico completo, ¿se compromete formalmente a contratarlo antes de empezar?":{"id":"G.6","kind":"bool"},"¿Tiene un Legajo Técnico de Obra actualizado y disponible?":{"id":"G.7","kind":"bool"},"¿Tiene cobertura de ART vigente para el 100% del personal que trabajará en el servicio?":{"id":"G.1","kind":"bool"},"¿Tiene los seguros vigentes que corresponden a la actividad (Responsabilidad Civil, automotor, equipos)?":{"id":"G.2","kind":"bool"},"¿Cuenta con un Programa de Seguridad acorde a las tareas a realizar en una obra de Mantenimiento de Camino?":{"id":"G.8","kind":"bool"},"¿Tiene una Política de Higiene, Seguridad, Salud Ocupacional y Ambiente?":{"id":"G.9","kind":"bool"},"¿Tiene procedimientos de trabajo seguro para las tareas (al menos tres)?":{"id":"G.10","kind":"bool"},"¿Usa un checklist diario para revisar vehículos, maquinaria y equipos antes de operar?":{"id":"G.11","kind":"bool"},"¿Tiene una matriz de identificación de peligros y evaluación de riesgos (IPERC, IPER u otra)?":{"id":"G.12","kind":"bool"},"¿Tiene un procedimiento de señalización y control de tránsito para las tareas de mantenimiento vial?":{"id":"G.13","kind":"bool"},"¿Tiene un protocolo de trabajo para condiciones climáticas adversas?":{"id":"G.14","kind":"bool"},"¿Tiene un plan de mantenimiento preventivo de vehículos, maquinaria y equipos críticos?":{"id":"G.15","kind":"bool"},"¿Tiene la documentación habilitante de vehículos, maquinaria y conductores/operadores?":{"id":"G.16","kind":"bool"},"¿Tiene un Plan Anual de Capacitación en seguridad, salud y ambiente?":{"id":"G.21","kind":"bool"},"¿Tiene un Plan de Contingencias para emergencias (incendio, derrame, sismo, accidente, clima)?":{"id":"G.22","kind":"bool"},"¿Tiene un sistema de traslado médico o cobertura de asistencia ante emergencias?":{"id":"G.23","kind":"bool"},"¿Tiene un Servicio de Medicina Laboral vigente o cobertura equivalente acorde a su actividad y dotación?":{"id":"G.25","kind":"bool"},"¿Cuenta con evaluación de aptitud médica del personal expuesto a tareas en alta montaña, conducción u operación de equipos?":{"id":"G.28","kind":"bool"},"¿Tiene el Índice de Siniestralidad de los últimos 3 años emitido por la ART?":{"id":"G.24","kind":"bool"},"¿Tiene vigente la Nómina de Trabajadores Expuestos a Agentes de Riesgo (RAR)?":{"id":"G.26","kind":"bool"},"Si tiene personal expuesto en el RAR, ¿le realiza los monitoreos o estudios correspondientes?":{"id":"G.27","kind":"bool"},"¿Cuenta con un Profesional Ambiental o cuenta con asesoramiento ambiental externo?":{"id":"G.29","kind":"bool"},"¿Cuenta con plan de gestión de residuos, incluyendo residuos peligrosos generados?":{"id":"G.30","kind":"bool"},"¿El ripio y los áridos que usa provienen de canteras habilitadas (fuentes 100% legales)?":{"id":"G.33","kind":"bool"},"¿Tiene registros de entrega de Elementos de Protección Personal (EPP)?":{"id":"G.17","kind":"bool"},"¿Los EPP cuentan con certificación, ficha técnica o respaldo del fabricante?":{"id":"G.18","kind":"bool"},"¿Cuenta con EPP y ropa de trabajo adecuados para operativo invierno en alta montaña?":{"id":"G.19","kind":"bool"},"¿Valora comprar EPP y ropa de trabajo a proveedores locales?":{"id":"G.20","kind":"bool"},"¿Tiene equipamiento para responder ante contingencias (kit antiderrame, extintores, botiquín, señalización)?":{"id":"G.31","kind":"bool"},"¿Dispone de medios de comunicación para zonas de alta montaña (radio, VHF, Starlink, satelital)?":{"id":"G.32","kind":"bool"},"¿Presenta el estatuto o contrato social inscripto?":{"id":"J.1","kind":"bool"},"¿Presenta el acta de designación de autoridades vigente y el DNI de los socios?":{"id":"J.2","kind":"bool"},"¿Cuenta con la constancia de inscripción ante ARCA ?":{"id":"J.3","kind":"bool"},"¿Tiene domicilio legal, fiscal y establecimiento operativo habilitado en San Juan, con al menos 12 meses de antigüedad?":{"id":"J.35","kind":"bool"},"¿Está inscripto en el RE.PRO.MIN. (Registro Provincial de Proveedores Mineros)?":{"id":"J.36","kind":"bool"},"¿Cuenta con un organigrama de la empresa?":{"id":"J.4","kind":"bool"},"¿Tiene definida una matriz de contactos y puntos de escalamiento para el proyecto?":{"id":"J.5","kind":"bool"},"¿Tiene un poder de representación o una matriz de responsabilidades?":{"id":"J.6","kind":"bool"},"¿Cuenta con el Certificado de Libre Deuda Previsional emitido por ARCA?":{"id":"J.7","kind":"bool"},"¿Cuenta el Certificado de Libre Conflictividad de la Subsecretaría de Trabajo de San Juan?":{"id":"J.8","kind":"bool"},"¿Cuenta el último Formulario 931 con su constancia de pago?":{"id":"J.9","kind":"bool"},"¿Cuenta el Certificado de Libre Deuda Sindical?":{"id":"J.37","kind":"bool"},"¿Cuenta una declaración jurada de antecedentes de huelgas o bloqueos de los últimos 2 años, con el encuadre sindical al día?":{"id":"J.38","kind":"bool"},"¿Cuenta con los últimos 2 estados contables legalizados por el Consejo Profesional de Ciencias Económicas?":{"id":"J.10","kind":"bool"},"¿Cuenta el detalle de ventas y compras posteriores al último balance (según libro IVA)?":{"id":"J.11","kind":"bool"},"¿Cuenta con las últimas 6 declaraciones juradas de IVA e IIBB?":{"id":"J.12","kind":"bool"},"Situación en el BCRA (Central de Deudores) de la empresa y de los socios: indique la peor situación (del 1 al 5)":{"id":"J.13","kind":"bcraMax2"},"¿Cuenta con el último informe comercial tipo VERAZ o NOSIS de la empresa?":{"id":"J.15","kind":"bool"},"¿Acepta ser auditada (financiera, técnica y de flota) por la consultora designada?":{"id":"J.33","kind":"bool"},"¿Cuántos empleados tiene en relación de dependencia (según el último F.931)?":{"id":"J.16","kind":"numMin","min":0},"¿Cuenta con el libro de sueldos digital o la planilla de altas tempranas de ARCA?":{"id":"J.17","kind":"bool"},"¿Tiene los CV de los operarios clave de maquinaria (motoniveladora, topadora, cargadora)?":{"id":"J.18","kind":"text"},"¿Tiene el carnet de conducir profesional o la tarjeta IERIC del personal?":{"id":"J.19","kind":"bool"},"¿Tiene los CV del jefe de obra, capataces y del supervisor que estará fijo en el lugar?":{"id":"J.20","kind":"text"},"Describa el esquema de turnos 14x7 y el sistema de relevos que propone":{"id":"J.21","kind":"text"},"¿Tiene un procedimiento para trasladar al personal hasta el lugar de trabajo?":{"id":"J.22","kind":"bool"},"¿Tiene un listado de personal de reemplazo (back-up) listo para ingresar?":{"id":"J.23","kind":"bool"},"¿Puede cubrir una vacante de personal en menos de 24 horas?":{"id":"J.32","kind":"bool"},"¿Cuántos años de experiencia tiene la empresa en mantenimiento de caminos no pavimentados (de ripio/tierra)?":{"id":"Q4.1","kind":"text"},"¿Tiene experiencia en estabilización de suelos (bischofita, cloruro de calcio/sodio, cal, enzimas)? Indique cuántos proyectos.":{"id":"Q4.2","kind":"text"},"¿Cuántos kilómetros de caminos no pavimentados mantuvo en los últimos 5 años?":{"id":"Q4.3","kind":"text"},"¿Tiene experiencia en perfilado con motoniveladora y control de polvo (riego o supresores)?":{"id":"Q4.4","kind":"bool"},"¿Tiene experiencia trabajando para la industria minera? Indique la antigüedad.":{"id":"Q4.5","kind":"text"},"¿A qué altura máxima (metros sobre el nivel del mar) operó la empresa de forma sostenida?":{"id":"Q4.6","kind":"text"},"¿Cuántos contratos con empresas mineras ejecutó en los últimos 5 años?":{"id":"Q4.7","kind":"text"},"¿Tiene experiencia en vialidad invernal (despeje de nieve o control de hielo)?":{"id":"Q4.8","kind":"bool"},"¿Operó en nieve/hielo y temperaturas bajo cero, con guardias las 24 horas?":{"id":"Q4.9","kind":"bool"},"¿Cuántos años de experiencia promedio tienen sus operadores de equipos de movimiento de suelo?":{"id":"Q4.10","kind":"text"},"¿Cuántos operadores certificados o habilitados para equipos de movimiento de suelo tiene?":{"id":"Q4.11","kind":"text"},"¿Cuántos años de experiencia tiene su responsable técnico o jefe de obra en caminos no pavimentados?":{"id":"Q4.12","kind":"text"},"¿Tiene un programa de capacitación e inducción del personal (seguridad y técnica) documentado?":{"id":"Q4.13","kind":"bool"},"¿El 100% de su flota (propia o alquilada) está registrada y tributando en San Juan?":{"id":"Q5.1","kind":"bool"},"¿Posee equipos para el mantenimiento del camino en la temporada estival (verano)?":{"id":"Q5.2","kind":"bool"},"Cargadora tipo CAT 938K o equivalente — Cantidad disponible":{"id":"F.1-cant","kind":"numMin","min":3},"Cargadora tipo CAT 938K  o equivalente  — Horas de uso":{"id":"F.1-horas","kind":"text"},"Cargadora tipo CAT 938K  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.1-mant","kind":"bool"},"Motoniveladora tipo CAT 140K  o equivalente  — Cantidad disponible":{"id":"F.2-cant","kind":"numMin","min":3},"Motoniveladora tipo CAT 140K  o equivalente  — Horas de uso":{"id":"F.2-horas","kind":"text"},"Motoniveladora tipo CAT 140K  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.2-mant","kind":"bool"},"Retroexcavadora tipo CAT 416E  o equivalente  — Cantidad disponible":{"id":"F.3-cant","kind":"numMin","min":1},"Retroexcavadora tipo CAT 416E  o equivalente  — Horas de uso":{"id":"F.3-horas","kind":"text"},"Retroexcavadora tipo CAT 416E  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.3-mant","kind":"bool"},"Vibrocompactador tipo CAT CS54B  o equivalente  — Cantidad disponible":{"id":"F.4-cant","kind":"numMin","min":1},"Vibrocompactador tipo CAT CS54B  o equivalente  — Horas de uso":{"id":"F.4-horas","kind":"text"},"Vibrocompactador tipo CAT CS54B  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.4-mant","kind":"bool"},"Camión volcador tipo IVECO 410 (14 m³)  o equivalente  — Cantidad disponible":{"id":"F.5-cant","kind":"numMin","min":1},"Camión volcador tipo IVECO 410 (14 m³) — Modelo del vehículo":{"id":"F.5-horas","kind":"text"},"Camión volcador tipo IVECO 410 (14 m³) — ¿Tiene registro de mantenimiento?":{"id":"F.5-mant","kind":"bool"},"Minicargadora tipo BobCat  o equivalente  — Cantidad disponible":{"id":"F.6-cant","kind":"numMin","min":1},"Minicargadora tipo BobCat  o equivalente  — Horas de uso":{"id":"F.6-horas","kind":"text"},"Minicargadora tipo BobCat  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.6-mant","kind":"bool"},"Camión regador tipo IVECO 410 (18 m³) — Cantidad disponible":{"id":"F.7-cant","kind":"numMin","min":2},"Camión regador tipo IVECO 410 (18 m³) —  Modelo del equipo":{"id":"F.7-horas","kind":"text"},"Camión regador tipo IVECO 410 (18 m³) — ¿Tiene registro de mantenimiento?":{"id":"F.7-mant","kind":"bool"},"Camioneta 4x4 tipo Toyota Hilux — Cantidad disponible":{"id":"F.8-cant","kind":"numMin","min":5},"Camioneta 4x4 tipo Toyota Hilux —  Modelo del vehículo":{"id":"F.8-horas","kind":"text"},"Camioneta 4x4 tipo Toyota Hilux — ¿Tiene registro de mantenimiento?":{"id":"F.8-mant","kind":"bool"},"Camión capilar/lubricador (4.000 l) — Cantidad disponible":{"id":"F.9-cant","kind":"numMin","min":2},"Camión capilar/lubricador (4.000 l) —  Modelo del equipo":{"id":"F.9-horas","kind":"text"},"Camión capilar/lubricador (4.000 l) — ¿Tiene registro de mantenimiento?":{"id":"F.9-mant","kind":"bool"},"Barredora tipo Fracchia N337 — Cantidad disponible":{"id":"F.10-cant","kind":"numMin","min":2},"Barredora tipo Fracchia N337 — Horas de uso":{"id":"F.10-horas","kind":"text"},"Barredora tipo Fracchia N337 — ¿Tiene registro de mantenimiento?":{"id":"F.10-mant","kind":"bool"},"Camión volcador tipo Scania 440 XT (20 m³) —  Modelo del equipo":{"id":"F.11-horas","kind":"text"},"Camión volcador tipo Scania 440 XT (20 m³) — ¿Tiene registro de mantenimiento?":{"id":"F.11-mant","kind":"bool"},"¿Posee equipos para el mantenimiento del camino en la temporada invernal?":{"id":"Q5.36","kind":"bool"},"Topadora tipo CAT D8T  o equivalente  — Cantidad disponible":{"id":"F.12-cant","kind":"numMin","min":3},"Topadora tipo CAT D8T  o equivalente  — Horas de uso":{"id":"F.12-horas","kind":"text"},"Topadora tipo CAT D8T  o equivalente  — ¿Tiene registro de mantenimiento?":{"id":"F.12-mant","kind":"bool"},"Camión barrenieve —  Modelo del equipo":{"id":"F.13-horas","kind":"text"},"Camión barrenieve — ¿Tiene registro de mantenimiento?":{"id":"F.13-mant","kind":"bool"},"¿Bajo qué modalidad realiza el mantenimiento de sus equipos?":{"id":"Q5.43","kind":"text"},"Disponibilidad de taller en zona: ¿cuántos presupuestos de proveedores presenta?":{"id":"Q5.44","kind":"numMin","min":0},"Disponibilidad de repuestos en zona: ¿cuántos presupuestos de proveedores presenta?":{"id":"Q5.45","kind":"numMin","min":0},"Disponibilidad de piezas de desgaste en zona (neumáticos, cuchillas, uñas, tren de rodaje): ¿cuántos presupuestos presenta?":{"id":"Q5.46","kind":"numMin","min":0},"Disponibilidad de filtros y lubricantes en zona: ¿cuántos presupuestos de proveedores presenta?":{"id":"Q5.47","kind":"numMin","min":0},"¿Tiene servicio mecánico propio o un banco de mecánicos para el primer diagnóstico ante una falla?":{"id":"Q5.48","kind":"bool"},"¿Garantiza que al menos el 80% del personal del servicio esté radicado en San Juan (con DNI y residencia efectiva de 12 meses o más)?":{"id":"J.39","kind":"bool"},"¿Da prioridad a contratar, en primer lugar, a personas de las comunidades de Iglesia y Jáchal?":{"id":"J.40","kind":"bool"},"¿Tiene un plan de capacitación o formación técnica para personal de la comunidad?":{"id":"J.25","kind":"bool"},"¿Tiene una política o procedimiento de compra y contratación de bienes y servicios locales?":{"id":"J.26","kind":"bool"},"¿Tiene un listado de subproveedores, talleres o comercios locales que planea integrar?":{"id":"J.27","kind":"text"},"Si se presenta como consorcio o alianza, ¿tiene el contrato de Unión Transitoria o acuerdo inscripto, con el % de cada firma?":{"id":"J.28","kind":"text"},"Si se presenta como empresa individual, ¿tiene convenios vigentes con cámaras, cooperativas, universidades u organizaciones de la comunidad?":{"id":"J.29","kind":"text"},"Aclaración (nombre y apellido de quien firma)":{"meta":"firmante"},"DNI":{"meta":"dniFirmante"},"Cargo":{"meta":"cargoFirmante"},"Empresa":{"meta":"empresaFirma"},"Lugar":{"meta":"lugarFirma"},"Fecha":{"meta":"fechaFirma"},"Teléfono de contacto del Representante Legal. ":{"meta":"telefono"},"¿Aceptá la Declaración Jurada?":{"meta":"consentimientoDDJJ"}};
+
+        // Subcriterios que hoy no tienen pregunta equivalente en "Respuestas de formulario 1".
+        const ITEMS_SIN_PREGUNTA_EN_FORM = ["J.30", "J.31"];
+
+        const DIM_ORDER = ["I","II","III","IV","V","VI","VII"];
+
+        // Estado de cada ítem: { declarado: bool, verificado: bool }. Para ítems no-Gate, ambos valores se mantienen iguales.
+        const state = {};
+
+        // Metadata de la empresa actualmente cargada (hoja de Sheets o caso de prueba). Null si no hay ninguna cargada.
+        let EMPRESA_ACTUAL = null;
+        function inicializarEstado() {
+            DIM_ORDER.forEach(dim => {
+                DATA.dimensiones[dim].subs.forEach(sub => {
+                    sub.items.forEach(it => {
+                        state[it.id] = { declarado: true, verificado: true };
+                    });
+                });
+            });
+        }
+
+        const PISOS_INFO = [
+            { id: "ANY0", label: "Cualquier subcriterio (27/27)", regla: "Puntaje = 0", detalle: "Regla general: si CUALQUIER subcriterio de la Matriz —no solo los 6 destacados abajo— llega a 0/5, el dictamen es No-Go automático." },
+            { id: "1.3", label: "1.3 · Integridad y libre conflictividad", regla: "Puntaje = 0", detalle: "Dimensión I. Sin certificados de conflictividad/deuda sindical en regla." },
+            { id: "2.1", label: "2.1 · Solvencia, liquidez y capital de trabajo", regla: "Puntaje = 0", detalle: "Dimensión II. Sin estados contables ni información contable verificable." },
+            { id: "2.2", label: "2.2 · Endeudamiento / financiamiento de flota", regla: "Puntaje = 0", detalle: "Dimensión II. Sin capacidad demostrable de financiar la flota exigida." },
+            { id: "3.4", label: "3.4 · Roster 14x7 y reemplazo 24 h", regla: "Puntaje = 0", detalle: "Dimensión III. Sin esquema de turnos ni back-up ante ausencias." },
+            { id: "4.2", label: "4.2 · Industria minera y alta montaña", regla: "Puntaje = 0", detalle: "Dimensión IV. Sin experiencia previa en minería o alta montaña." },
+            { id: "5.1", label: "5.1 · Flota disponible vs. mínima", regla: "Puntaje = 0", detalle: "Dimensión V. No alcanza la flota mínima exigida por el pliego." },
+            { id: "FIN", label: "Salud Financiera (2.1–2.3)", regla: "Promedio < 2", detalle: "Dimensión II completa. Insolvencia estructural, no un único documento." },
+            { id: "SSMA", label: "SSMA excluyente (6.1 / 6.2 / 6.3)", regla: "Puntaje ≤ 1", detalle: "Dimensión VI, alimentados por el Gate Nivel 1. Higiene y seguridad por debajo del mínimo aceptable." },
+            { id: "GATE1", label: "Gate Nivel 1 completo (24 ítems)", regla: "1 solo 'No' verificado", detalle: "Cualquier ítem de los 24 excluyentes produce No-Go inmediato, sin promediar con nada." },
+        ];
+
+        // Definición ordenada de la cascada real del dictamen (16 pasos del archivo, resumidos)
+        function evaluarCascada() {
+            const auditoria = document.getElementById("chk-auditoria").checked;
+            const elegible = document.getElementById("chk-elegibilidad").checked;
+
+            const gateN1Items = itemsGate("n1");
+            const gateN1Fail = gateN1Items.some(it => !state[it.id].verificado);
+
+            const finProm = promedioFinanciero();
+            const ssmaMin = Math.min(getScoreSub("6.1"), getScoreSub("6.2"), getScoreSub("6.3"));
+
+            const enCero = subcriteriosEnCero();
+            const enCeroTxt = enCero.length > 3
+                ? `${enCero.slice(0, 3).map(x => x.id).join(", ")} y ${enCero.length - 3} más`
+                : enCero.map(x => x.id).join(", ");
+
+            const global = getPuntajeGlobal();
+
+            const pasos = [
+                { label: "Consentimiento de auditoría", ok: auditoria, detalle: auditoria ? "Aceptado" : "Rechazado → No-Go", detiene: !auditoria },
+                { label: "Elegibilidad geográfica", ok: elegible, detalle: elegible ? "Dentro del área" : "Fuera de Iglesia/Jáchal → No-Go", detiene: !elegible },
+                { label: "Gate Nivel 1 (24 ítems)", ok: !gateN1Fail, detalle: gateN1Fail ? "Al menos 1 ítem verificado en 'No'" : "24/24 verificados en 'Sí'", detiene: gateN1Fail },
+                { label: "Salud Financiera (prom. 2.1–2.3)", ok: finProm >= 2, detalle: `Promedio ${finProm.toFixed(1)} / 5 (piso: 2,0)`, detiene: finProm < 2 },
+                { label: "SSMA excluyente (6.1/6.2/6.3)", ok: ssmaMin > 1, detalle: `Mínimo de los 3: ${ssmaMin} pts (piso: >1)`, detiene: ssmaMin <= 1 },
+                { label: enCero.length ? `Subcriterio(s) en 0 pts: ${enCeroTxt}` : "Ningún subcriterio en 0 puntos (27/27)", ok: enCero.length === 0, detalle: enCero.length ? enCero.map(x => `${x.id} ${x.nombre}`).join(" | ") : "Los 27 subcriterios de la Matriz tienen puntaje > 0", detiene: enCero.length > 0 },
+                { label: "Puntaje global ≥ 55", ok: global >= 55, detalle: `${global.toFixed(1)} / 100`, detiene: global < 55 },
+                { label: "Puntaje global ≥ 70", ok: global >= 70, detalle: global >= 70 ? "Sin brechas de puntaje" : "Banda 55–69,9 → Plan de Acción", detiene: false, informativo: global < 70 },
+            ];
+
+            let resultado, tipo;
+            for (const p of pasos) {
+                if (p.detiene) { resultado = p.label; tipo = "nogo"; break; }
+            }
+            if (!resultado) {
+                if (global < 55) { resultado = "Puntaje global insuficiente"; tipo = "nogo"; }
+                else if (global < 70) { resultado = "GO CON PLAN DE ACCIÓN"; tipo = "pai"; }
+                else { resultado = "GO"; tipo = "go"; }
+            }
+            return { pasos, resultado, tipo, global };
+        }
+
+        function findSub(subId) {
+            for (const dim of DIM_ORDER) {
+                const s = DATA.dimensiones[dim].subs.find(x => x.id === subId);
+                if (s) return s;
+            }
+            return null;
+        }
+
+        function itemsGate(tipo) {
+            let out = [];
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => {
+                sub.items.forEach(it => { if (it.gate === tipo) out.push(it); });
+            }));
+            return out;
+        }
+
+        function getScoreSub(subId) {
+            const sub = findSub(subId);
+            if (!sub) return 0;
+            const items = sub.items.filter(it => it.scoreable !== false);
+            if (items.length === 0) return 0;
+            const checked = items.filter(it => state[it.id].verificado).length;
+            return Math.round((checked / items.length) * 5);
+        }
+
+        function promedioFinanciero() {
+            return (getScoreSub("2.1") + getScoreSub("2.2") + getScoreSub("2.3")) / 3;
+        }
+
+        // Regla general: CUALQUIER subcriterio (de los 27) con puntaje 0/5 es piso → No-Go.
+        function subcriteriosEnCero() {
+            const out = [];
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => {
+                if (getScoreSub(sub.id) === 0) out.push({ id: sub.id, nombre: sub.nombre });
+            }));
+            return out;
+        }
+
+        // Ponderado real: cada subcriterio aporta (puntaje/5)*peso_propio — no un promedio simple por dimensión.
+        function getObtenidoDimension(dim) {
+            return DATA.dimensiones[dim].subs.reduce((acc, s) => acc + (getScoreSub(s.id) / 5) * s.peso, 0);
+        }
+
+        function getScoreDimension(dim) {
+            const peso = DATA.dimensiones[dim].peso;
+            return peso ? (getObtenidoDimension(dim) / peso) * 5 : 0;
+        }
+
+        function getPuntajeGlobal() {
+            let total = 0;
+            DIM_ORDER.forEach(dim => { total += getObtenidoDimension(dim); });
+            return total;
+        }
+
+        function contarDiscrepancias() {
+            const seen = new Set();
+            let n = 0;
+            DIM_ORDER.forEach(dim => DATA.dimensiones[dim].subs.forEach(sub => sub.items.forEach(it => {
+                if (seen.has(it.id)) return;
+                seen.add(it.id);
+                if (state[it.id].declarado !== state[it.id].verificado) n++;
+            })));
+            return n;
+        }
+
+        function colorScore(v) {
+            if (v >= 4) return "text-green-600";
+            if (v >= 2) return "text-yellow-600";
+            return "text-red-600";
+        }
+        function bgScore(v) {
+            if (v >= 4) return ["bg-green-50", "border-green-300"];
+            if (v >= 2) return ["bg-yellow-50", "border-yellow-300"];
+            return ["bg-red-50", "border-red-300"];
+        }
+        function ledClass(v) {
+            if (v >= 4) return "led-green";
+            if (v >= 2) return "led-yellow";
+            return "led-red";
+        }
+
+        function recalcular() {
+            // 1) Refrescar cada caja de puntaje por subcriterio + discrepancias visibles
+            DIM_ORDER.forEach(dim => {
+                DATA.dimensiones[dim].subs.forEach(sub => {
+                    const score = getScoreSub(sub.id);
+                    const val = document.getElementById(`val-${sub.id}`);
+                    const box = document.getElementById(`box-${sub.id}`);
+                    if (val) val.innerText = score;
+                    if (box) {
+                        const [bg, border] = bgScore(score);
+                        box.className = `p-3 rounded-xl border text-center w-full md:w-28 flex-shrink-0 flex flex-col justify-center transition-colors duration-300 ${bg} ${border}`;
+                        val.className = `text-2xl font-black mono transition-colors duration-300 ${colorScore(score)}`;
+                    }
+                    // Chequear discrepancia por item dentro de este subcriterio
+                    sub.items.forEach(it => {
+                        const disc = state[it.id].declarado !== state[it.id].verificado;
+                        document.querySelectorAll(`[data-disc-id="${it.id}"]`).forEach(badge => {
+                            badge.classList.toggle("hidden", !disc);
+                        });
+                    });
+                });
+
+                const scoreDim = getScoreDimension(dim);
+                const elDim = document.getElementById(`score-dim-${dim}`);
+                if (elDim) { elDim.innerText = scoreDim.toFixed(1); elDim.className = `font-black mono transition-colors ${colorScore(scoreDim)}`; }
+                const led = document.getElementById(`dim-led-${dim}`);
+                if (led) led.className = `w-3.5 h-3.5 rounded-full mr-2 transition-colors duration-300 flex-shrink-0 ${ledClass(scoreDim)}`;
+            });
+
+            // 2) Cascada + dictamen
+            const { pasos, resultado, tipo, global } = evaluarCascada();
+            document.getElementById("puntaje-total").innerText = global.toFixed(1);
+            document.getElementById("puntaje-total").className = `text-6xl font-black mono mb-1 transition-colors duration-500 ${tipo === "go" ? "text-green-600" : tipo === "pai" ? "text-yellow-600" : "text-red-700"}`;
+
+            const badge = document.getElementById("dictamen-badge");
+            const cfgBadge = {
+                go: ["bg-green-600 text-white border border-green-700", "GO — " + global.toFixed(1) + " PTS"],
+                pai: ["bg-yellow-500 text-white border border-yellow-600", "GO CON PLAN DE ACCIÓN — " + global.toFixed(1) + " PTS"],
+                nogo: ["bg-red-700 text-white", "NO-GO — " + resultado.toUpperCase()],
+            }[tipo];
+            badge.className = `px-4 py-3 rounded-lg text-base font-bold w-full shadow-inner transition-all duration-300 ${cfgBadge[0]}`;
+            badge.innerText = cfgBadge[1];
+
+            const nDisc = contarDiscrepancias();
+            const discBox = document.getElementById("discrepancias-resumen");
+            discBox.innerHTML = nDisc === 0
+                ? `<span class="text-slate-400">Sin discrepancias declarado/verificado.</span>`
+                : `<span class="text-amber-700 font-bold">⚠ ${nDisc} discrepancia(s) declarado ≠ verificado</span>`;
+
+            // 3) Cascada visual
+            const casc = document.getElementById("cascada-container");
+            let yaDetuvo = false;
+            casc.innerHTML = pasos.map(p => {
+                let estado = "pend";
+                if (!yaDetuvo) {
+                    estado = p.ok ? "ok" : "fail";
+                    if (p.detiene) yaDetuvo = true;
+                } else {
+                    estado = "skip";
+                }
+                const iconos = {
+                    ok: '<div class="cascade-dot bg-green-100 text-green-600"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>',
+                    fail: '<div class="cascade-dot bg-red-100 text-red-600"><i data-lucide="x" class="w-3.5 h-3.5"></i></div>',
+                    skip: '<div class="cascade-dot bg-slate-100 text-slate-300"><i data-lucide="minus" class="w-3.5 h-3.5"></i></div>',
+                };
+                const textCls = estado === "skip" ? "text-slate-300" : "text-slate-700";
+                return `<div class="cascade-step">${iconos[estado]}
+                    <div class="font-semibold ${textCls}">${p.label}</div>
+                    <div class="text-slate-400 ${estado === 'skip' ? 'text-slate-300' : ''}">${p.detalle}</div>
+                </div>`;
+            }).join("");
+
+            lucide.createIcons();
+        }
+
+        function toggleAccordion(dim) {
+            const content = document.getElementById('content-' + dim);
+            const icon = document.getElementById('icon-' + dim);
+            const open = content.classList.contains('open');
+            content.classList.toggle('open', !open);
+            icon.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function onToggleItem(id, field, checked) {
+            state[id][field] = checked;
+            document.querySelectorAll(`input[data-item-id="${id}"][data-field="${field}"]`)
+                .forEach(el => { el.checked = checked; });
+            recalcular();
+        }
+
+        function renderItem(it, ctx) {
+            const cls = it.gate === "n1" ? "gate-item" : it.gate === "n2" ? "gate-n2-item" : "";
+            const tagTxt = it.gate === "n1" ? "N1 · excluyente" : it.gate === "n2" ? "N2 · brecha" : "";
+            const tagCls = it.gate === "n1" ? "bg-accent/10 text-accent" : "bg-brand-2/10 text-brand-2";
+            return `
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 py-2.5 px-3 rounded-lg mb-2 ${cls}">
+                <div class="flex-1 flex items-start gap-2">
+                    <span class="mono text-[10px] font-bold text-slate-400 mt-0.5">${it.id}</span>
+                    <span class="text-sm text-slate-700">${it.texto}${it.entregable ? `<span class="block text-[11px] text-slate-400 italic mt-0.5">Entregable: ${it.entregable}</span>` : ""}</span>
+                </div>
+                <div class="flex items-center gap-4 flex-shrink-0 pl-6 sm:pl-0">
+                    ${it.gate ? `<span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${tagCls} hidden md:inline-block">${tagTxt}</span>` : ""}
+                    <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                        <span class="text-[9px] uppercase text-slate-400 font-bold">Declarado</span>
+                        <input type="checkbox" id="chk-${ctx}-${it.id}-declarado" data-item-id="${it.id}" data-field="declarado" checked class="w-4 h-4 accent-brand-2" onchange="onToggleItem('${it.id}','declarado', this.checked)">
+                    </label>
+                    <label class="flex flex-col items-center gap-0.5 cursor-pointer">
+                        <span class="text-[9px] uppercase text-slate-400 font-bold">Verificado</span>
+                        <input type="checkbox" id="chk-${ctx}-${it.id}-verificado" data-item-id="${it.id}" data-field="verificado" checked class="w-4 h-4 accent-emerald-600" onchange="onToggleItem('${it.id}','verificado', this.checked)">
+                    </label>
+                    <span data-disc-id="${it.id}" class="hidden text-[10px] font-bold text-amber-600 whitespace-nowrap">⚠ discrepancia</span>
+                </div>
+            </div>`;
+        }
+
+        function renderSub(sub) {
+            const pisoBadge = sub.piso
+                ? `<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-black tracking-widest rounded uppercase">${sub.piso}</span>`
+                : "";
+            return `
+            <div class="mb-4 bg-white border border-slate-200 shadow-sm rounded-xl p-5">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div class="w-full">
+                        <div class="flex items-center mb-3 flex-wrap gap-y-1">
+                            <h4 class="font-bold text-slate-800 text-base"><span class="mono">${sub.id}</span> ${sub.nombre}</h4>
+                            <span class="ml-2 px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-md border border-slate-200 mono">${sub.peso} pts</span>
+                            ${pisoBadge}
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            ${sub.items.map(it => renderItem(it, sub.id)).join("")}
+                        </div>
+                    </div>
+                    <div id="box-${sub.id}" class="p-3 rounded-xl border border-red-300 bg-red-50 text-center w-full md:w-28 flex-shrink-0 flex flex-col justify-center">
+                        <span class="uppercase tracking-widest text-[9px] font-bold text-slate-500">Puntaje</span>
+                        <span class="text-2xl font-black mono text-red-700" id="val-${sub.id}">0</span>
+                        <span class="text-[9px] text-slate-400 font-bold">SOBRE 5</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderAcordeon() {
+            const cont = document.getElementById("accordion-container");
+            cont.innerHTML = DIM_ORDER.map(dim => {
+                const d = DATA.dimensiones[dim];
+                return `
+                <div class="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
+                    <button class="w-full px-5 py-3.5 text-left font-black text-slate-800 bg-white hover:bg-slate-50 flex justify-between items-center transition-colors" onclick="toggleAccordion('${dim}')">
+                        <div class="flex items-center flex-wrap gap-2">
+                            <div id="dim-led-${dim}" class="w-3.5 h-3.5 rounded-full bg-slate-300 mr-1 flex-shrink-0"></div>
+                            <span class="text-base tracking-tight font-display">${dim}. ${d.nombre}</span>
+                            <span class="px-2 py-0.5 bg-brand/10 text-brand text-xs font-bold rounded-md border border-brand/20 mono">${d.peso} pts</span>
+                        </div>
+                        <i data-lucide="chevron-down" id="icon-${dim}" class="w-5 h-5 text-slate-400 transition-transform duration-300 flex-shrink-0"></i>
+                    </button>
+                    <div id="content-${dim}" class="accordion-content bg-slate-50/50 border-t border-slate-100">
+                        <div class="p-4">${d.subs.map(renderSub).join("")}</div>
+                    </div>
+                </div>`;
+            }).join("");
+
+            document.getElementById("dimensiones-scores").innerHTML = DIM_ORDER.map(dim => {
+                const d = DATA.dimensiones[dim];
+                return `
+                <div class="flex justify-between items-center text-sm border-b border-slate-100 pb-2.5">
+                    <span class="text-slate-600 font-semibold truncate pr-2">${dim}. ${d.nombre}</span>
+                    <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-md border border-slate-200 flex-shrink-0">
+                        <span class="font-black mono text-red-600" id="score-dim-${dim}">0.0</span>
+                        <span class="text-[10px] text-slate-400 font-bold">/5</span>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        function renderPisosGrid() {
+            document.getElementById("pisos-grid").innerHTML = PISOS_INFO.map(p => `
+                <div class="border border-slate-200 rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-bold text-slate-700 text-xs">${p.label}</span>
+                        <span class="text-[10px] font-black text-red-600 bg-red-50 px-1.5 py-0.5 rounded">${p.regla}</span>
+                    </div>
+                    <p class="text-slate-500 text-xs">${p.detalle}</p>
+                </div>`).join("");
+        }
+
+        function renderEmpresaButtons() {
+            const keys = { vialidad: ["bg-green-600 hover:bg-green-700", "check-circle"], transportes: ["bg-yellow-500 hover:bg-yellow-600", "alert-triangle"], cordillera: ["bg-red-800 hover:bg-red-900", "ban"], oeste: ["bg-red-500 hover:bg-red-600", "trending-down"] };
+            const html = Object.entries(DATA.empresas).map(([key, e]) => {
+                const [cls, icon] = keys[key];
+                return `<button onclick="cargarEmpresa('${key}')" class="flex-1 md:flex-none px-3 py-2 ${cls} text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-1.5" title="${e.resultado_real}">
+                    <i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${e.nombre.split(" ")[0]}
+                </button>`;
+            }).join("");
+            document.getElementById("empresa-buttons").innerHTML = html +
+                `<button onclick="cargarEmpresa(null)" class="flex-1 md:flex-none px-3 py-2 bg-slate-500 hover:bg-slate-600 text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-1.5">
+                    <i data-lucide="square" class="w-3.5 h-3.5"></i> Vaciar todo
+                </button>`;
+        }
+
+        function cargarEmpresa(key) {
+            inicializarEstado();
+            document.getElementById("chk-auditoria").checked = true;
+            document.getElementById("chk-elegibilidad").checked = true;
+
+            if (key === null) {
+                // Vaciar: todo en false
+                Object.keys(state).forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+                document.getElementById("empresa-actual-wrap").classList.add("hidden");
+                EMPRESA_ACTUAL = null;
+            } else {
+                const e = DATA.empresas[key];
+                e.regularUnchecked.forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+                e.gateN2Unchecked.forEach(id => { state[id].declarado = false; state[id].verificado = false; });
+                Object.keys(e.gateDiscrepancias).forEach(id => { state[id].declarado = true; state[id].verificado = false; });
+                document.getElementById("empresa-actual").innerHTML =
+                    `<strong>${e.nombre}</strong> · CUIT ${e.cuit} · ${e.localidad} · <span class="text-slate-400">caso de prueba — resultado real: ${e.resultado_real}</span>`;
+                document.getElementById("empresa-actual-wrap").classList.remove("hidden");
+                EMPRESA_ACTUAL = { nombre: e.nombre, cuit: e.cuit, localidad: e.localidad, representante: "", email: "", telefono: "", antiguedad: "", fecha: "", fuente: "test" };
+            }
+
+            // Sincronizar checkboxes del DOM con el estado (un item puede tener más de una copia en el DOM)
+            document.querySelectorAll("input[data-item-id]").forEach(el => {
+                const id = el.dataset.itemId, field = el.dataset.field;
+                if (state[id]) el.checked = state[id][field];
+            });
+
+            recalcular();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ---------- Google Sheets: leer "Respuestas de formulario 1" y aplicar una respuesta ----------
+        let SHEET_RESPONSES = [];
+
+        function cellText(cell) {
+            if (!cell) return "";
+            const v = (cell.f !== undefined && cell.f !== null) ? cell.f : cell.v;
+            return v === null || v === undefined ? "" : String(v);
+        }
+        function parseSiNo(v) {
+            const s = String(v ?? "").trim().toLowerCase();
+            if (!s) return false;
+            if (s.startsWith("sí") || s.startsWith("si") || s === "true" || s === "1") return true;
+            return false;
+        }
+        function parseTexto(v) {
+            return String(v ?? "").trim().length > 0;
+        }
+        function parseNumMin(v, min) {
+            const match = String(v ?? "").replace(",", ".").match(/-?\d+(\.\d+)?/);
+            if (!match) return false;
+            return parseFloat(match[0]) >= min;
+        }
+        function parseBcraMax2(v) {
+            const match = String(v ?? "").match(/\d+/);
+            if (!match) return false;
+            return parseInt(match[0], 10) <= 2;
+        }
+
+        function cargarHojaFormulario() {
+            const status = document.getElementById("sheet-status");
+            const select = document.getElementById("sheet-empresa-select");
+            status.textContent = `Conectando con "${GOOGLE_SHEET_NAME}"…`;
+            select.disabled = true;
+
+            const cbName = "__sheetCb_" + Math.random().toString(36).slice(2);
+            const script = document.createElement("script");
+            const timer = setTimeout(() => {
+                status.textContent = "No se pudo conectar con Google Sheets (tiempo agotado). Reintentá con 'Actualizar'.";
+                cleanup();
+            }, 15000);
+            const cleanup = () => { delete window[cbName]; script.remove(); clearTimeout(timer); };
+
+            window[cbName] = function (res) {
+                cleanup();
+                try {
+                    procesarRespuestasSheet(res);
+                } catch (e) {
+                    console.error(e);
+                    status.textContent = `Error al leer "${GOOGLE_SHEET_NAME}": ` + e.message;
+                }
+            };
+            script.onerror = () => {
+                cleanup();
+                status.textContent = "No se pudo conectar con Google Sheets. Verificá que el enlace sea público (Cualquiera con el enlace → Lector) y reintentá.";
+            };
+            script.src = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cbName}&gid=${GOOGLE_SHEET_GID}&headers=1`;
+            document.body.appendChild(script);
+        }
+
+        function procesarRespuestasSheet(res) {
+            if (res.status !== "ok") {
+                throw new Error((res.errors && res.errors[0] && res.errors[0].detailed_message) || "la hoja no devolvió datos válidos");
+            }
+            const cols = res.table.cols;
+            const headerSet = new Set(cols.map(c => c.label));
+            const faltantes = Object.keys(FORM_ITEM_MAP).filter(h => !headerSet.has(h));
+            if (faltantes.length) {
+                console.warn(`"${GOOGLE_SHEET_NAME}" cambió: ${faltantes.length} pregunta(s) mapeada(s) ya no aparecen con el mismo texto (se agregaron, movieron o reformularon). Revisá FORM_ITEM_MAP para: ${faltantes.slice(0, 5).join(" | ")}${faltantes.length > 5 ? "…" : ""}`);
+            }
+
+            SHEET_RESPONSES = res.table.rows.map(row => {
+                const obj = {};
+                cols.forEach((col, i) => { obj[col.label] = cellText(row.c[i]); });
+                return obj;
+            });
+
+            const status = document.getElementById("sheet-status");
+            const select = document.getElementById("sheet-empresa-select");
+
+            if (SHEET_RESPONSES.length === 0) {
+                select.innerHTML = '<option value="">— Todavía no hay respuestas —</option>';
+                select.disabled = true;
+                status.textContent = `Conectado a "${GOOGLE_SHEET_NAME}". Todavía no hay respuestas cargadas.`;
+                return;
+            }
+
+            select.disabled = false;
+            select.innerHTML = SHEET_RESPONSES.map((r, i) => {
+                const nombre = r["Razón social"] || `Respuesta ${i + 1}`;
+                const fecha = r["Marca temporal"] || "";
+                return `<option value="${i}">${nombre}${fecha ? " · " + fecha : ""}</option>`;
+            }).join("");
+            status.textContent = `Conectado. ${SHEET_RESPONSES.length} respuesta(s) en "${GOOGLE_SHEET_NAME}".`;
+            aplicarRespuestaSheet(SHEET_RESPONSES.length - 1);
+        }
+
+        function aplicarRespuestaSheet(idx) {
+            const row = SHEET_RESPONSES[idx];
+            if (!row) return;
+
+            inicializarEstado();
+
+            Object.entries(FORM_ITEM_MAP).forEach(([header, def]) => {
+                if (!def.id) return;
+                const val = row[header];
+                let ok;
+                switch (def.kind) {
+                    case "bool": ok = parseSiNo(val); break;
+                    case "text": ok = parseTexto(val); break;
+                    case "numMin": ok = parseNumMin(val, def.min); break;
+                    case "bcraMax2": ok = parseBcraMax2(val); break;
+                    default: ok = parseTexto(val);
+                }
+                // "declarado" sale del Form. "verificado" arranca sin marcar: solo lo tilda
+                // el evaluador a mano, en la visita — es la única forma de que una discrepancia
+                // declarado≠verificado signifique algo.
+                state[def.id].declarado = ok;
+                state[def.id].verificado = false;
+            });
+
+            // Subcriterios sin pregunta equivalente en el formulario: sin evidencia declarada.
+            ITEMS_SIN_PREGUNTA_EN_FORM.forEach(id => {
+                if (state[id]) { state[id].declarado = false; state[id].verificado = false; }
+            });
+
+            document.getElementById("chk-auditoria").checked =
+                parseSiNo(row["¿Acepta ser auditada (financiera, técnica y de flota) por la consultora designada?"]);
+            const zona = `${row["Departamento donde está radicada la empresa"] || ""} ${row["Localidad donde está ubicada la empresa."] || ""}`;
+            document.getElementById("chk-elegibilidad").checked = /iglesia|j[aá]chal/i.test(zona);
+
+            document.querySelectorAll("input[data-item-id]").forEach(el => {
+                const id = el.dataset.itemId, field = el.dataset.field;
+                if (state[id]) el.checked = state[id][field];
+            });
+
+            const nombre = row["Razón social"] || "Sin razón social";
+            const cuit = row["CUIT"] || "—";
+            const localidad = row["Localidad donde está ubicada la empresa."] || row["Departamento donde está radicada la empresa"] || "—";
+            const fecha = row["Marca temporal"] || "—";
+            document.getElementById("empresa-actual").innerHTML =
+                `<strong>${nombre}</strong> · CUIT ${cuit} · ${localidad} · presentado ${fecha}` +
+                ` <span class="text-amber-600">· sin pregunta en el formulario: ${ITEMS_SIN_PREGUNTA_EN_FORM.join(", ")}</span>`;
+            document.getElementById("empresa-actual-wrap").classList.remove("hidden");
+
+            EMPRESA_ACTUAL = {
+                nombre, cuit, localidad, fecha,
+                representante: row["Representante legal - Indique nombre completo."] || "",
+                email: row["Email del Representante Legal. "] || "",
+                telefono: row["Teléfono de contacto del Representante Legal. "] || "",
+                antiguedad: row["Antigüedad de la empresa (en años)"] || "",
+                fuente: "sheet"
+            };
+
+            const select = document.getElementById("sheet-empresa-select");
+            if (select) select.value = String(idx);
+
+            recalcular();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ---------- Checklist del proveedor para la visita (Checklist_Proveedor_Visita_Veladero.pdf) ----------
+        // Transcripción 1:1 del PDF oficial que se entrega al proveedor. "id" referencia el ítem de DATA
+        // (para leer su estado "declarado" ya cargado desde la hoja o el caso de prueba); "id: null" son los
+        // 3 documentos que el checklist pide pero que no tienen pregunta equivalente en la Matriz/Form.
+        // Nota: la Dimensión VII (Desarrollo Comunitario) no tiene sección propia en el checklist oficial —no
+        // pide documentación de respaldo para esos ítems— por eso no aparece acá.
+        const CHECKLIST_VISITA = [
+            {
+                titulo: "Seguridad, Higiene y Salud Ocupacional",
+                notaSeccion: "Documentación obligatoria. Si falta cualquiera de estos ítems, la propuesta queda automáticamente fuera del proceso.",
+                items: [
+                    { id: "G.3", prioridad: "OB", doc: "Matrícula profesional vigente del Profesional de Higiene y Seguridad.", emite: "Consejo de Profesionales de Higiene y Seguridad en el Trabajo de San Juan", vigencia: "Matrícula vigente (al día)" },
+                    { id: "G.4", prioridad: "OB", doc: "CV y antecedentes laborales que acrediten ≥ 4 años en minería / obra vial / alta montaña.", emite: "Profesional (certificados de trabajo)", vigencia: "Acreditación histórica" },
+                    { id: "G.5", prioridad: "OB", doc: "Nómina del equipo HSE disponible + CV de los técnicos.", emite: "Empresa" },
+                    { id: "G.6", prioridad: "OB", doc: "Nota de compromiso / propuesta de servicio / cotización / preacuerdo / plan de incorporación del personal técnico.", emite: "Empresa o proveedor del servicio", soloSi: "No cuenta con la totalidad del equipo técnico" },
+                    { id: "G.7", prioridad: "OB", doc: "Índice del Legajo Técnico de Obra + evidencia de disponibilidad documental.", emite: "Profesional HyS de la empresa", vigencia: "Actualizado" },
+                    { id: "G.1", prioridad: "OB", doc: "Póliza o constancia de afiliación de ART vigente, con cobertura del 100% de la nómina afectada.", emite: "ART contratada", vigencia: "Vigente" },
+                    { id: "G.2", prioridad: "OB", doc: "Pólizas vigentes + comprobantes de cobertura: RC + automotor obligatorio + equipos (incl. barrenieve provisto por Veladero).", emite: "Aseguradora", vigencia: "Vigentes" },
+                    { id: "G.8", prioridad: "OB", doc: "Programa de Seguridad + constancia de presentación / aprobación por la ART.", emite: "Profesional HyS (elab.) · ART (aprob.)", vigencia: "Vigente" },
+                    { id: "G.9", prioridad: "OB", doc: "Política HSSOA firmada por la dirección y difundida.", emite: "Dirección de la empresa", vigencia: "Vigente" },
+                    { id: "G.10", prioridad: "OB", doc: "Mínimo 3 procedimientos de trabajo seguro aplicables a las tareas (incluyendo aspectos ambientales).", emite: "Empresa" },
+                    { id: "G.11", prioridad: "OB", doc: "Modelos de checklist preoperacional + registros disponibles.", emite: "Empresa" },
+                    { id: "G.12", prioridad: "OB", doc: "Matriz de riesgos vigente, con alcance en vialidad de alta montaña.", emite: "Profesional HyS", vigencia: "Vigente" },
+                    { id: "G.13", prioridad: "OB", doc: "Procedimiento + croquis tipo + inventario/registro de cartelería, conos, balizas, banderilleros y comunicación.", emite: "Empresa" },
+                    { id: "G.14", prioridad: "OB", doc: "Protocolo por viento, nieve, hielo, tormenta eléctrica, baja visibilidad, frío extremo o crecidas.", emite: "Empresa" },
+                    { id: "G.15", prioridad: "OB", doc: "Plan de mantenimiento preventivo + registros de servicios, inspecciones y control de fallas críticas.", emite: "Empresa" },
+                    { id: "G.16", prioridad: "OB", doc: "Licencias de conducir, habilitaciones, RTO/RTO minera si aplica, seguros, cédulas, certificados de operador y aptos médicos.", emite: "Organismos de tránsito / RTO · Empresa · Médico laboral", vigencia: "Vigentes" },
+                    { id: "G.21", prioridad: "OB", doc: "Plan anual de capacitación en SSA.", emite: "Empresa / Profesional HyS", vigencia: "Vigente (anual)" },
+                    { id: "G.22", prioridad: "OB", doc: "Plan de Contingencias que cubra incendio, derrame, sismo, accidente vehicular y clima adverso.", emite: "Empresa / Profesional HyS", vigencia: "Vigente" },
+                    { id: "G.23", prioridad: "OB", doc: "Contrato / convenio / cobertura médica / servicio de ambulancia o cotización vigente (traslado Tudcum→San Juan + plan MEDEVAC).", emite: "Prestador médico / servicio de ambulancia", vigencia: "Vigente" },
+                    { id: "G.25", prioridad: "OB", doc: "Contrato de servicio de Medicina Laboral o cotización vigente del servicio.", emite: "Prestador de Medicina Laboral", vigencia: "Vigente" },
+                    { id: "G.28", prioridad: "OB", doc: "Certificados de aptitud médica del personal expuesto (alta montaña, conducción y operación de equipos).", emite: "Médico laboral", vigencia: "Vigentes" },
+                    { id: "G.24", prioridad: "OB", doc: "Índice de siniestralidad de los últimos 3 años emitido por la ART.", emite: "ART", vigencia: "Últimos 3 años" },
+                    { id: "G.26", prioridad: "OB", doc: "RAR/NTE vigente o constancia de presentación ante la ART.", emite: "Empresa / ART", vigencia: "Vigente" },
+                    { id: "G.27", prioridad: "OB", doc: "Mediciones / monitoreos / estudios del personal expuesto declarado en el RAR.", emite: "Laboratorio / servicio de HyS", vigencia: "Según periodicidad", soloSi: "Tiene personal expuesto declarado en el RAR" },
+                    { id: null, prioridad: "OB", doc: "RGRL presentado (declaración jurada).", emite: "Empresa ante ART", vigencia: "Vigente" },
+                ]
+            },
+            {
+                titulo: "Ambiente y complementos de seguridad",
+                notaSeccion: "Documentación recomendada: mejora su evaluación y evita observaciones.",
+                items: [
+                    { id: "G.29", prioridad: "RE", doc: "CV, contrato o cotización del profesional / asesoramiento ambiental.", emite: "Profesional / consultora ambiental" },
+                    { id: "G.30", prioridad: "RE", doc: "Procedimiento de gestión de residuos + manifiestos + registros de retiro / contrato con operador habilitado (si corresponde).", emite: "Empresa / operador habilitado", vigencia: "Vigente" },
+                    { id: "G.33", prioridad: "RE", doc: "Constancia de procedencia legal de áridos: habilitación minera/ambiental de la cantera + remitos/comprobantes de compra.", emite: "Cantera habilitada / autoridad minera provincial", vigencia: "Vigente" },
+                    { id: "G.17", prioridad: "RE", doc: "Registros/planillas de entrega de EPP firmados por los trabajadores.", emite: "Empresa" },
+                    { id: "G.18", prioridad: "RE", doc: "Certificados / declaraciones de conformidad / fichas técnicas o documentación del proveedor de los EPP.", emite: "Fabricante / proveedor de EPP", vigencia: "Vigente" },
+                    { id: "G.19", prioridad: "RE", doc: "Stock / registros de entrega / fichas técnicas o cotización de EPP y ropa de invierno (operativo a −30 °C, con recambios).", emite: "Empresa / proveedor" },
+                    { id: "G.20", prioridad: "RE", doc: "Cotización de dos proveedores locales de EPP.", emite: "Proveedores locales" },
+                    { id: "G.31", prioridad: "RE", doc: "Inventario / registro de inspección / evidencia del equipamiento de contingencia.", emite: "Empresa", vigencia: "Inspección vigente" },
+                    { id: "G.32", prioridad: "RE", doc: "Registro de equipos de comunicación disponibles (radio / VHF / Starlink / telefonía satelital).", emite: "Empresa" },
+                    { id: null, prioridad: "RE", doc: "Plan de economía circular / minimización de residuos realizado anteriormente.", emite: "Empresa" },
+                ]
+            },
+            {
+                titulo: "Gobernanza, legales e integridad de la empresa",
+                notaSeccion: "Reúna la documentación que respalde lo declarado en el formulario. Cuanto más completa, mejor será su puntaje.",
+                items: [
+                    { id: "J.1", prioridad: "SP", doc: "Contrato social / estatuto inscripto en el registro correspondiente.", emite: "IGJ / Registro Público de Comercio", vigencia: "Inscripción vigente" },
+                    { id: "J.2", prioridad: "SP", doc: "Acta de designación de autoridades vigente + DNI de los socios.", emite: "La sociedad (acta) · RENAPER (DNI)", vigencia: "Vigente" },
+                    { id: "J.3", prioridad: "SP", doc: "Constancia de inscripción ante ARCA (AFIP).", emite: "ARCA (AFIP)", vigencia: "Actual" },
+                    { id: "J.35", prioridad: "SP", doc: "Constancia de domicilio fiscal (ARCA) + habilitación municipal/provincial del establecimiento, con antigüedad ≥ 12 meses.", emite: "ARCA + Municipio / Provincia", vigencia: "Vigente · ≥ 12 meses" },
+                    { id: "J.36", prioridad: "SP", doc: "Constancia de inscripción vigente en RE.PRO.MIN. y, si corresponde, en el Registro Provincial de Constructores.", emite: "RE.PRO.MIN. (Min. Minería SJ) / Registro Prov. de Constructores", vigencia: "Vigente" },
+                    { id: "J.4", prioridad: "SP", doc: "Organigrama institucional con áreas funcionales definidas.", emite: "Empresa" },
+                    { id: "J.5", prioridad: "SP", doc: "Listado formal de contactos y niveles de escalamiento.", emite: "Empresa" },
+                    { id: "J.6", prioridad: "SP", doc: "Poderes firmados / DDJJ / anexo de asignación de responsabilidades.", emite: "Escribano (poder) · Empresa", vigencia: "Vigente" },
+                    { id: "J.7", prioridad: "OB", doc: "Certificado de Libre Deuda Previsional.", emite: "ARCA (AFIP)", vigencia: "Vigente" },
+                    { id: "J.8", prioridad: "OB", doc: "Certificado de Libre Conflictividad (original).", emite: "Subsecretaría de Trabajo de San Juan", vigencia: "Vigente" },
+                    { id: "J.9", prioridad: "OB", doc: "Último F.931 presentado + constancia de pago.", emite: "Empresa / ARCA", vigencia: "Último período" },
+                    { id: "J.37", prioridad: "OB", doc: "Certificado de Libre Deuda Sindical vigente (distinto del previsional J.7).", emite: "Sindicato correspondiente (UOCRA / Camioneros según encuadre)", vigencia: "Vigente" },
+                    { id: "J.38", prioridad: "OB", doc: "DDJJ de antecedentes de huelgas/bloqueos (últimos 2 años) + constancia de encuadre sindical al día.", emite: "Empresa (DDJJ) · Sindicato", vigencia: "Últimos 2 años" },
+                    { id: "Q5.1", prioridad: "SP", doc: "Constancia de registro y tributación provincial (San Juan) de cada unidad.", emite: "DNRPA / Rentas San Juan", vigencia: "Al día", nota: "Coincide con el mismo documento pedido en la sección de Flota — respaldar una sola vez." },
+                ]
+            },
+            {
+                titulo: "Situación financiera",
+                notaSeccion: "Reúna la documentación que respalde lo declarado en el formulario. Cuanto más completa, mejor será su puntaje.",
+                items: [
+                    { id: "J.10", prioridad: "SP", doc: "Últimos 2 estados contables legalizados por el CPCE.", emite: "Contador · CPCE (legalización)", vigencia: "Últimos 2 ejercicios" },
+                    { id: "J.11", prioridad: "SP", doc: "Detalle de ventas y compras post-balance (libro IVA).", emite: "Empresa", vigencia: "Post último cierre" },
+                    { id: "J.12", prioridad: "SP", doc: "6 últimas DDJJ de IVA e IIBB con comprobantes.", emite: "Empresa / ARCA / Rentas", vigencia: "Últimos 6 períodos" },
+                    { id: "J.13", prioridad: "OB", doc: "Informe del BCRA (Central de Deudores) de la empresa y de los socios individualmente (indicar peor situación 1–5).", emite: "BCRA", vigencia: "≤ 15 días" },
+                    { id: null, prioridad: "OB", doc: "Manifestación de bienes de la sociedad/socios certificada por el CPCE.", emite: "Contador · CPCE", vigencia: "Reciente" },
+                    { id: "J.15", prioridad: "SP", doc: "Informe comercial tipo Veraz / NOSIS.", emite: "Veraz / NOSIS", vigencia: "≤ 15 días" },
+                    { id: "J.33", prioridad: "SP", doc: "Carta / DDJJ de aceptación de auditoría financiera, técnica y de flota por la consultora designada.", emite: "Empresa (representante legal)", vigencia: "Firmada" },
+                ]
+            },
+            {
+                titulo: "Recursos humanos y régimen laboral",
+                notaSeccion: "Reúna la documentación que respalde lo declarado en el formulario. Cuanto más completa, mejor será su puntaje.",
+                items: [
+                    { id: "J.16", prioridad: "SP", doc: "Nómina del personal declarada en el último F.931.", emite: "Empresa / ARCA", vigencia: "Último período" },
+                    { id: "J.17", prioridad: "SP", doc: "Libro de sueldos digital del último mes o planilla de altas tempranas de ARCA.", emite: "Empresa / ARCA", vigencia: "Último mes" },
+                    { id: "J.18", prioridad: "SP", doc: "CV de los operarios clave de maquinaria.", emite: "Empresa" },
+                    { id: "J.19", prioridad: "SP", doc: "Carnet de conducir profesional / Tarjeta de IERIC del personal.", emite: "Organismo de tránsito / IERIC", vigencia: "Vigente" },
+                    { id: "J.20", prioridad: "SP", doc: "CV del jefe de obra, capataces y supervisor fijo en sitio.", emite: "Empresa" },
+                    { id: "J.21", prioridad: "OB", doc: "Plan de roster / diagrama de turnos propuesto (documento descriptivo).", emite: "Empresa" },
+                    { id: "J.22", prioridad: "OB", doc: "Procedimiento logístico de transporte del personal.", emite: "Empresa" },
+                    { id: "J.23", prioridad: "OB", doc: "Listado de personal de back-up vigente, listo para ingresar.", emite: "Empresa", vigencia: "Vigente" },
+                    { id: "J.32", prioridad: "OB", doc: "Declaración del tiempo de cobertura + respaldo del procedimiento de reemplazo.", emite: "Empresa" },
+                ]
+            },
+            {
+                titulo: "Experiencia técnica",
+                notaSeccion: "Reúna la documentación que respalde lo declarado en el formulario. Cuanto más completa, mejor será su puntaje.",
+                items: [
+                    { id: "Q4.1", prioridad: "SP", doc: "Contratos o actas de recepción de mantenimiento vial (o similar) que acrediten los años declarados.", emite: "Empresa / comitentes" },
+                    { id: "Q4.2", prioridad: "SP", doc: "Contratos + fichas técnicas del producto/tratamiento aplicado.", emite: "Empresa / comitentes" },
+                    { id: "Q4.3", prioridad: "SP", doc: "Contratos con detalle de tramos y kilometraje.", emite: "Empresa / comitentes", vigencia: "Últimos 5 años" },
+                    { id: "Q4.4", prioridad: "SP", doc: "Registros de obra, fotos, informes técnicos (o protocolo documentado).", emite: "Empresa" },
+                    { id: "Q4.5", prioridad: "OB", doc: "Contratos u órdenes de compra con empresas mineras.", emite: "Empresa / comitentes mineros" },
+                    { id: "Q4.6", prioridad: "OB", doc: "Contratos, ubicación de obras e informes de operación que acrediten la altitud.", emite: "Empresa / comitentes" },
+                    { id: "Q4.7", prioridad: "OB", doc: "Listado de contratos con referencias verificables.", emite: "Empresa / comitentes mineros", vigencia: "Últimos 5 años" },
+                    { id: "Q4.8", prioridad: "SP", doc: "Contratos o actas de servicios invernales.", emite: "Empresa / comitentes" },
+                    { id: "Q4.9", prioridad: "SP", doc: "Registros de operación invernal + planillas de guardia.", emite: "Empresa" },
+                    { id: "Q4.10", prioridad: "SP", doc: "Legajos / CV de operadores + constancias laborales.", emite: "Empresa" },
+                    { id: "Q4.11", prioridad: "SP", doc: "Certificados / licencias de habilitación vigentes.", emite: "Organismos habilitantes", vigencia: "Vigentes" },
+                    { id: "Q4.12", prioridad: "SP", doc: "CV + matrícula profesional (si aplica).", emite: "Empresa / Consejo profesional", vigencia: "Matrícula vigente si aplica" },
+                    { id: "Q4.13", prioridad: "SP", doc: "Programa de capacitación + registros de asistencia/dictado.", emite: "Empresa" },
+                ]
+            },
+            {
+                titulo: "Flota, equipos y capacidad mecánica",
+                notaSeccion: "Reúna la documentación que respalde lo declarado en el formulario. Cuanto más completa, mejor será su puntaje.",
+                items: [
+                    { id: "Q5.1", prioridad: "SP", doc: "Constancia de registro y tributación provincial (San Juan) de CADA unidad.", emite: "DNRPA / Rentas San Juan", vigencia: "Al día" },
+                    { id: "Q5.2", prioridad: "OB", doc: "Declaración general — se respalda con el detalle de flota estival (título/cédula/boleto o acuerdo de alquiler de cada unidad).", emite: "Empresa" },
+                    { id: "Q5.36", prioridad: "OB", doc: "Declaración general — se respalda con el detalle de flota invernal (título/cédula/boleto o acuerdo de alquiler de cada unidad).", emite: "Empresa" },
+                    { id: null, prioridad: "SP", doc: "Por cada unidad: (1) título, cédula de registro o boleto de compra-venta —o acuerdo de alquiler firmado— que acredite disponibilidad y titularidad; (2) registro de mantenimiento; (3) año/horas de uso declarados. Detalle por equipo en la tabla de flota, más abajo.", emite: "DNRPA / vendedor / locador · Empresa", vigencia: "Registro al día" },
+                    { id: "Q5.43", prioridad: "SP", doc: "Registro de mantenimiento de los vehículos según la modalidad declarada (0 Propio S/R · 1 Propio C/R · 2 Tercerizado C/R).", emite: "Empresa / taller tercerizado" },
+                    { id: "Q5.44", prioridad: "SP", doc: "Presupuesto de cada proveedor de taller en zona.", emite: "Proveedores de taller", vigencia: "Vigente" },
+                    { id: "Q5.45", prioridad: "SP", doc: "Presupuesto de cada proveedor de repuestos.", emite: "Proveedores de repuestos", vigencia: "Vigente" },
+                    { id: "Q5.46", prioridad: "SP", doc: "Presupuesto de cada proveedor de piezas de desgaste.", emite: "Proveedores", vigencia: "Vigente" },
+                    { id: "Q5.47", prioridad: "SP", doc: "Presupuesto de cada proveedor de filtros y lubricantes.", emite: "Proveedores", vigencia: "Vigente" },
+                    { id: "Q5.48", prioridad: "SP", doc: "Legajos / CV de mecánicos + constancias laborales.", emite: "Empresa" },
+                ]
+            },
+        ];
+
+        // Mínimo exigido por tipo de equipo (tabla "Flota — qué preparar por cada equipo" del checklist).
+        // cantId/mantId referencian los ítems F.x de DATA para leer si la cantidad/mantenimiento fue declarado.
+        const FLOTA_TABLA = [
+            { nombre: "Topadora tipo CAT D8T", cantId: "F.12-cant", mantId: "F.12-mant", minimo: 3, nota: "Operativo invierno." },
+            { nombre: "Cargadora tipo CAT 938K", cantId: "F.1-cant", mantId: "F.1-mant", minimo: 3, nota: "Operativo estival." },
+            { nombre: "Motoniveladora tipo CAT 140K", cantId: "F.2-cant", mantId: "F.2-mant", minimo: 3, nota: "Operativo estival. Equipo clave de perfilado." },
+            { nombre: "Retroexcavadora tipo CAT 416E", cantId: "F.3-cant", mantId: "F.3-mant", minimo: 1, nota: "Operativo estival." },
+            { nombre: "Vibrocompactador tipo CAT CS54B", cantId: "F.4-cant", mantId: "F.4-mant", minimo: 1, nota: "Operativo estival." },
+            { nombre: "Camión volcador IVECO 410 (14 m³)", cantId: "F.5-cant", mantId: "F.5-mant", minimo: 1, nota: "Operativo estival." },
+            { nombre: "Minicargadora tipo BobCat", cantId: "F.6-cant", mantId: "F.6-mant", minimo: 1, nota: "Operativo estival." },
+            { nombre: "Camión regador IVECO 410 (18 m³)", cantId: "F.7-cant", mantId: "F.7-mant", minimo: 2, nota: "Operativo estival. Control de polvo." },
+            { nombre: "Camioneta 4x4 tipo Toyota Hilux", cantId: "F.8-cant", mantId: "F.8-mant", minimo: 5, nota: "Operativo estival. Movilidad y supervisión." },
+            { nombre: "Camión capilar/lubricador (4.000 l)", cantId: "F.9-cant", mantId: "F.9-mant", minimo: 2, nota: "Operativo estival." },
+            { nombre: "Barredora tipo Fracchia N337", cantId: "F.10-cant", mantId: "F.10-mant", minimo: 2, nota: "Operativo estival." },
+            { nombre: "Camión volcador Scania 440 XT (20 m³)", cantId: null, mantId: "F.11-mant", minimo: "OPCIONAL", nota: "Fuera del pliego: no integra el mínimo." },
+            { nombre: "Camión barrenieve", cantId: null, mantId: "F.13-mant", minimo: "PROVISTO x VELADERO", nota: "No cuenta al mínimo; se declara para trazar horas/registro." },
+        ];
+
+        function prioridadInfo(p) {
+            if (p === "OB") return { label: "Obligatorio", cls: "bg-red-100 text-red-700 border-red-300" };
+            if (p === "RE") return { label: "Recomendado", cls: "bg-orange-100 text-orange-700 border-orange-300" };
+            return { label: "Suma puntaje", cls: "bg-emerald-100 text-emerald-700 border-emerald-300" };
+        }
+
+        function estadoDeclarado(id) {
+            if (!id) return { icon: "•", label: "Sin dato en el sistema", cls: "text-slate-400" };
+            const declarado = state[id] ? state[id].declarado : false;
+            return declarado
+                ? { icon: "✓", cls: "text-emerald-600 font-bold" }
+                : { icon: "✕", cls: "text-red-600 font-bold" };
+        }
+
+        function renderChecklistItemPdf(it) {
+            const pr = prioridadInfo(it.prioridad);
+            const ed = estadoDeclarado(it.id);
+            const meta = [it.emite ? "Lo emite: " + it.emite : "", it.vigencia ? "Vigencia: " + it.vigencia : ""].filter(Boolean).join(" · ");
+            return `
+            <div style="page-break-inside: avoid;" class="flex items-start justify-between gap-3 py-2 px-3 border-b border-slate-100">
+                <div class="flex items-start gap-2 flex-1">
+                    <span class="${ed.cls} text-sm w-4 flex-shrink-0 text-center">${ed.icon}</span>
+                    <div>
+                        <div class="text-[12px] text-slate-700 leading-snug">${it.doc}</div>
+                        ${meta ? `<div class="text-[10px] text-slate-400 italic mt-0.5">${meta}</div>` : ""}
+                        ${it.soloSi ? `<div class="text-[10px] text-amber-600 font-semibold mt-0.5">Solo si: ${it.soloSi}</div>` : ""}
+                        ${it.nota ? `<div class="text-[10px] text-brand-2 mt-0.5">${it.nota}</div>` : ""}
+                    </div>
+                </div>
+                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${pr.cls} flex-shrink-0 whitespace-nowrap">${pr.label}</span>
+            </div>`;
+        }
+
+        function renderChecklistSeccionPdf(sec, n) {
+            return `
+            <div style="page-break-inside: avoid;" class="mb-4">
+                <div class="bg-ink text-white text-sm font-bold px-3 py-2 rounded-t-lg">${n} · ${sec.titulo}</div>
+                <div class="bg-slate-100 text-[10px] text-slate-500 italic px-3 py-1.5 border-x border-slate-200">${sec.notaSeccion}</div>
+                <div class="border border-slate-200 rounded-b-lg overflow-hidden">
+                    ${sec.items.map(renderChecklistItemPdf).join("")}
+                </div>
+            </div>`;
+        }
+
+        function renderFlotaTablaPdf() {
+            const filas = FLOTA_TABLA.map(eq => {
+                const cumple = eq.cantId ? (state[eq.cantId] && state[eq.cantId].declarado ? '<span class="text-emerald-600 font-bold">✓</span>' : '<span class="text-red-600 font-bold">✕</span>') : '<span class="text-slate-400">—</span>';
+                const mant = eq.mantId ? (state[eq.mantId] && state[eq.mantId].declarado ? '<span class="text-emerald-600 font-bold">✓</span>' : '<span class="text-red-600 font-bold">✕</span>') : '<span class="text-slate-400">—</span>';
+                return `<tr style="page-break-inside: avoid;" class="border-b border-slate-100">
+                    <td class="py-1.5 px-2 text-[11px] text-slate-700">${eq.nombre}</td>
+                    <td class="py-1.5 px-2 text-[11px] text-center mono">${eq.minimo}</td>
+                    <td class="py-1.5 px-2 text-[11px] text-center">${cumple}</td>
+                    <td class="py-1.5 px-2 text-[11px] text-center">${mant}</td>
+                    <td class="py-1.5 px-2 text-[10px] text-slate-400">${eq.nota}</td>
+                </tr>`;
+            }).join("");
+            return `
+            <div style="page-break-inside: avoid;" class="mb-4">
+                <div class="bg-brand-2 text-white text-sm font-bold px-3 py-2 rounded-t-lg">Flota — mínimo exigido por equipo</div>
+                <table class="w-full border border-slate-200 rounded-b-lg border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="py-1.5 px-2 text-[10px] uppercase text-slate-500 text-left">Tipo de equipo</th>
+                            <th class="py-1.5 px-2 text-[10px] uppercase text-slate-500">Mínimo</th>
+                            <th class="py-1.5 px-2 text-[10px] uppercase text-slate-500">Cumple cant.</th>
+                            <th class="py-1.5 px-2 text-[10px] uppercase text-slate-500">Con mantenim.</th>
+                            <th class="py-1.5 px-2 text-[10px] uppercase text-slate-500 text-left">Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody>${filas}</tbody>
+                </table>
+            </div>`;
+        }
+
+        function buildChecklistHTML() {
+            const e = EMPRESA_ACTUAL || {};
+            const hoy = new Date().toLocaleDateString("es-AR");
+
+            const resumen = { OB: [0, 0], SP: [0, 0], RE: [0, 0] };
+            CHECKLIST_VISITA.forEach(sec => sec.items.forEach(it => {
+                if (!it.id) return;
+                const r = resumen[it.prioridad];
+                r[1]++;
+                if (state[it.id] && state[it.id].declarado) r[0]++;
+            }));
+
+            return `
+            <div style="font-family: 'Open Sans', system-ui, sans-serif; padding: 18px; color:#1A1A1A; width: 704px;">
+                <div class="flex items-start justify-between border-b-4 border-brand pb-3 mb-4">
+                    <div>
+                        <h1 style="font-family:'Montserrat',sans-serif;" class="text-xl font-black text-ink">Checklist de documentación para la visita</h1>
+                        <p class="text-xs text-slate-500 mt-1">Servicio de Mantenimiento del Camino a Veladero — MAS S.R.L.</p>
+                    </div>
+                    <div class="text-right text-[10px] text-slate-400 flex-shrink-0">Generado el ${hoy}</div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
+                    <h2 class="text-sm font-bold text-slate-800 mb-2">${e.nombre || "Empresa sin identificar"}</h2>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-600">
+                        <div><strong>CUIT:</strong> ${e.cuit || "—"}</div>
+                        <div><strong>Localidad:</strong> ${e.localidad || "—"}</div>
+                        <div><strong>Representante legal:</strong> ${e.representante || "—"}</div>
+                        <div><strong>Email:</strong> ${e.email || "—"}</div>
+                        <div><strong>Teléfono:</strong> ${e.telefono || "—"}</div>
+                        <div><strong>Antigüedad:</strong> ${e.antiguedad ? e.antiguedad + " años" : "—"}</div>
+                        <div><strong>Presentado:</strong> ${e.fecha || "—"}</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-4 text-center">
+                    <div class="border border-red-200 bg-red-50 rounded-lg p-2">
+                        <div class="text-lg font-black text-red-700">${resumen.OB[0]}/${resumen.OB[1]}</div>
+                        <div class="text-[9px] uppercase text-red-600 font-bold">Obligatorios declarados</div>
+                    </div>
+                    <div class="border border-emerald-200 bg-emerald-50 rounded-lg p-2">
+                        <div class="text-lg font-black text-emerald-700">${resumen.SP[0]}/${resumen.SP[1]}</div>
+                        <div class="text-[9px] uppercase text-emerald-600 font-bold">Suma puntaje declarados</div>
+                    </div>
+                    <div class="border border-orange-200 bg-orange-50 rounded-lg p-2">
+                        <div class="text-lg font-black text-orange-700">${resumen.RE[0]}/${resumen.RE[1]}</div>
+                        <div class="text-[9px] uppercase text-orange-600 font-bold">Recomendados declarados</div>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-slate-500 mb-4 leading-relaxed">
+                    <strong>Cómo leer este checklist:</strong> la columna de estado (✓ / ✕) indica si la empresa <strong>declaró</strong> tener ese documento en el formulario de intake — no reemplaza la verificación presencial. <strong>Obligatorio</strong>: si falta, la propuesta queda fuera del proceso. <strong>Suma puntaje</strong>: cuantos más presente, mejor el puntaje. <strong>Recomendado</strong>: evita observaciones y refuerza la presentación. Lleve original y copia de cada documento, todos vigentes a la fecha de la visita.
+                </div>
+
+                ${CHECKLIST_VISITA.map((sec, i) => renderChecklistSeccionPdf(sec, i + 1)).join("")}
+                ${renderFlotaTablaPdf()}
+
+                <div class="border border-slate-300 rounded-xl p-4 mt-4" style="page-break-inside: avoid;">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2">Antes de salir a la visita — verificación final</h3>
+                    <ul class="text-[11px] text-slate-600 space-y-1 list-disc pl-4">
+                        <li>Original y una copia de cada documento de este checklist.</li>
+                        <li>Todos los documentos vigentes a la fecha de la visita.</li>
+                        <li>Carpeta ordenada siguiendo las secciones de este checklist.</li>
+                        <li>Representante técnico y responsable de Higiene y Seguridad presentes para responder consultas.</li>
+                        <li>Si la visita incluye inspección de flota: equipos disponibles y en condiciones.</li>
+                    </ul>
+                </div>
+
+                <p class="text-center text-[9px] text-slate-400 mt-4">Documento generado automáticamente a partir de lo declarado en el formulario de intake — no reemplaza la verificación presencial ni la Matriz Integral de Evaluación v4.1.</p>
+            </div>`;
+        }
+
+        function esperarSiguienteFrame() {
+            return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function descargarChecklistVisita() {
+            if (!EMPRESA_ACTUAL) {
+                alert("Primero cargá una empresa (desde la hoja de respuestas o un caso de prueba) para poder generar su checklist de visita.");
+                return;
+            }
+            const btn = document.getElementById("btn-descargar-pdf");
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "Generando PDF…";
+            btn.disabled = true;
+
+            // html2canvas necesita que el contenido esté realmente pintado por el navegador: un contenedor
+            // desplazado muy lejos con left:-9999px queda fuera del área que el navegador pinta y sale en
+            // blanco. Por eso se muestra en pantalla como overlay de página completa mientras se genera.
+            const overlay = document.createElement("div");
+            overlay.id = "pdf-generation-overlay";
+            overlay.style.cssText = "position:fixed; inset:0; z-index:99999; background:#fff; overflow:auto; display:flex; justify-content:center; padding:24px 0;";
+            const cont = document.createElement("div");
+            cont.style.cssText = "width:740px; max-width:100%; background:#fff;";
+            cont.innerHTML = buildChecklistHTML();
+            overlay.appendChild(cont);
+            document.body.appendChild(overlay);
+            window.scrollTo(0, 0);
+
+            // Esperar a que las fuentes web (Montserrat/Open Sans) terminen de cargar y a que el navegador
+            // pinte el overlay al menos un frame: capturar antes de tiempo puede dejar texto superpuesto
+            // (fallback + web font dibujados en el mismo pase).
+            if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+            await esperarSiguienteFrame();
+
+            const slug = (EMPRESA_ACTUAL.nombre || "proveedor").normalize("NFD").replace(new RegExp("[\\u0300-\\u036f]", "g"), "").replace(/[^a-zA-Z0-9]+/g, "_");
+            const nombreArchivo = `Checklist_Visita_${slug}.pdf`;
+
+            const restaurar = () => {
+                overlay.remove();
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+                lucide.createIcons();
+            };
+
+            html2pdf().set({
+                margin: [10, 8, 12, 8],
+                filename: nombreArchivo,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+                pagebreak: { mode: ["css"] }
+            }).from(cont).save().then(restaurar).catch(err => {
+                console.error(err);
+                restaurar();
+                alert("No se pudo generar el PDF: " + err.message);
+            });
+        }
+
+        // ---------- Arranque ----------
+        inicializarEstado();
+        renderAcordeon();
+        renderPisosGrid();
+        renderEmpresaButtons();
+        cargarHojaFormulario();
+        lucide.createIcons();
+        recalcular();
+    </script>
+</body>
+</html>
