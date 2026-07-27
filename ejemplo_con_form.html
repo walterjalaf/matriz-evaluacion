@@ -259,7 +259,10 @@
 
             const finProm = promedioFinanciero();
             const bcraRaw = state["J.13"] ? state["J.13"].bcraRaw : null;
-            const bcraExcluyente = bcraRaw !== null && bcraRaw !== undefined && bcraRaw >= 4;
+            const bcraVerificado = state["J.13"] ? state["J.13"].verificado : false;
+            // Igual que el Gate Nivel 1: el piso solo corta una vez que el evaluador verificó J.13
+            // en la visita, no apenas se declara en el Form.
+            const bcraExcluyente = bcraVerificado && bcraRaw !== null && bcraRaw !== undefined && bcraRaw >= 4;
             const ssmaMin = Math.min(getScoreSub("6.1"), getScoreSub("6.2"), getScoreSub("6.3"));
 
             const enCero = subcriteriosEnCero();
@@ -274,7 +277,7 @@
                 { label: "Elegibilidad geográfica", ok: elegible, detalle: elegible ? "Dentro del área" : "Fuera de Iglesia/Jáchal → No-Go", detiene: !elegible },
                 { label: "Gate Nivel 1 (25 ítems)", ok: !gateN1Fail, detalle: gateN1Fail ? "Al menos 1 ítem verificado en 'No'" : "25/25 verificados en 'Sí'", detiene: gateN1Fail },
                 { label: "Salud Financiera (prom. 2.1–2.3)", ok: finProm >= 2, detalle: `Promedio ${finProm.toFixed(1)} / 5 (piso: 2,0)`, detiene: finProm < 2 },
-                { label: "Piso 2.2 · Situación BCRA (peor situación, empresa y socios)", ok: !bcraExcluyente, detalle: bcraExcluyente ? `Situación ${bcraRaw} (banda 4-5, ej. Situación 5 = Irrecuperable) → No-Go` : (bcraRaw ? `Situación ${bcraRaw} → T6 sugiere ${scoreT6Bcra(bcraRaw)} pts en 2.2` : "Sin dato de BCRA declarado"), detiene: bcraExcluyente },
+                { label: "Piso 2.2 · Situación BCRA (peor situación, empresa y socios)", ok: !bcraExcluyente, detalle: bcraExcluyente ? `Situación ${bcraRaw} verificada (banda 4-5, ej. Situación 5 = Irrecuperable) → No-Go` : (bcraRaw == null ? "Sin dato de BCRA declarado" : (bcraVerificado ? `Situación ${bcraRaw} verificada → T6 sugiere ${scoreT6Bcra(bcraRaw)} pts en 2.2` : `Situación ${bcraRaw} declarada, sin verificar aún`)), detiene: bcraExcluyente },
                 { label: "SSMA excluyente (6.1/6.2/6.3)", ok: ssmaMin > 1, detalle: `Mínimo de los 3: ${ssmaMin} pts (piso: >1)`, detiene: ssmaMin <= 1 },
                 { label: enCero.length ? `Subcriterio(s) en 0 pts: ${enCeroTxt}` : "Ningún subcriterio en 0 puntos (27/27)", ok: enCero.length === 0, detalle: enCero.length ? enCero.map(x => `${x.id} ${x.nombre}`).join(" | ") : "Los 27 subcriterios de la Matriz tienen puntaje > 0", detiene: enCero.length > 0 },
                 { label: "Puntaje global ≥ 55", ok: global >= 55, detalle: `${global.toFixed(1)} / 100`, detiene: global < 55 },
@@ -321,10 +324,13 @@
         }
 
         function getScoreSub(subId) {
-            if (subId === "2.2") {
-                const t6 = scoreT6Bcra(state["J.13"] ? state["J.13"].bcraRaw : null);
+            if (subId === "2.2" && state["J.13"] && state["J.13"].verificado) {
+                // El puntaje OFICIAL de 2.2 (cascada, dictamen, cajas del acordeón) solo usa T6
+                // una vez que el evaluador tildó "Verificado" en J.13 — igual que el resto de los
+                // 27 subcriterios, que arrancan en 0 hasta la visita. Sin verificar, cae al
+                // fallback genérico de abajo (da 0 si nada está verificado).
+                const t6 = scoreT6Bcra(state["J.13"].bcraRaw);
                 if (t6 !== null) return t6;
-                // Sin dato de BCRA declarado (todavía no se cargó ninguna respuesta): aproximación genérica.
             }
             const sub = findSub(subId);
             if (!sub) return 0;
@@ -372,11 +378,17 @@
             return campo === "declarado" ? state[id].declarado : (state[id].declarado && state[id].verificado);
         }
         function getScoreSubCampo(subId, campo) {
-            if (subId === "2.2") {
-                // La situación BCRA es un dato declarado, no un documento con estado verificado
-                // aparte — "declarado" y "declarado y verificado" usan el mismo T6(raw).
-                const t6 = scoreT6Bcra(state["J.13"] ? state["J.13"].bcraRaw : null);
-                if (t6 !== null) return t6;
+            if (subId === "2.2" && state["J.13"]) {
+                // "declarado": T6 aplica apenas hay un valor de BCRA en la hoja, sin esperar la
+                // visita — igual que cualquier otro ítem declarado. "ambos" (declarado Y
+                // verificado): T6 solo cuenta una vez que J.13 está tildado "Verificado"; si no,
+                // cae al fallback genérico (da 0 si nada está verificado, evitando que el KPI
+                // "Declarado y verificado" muestre puntaje sin ningún check).
+                const bcraOk = campo === "declarado" ? true : state["J.13"].verificado;
+                if (bcraOk) {
+                    const t6 = scoreT6Bcra(state["J.13"].bcraRaw);
+                    if (t6 !== null) return t6;
+                }
             }
             const sub = findSub(subId);
             if (!sub) return 0;

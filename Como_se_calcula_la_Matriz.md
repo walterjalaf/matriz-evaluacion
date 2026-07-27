@@ -126,6 +126,8 @@ Más dos pisos "de bloque" (no de un solo subcriterio):
 
 Y un piso adicional específico de **2.2** que usa el dato crudo declarado en `J.13` (situación BCRA, escala real 1-5 del Central de Deudores de empresa y socios): **situación 4 o 5 → No-Go**. Situación 5 = Irrecuperable (atrasos superiores a un año o insolvencia/instancia judicial). Situación 3 **no** es piso — es la banda mínima que alcanza para seguir en carrera (ver tabla T6, Sección 12).
 
+Igual que el Gate Nivel 1, este piso solo corta una vez que el evaluador tildó "Verificado" en `J.13` durante la visita — no apenas se carga la respuesta del Form. Antes de verificar, el puntaje **oficial** de 2.2 (el que alimenta la cascada, el dictamen y el KPI "Declarado y verificado") es 0, igual que los otros 26 subcriterios; el puntaje según T6 solo se ve reflejado en el KPI **"Declarado"**, que sí muestra lo que dice el Excel sin esperar la visita.
+
 **Ejemplo real — Servicios Viales del Oeste SA**: no marcó ninguno de los 11 equipos "core" de flota exigidos por el pliego (cargadora, motoniveladora, retro, etc. — ver Sección 11). Eso hace que:
 
 ```
@@ -210,7 +212,11 @@ El simulador usa una aproximación **lineal** (`round(cumplen/11×5)`) porque no
 | 3 | 1 |
 | 4 o 5 | 0 (además, piso → No-Go — ver Sección 9) |
 
-A diferencia de las otras 5 tablas de esta sección, **T6 sí está implementada tal cual**: `ejemplo_con_form.html` la usa directamente (`scoreT6Bcra()`) para calcular el puntaje 0-5 de 2.2 a partir del valor crudo declarado en `J.13`, no de una proporción de checkboxes. `J.14` (manifestación de bienes) queda dentro de 2.2 como ítem de evidencia/checklist — el Marco Metodológico v4.1 la describe como refuerzo cualitativo de la misma banda BCRA, no como un eje de puntaje separado — pero ya no mueve el puntaje del subcriterio de forma independiente. Si todavía no se cargó ninguna respuesta de la hoja (sin dato de BCRA disponible), 2.2 cae a la aproximación genérica de checkboxes (`verificados/total×5` sobre J.13+J.14) para no mostrar un puntaje vacío.
+A diferencia de las otras 5 tablas de esta sección, **T6 sí está implementada tal cual**: `ejemplo_con_form.html` la usa directamente (`scoreT6Bcra()`) para calcular el puntaje 0-5 de 2.2 a partir del valor crudo declarado en `J.13`, no de una proporción de checkboxes. `J.14` (manifestación de bienes) queda dentro de 2.2 como ítem de evidencia/checklist — el Marco Metodológico v4.1 la describe como refuerzo cualitativo de la misma banda BCRA, no como un eje de puntaje separado — pero ya no mueve el puntaje del subcriterio de forma independiente.
+
+T6 se aplica distinto según qué puntaje se esté mirando:
+- **"Declarado"** (KPI de la derecha, refleja el Excel sin esperar la visita): T6 aplica apenas hay un `J.13` con valor de BCRA cargado, sin exigir nada más.
+- **Puntaje oficial** (cascada, dictamen, cajas del acordeón) y **"Declarado y verificado"**: T6 solo aplica una vez que el evaluador tildó "Verificado" en `J.13` — igual que el resto de los 27 subcriterios, que arrancan en 0 hasta la visita. Sin eso, 2.2 cae a la aproximación genérica de checkboxes (`verificados/total×5` sobre J.13+J.14), que da 0 mientras nada esté tildado.
 
 **3.1 — Cantidad de empleados en relación de dependencia:**
 | Empleados | Puntaje |
