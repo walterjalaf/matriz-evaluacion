@@ -50,17 +50,19 @@ La columna **Nota** marca cuando el ítem real del Form se desvía de la especif
 
 La v4 marca explícitamente "No requiere documentación de respaldo". Confirmado: ningún campo de esta sección tiene columna de adjunto en la hoja real.
 
-| Campo | Columna real en la hoja |
-|---|---|
-| Razón social | `B` |
-| CUIT | `C` |
-| Departamento | `D` |
-| Localidad | `E` — texto cambiado a "Localidad donde está ubicada la empresa." |
-| Representante legal | `F` — texto cambiado a "Representante legal - Indique nombre completo." |
-| Email de contacto | `G` — separado del teléfono (antes un solo campo) |
-| Teléfono de contacto | `GU` — separado y movido al final de la hoja |
-| Fecha de presentación | `H` — encabezado truncado en la fuente: `"Fecha de presentación del formulario ("` |
-| Antigüedad (años) | `I` |
+| Campo | Columna real en la hoja | Encabezado literal vigente |
+|---|---|---|
+| Razón social | `B` | `Razon Social` (sin tilde, S mayúscula) |
+| CUIT | `C` | `CUIT` |
+| Departamento | `D` | `Departamento` |
+| Localidad | `E` | `Localidad` |
+| Representante legal | `F` | `Representante Legal` |
+| Email de contacto | `G` — separado del teléfono (antes un solo campo) | `Dirección de email` |
+| Teléfono de contacto | `GU` — separado y movido al final de la hoja | `Teléfono personal` |
+| Fecha de presentación | `H` — encabezado truncado en la fuente; **vacía en todas las respuestas** | `Fecha de presentación del formulario (` |
+| Antigüedad | `I` | `Antigüedad de la empresa` — ojo: hoy responden texto libre ("11 años"), no solo el número |
+
+> Estos encabezados ya se renombraron una vez y rompieron en silencio el simulador (el selector caía a "Respuesta N" y el filtro de zona Iglesia/Jáchal daba siempre falso). Por eso `ejemplo_con_form.html` ya **no** los busca por texto exacto: los resuelve con `normHeader` + `META_ALIASES`, que ignoran tildes, mayúsculas, espacios de más y sufijos de puntuación. Si se vuelve a renombrar una de estas columnas, agregá el texto nuevo al principio de la lista de alias correspondiente.
 
 ---
 
