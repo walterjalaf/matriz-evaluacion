@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado según lo declarado · Intake Veladero</title>
+    <title>Comparativa de proveedores · Estado declarado · Veladero</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = { theme: { extend: {
-            colors: { ink:'#0E1F33', brand:'#1E4A82', 'brand-2':'#2D6CB8', pearl:'#E8EAEC', paper:'#F5F6F8', accent:'#F26522' },
+            colors: { ink:'#0E1F33', brand:'#1E4A82', 'brand-2':'#2D6CB8', paper:'#F5F6F8', accent:'#F26522' },
             fontFamily: { display:['Montserrat','sans-serif'] },
         } } };
     </script>
@@ -21,121 +21,94 @@
         h1,h2,h3,h4 { font-family:'Montserrat', sans-serif; }
         .mono { font-family:'JetBrains Mono','SF Mono',Menlo,monospace; }
         .acc-body { max-height:0; overflow:hidden; transition:max-height .3s ease-out; }
-        .acc-body.open { max-height:20000px; }
-        .paso::before { content:''; position:absolute; left:.68rem; top:1.7rem; bottom:-.6rem; width:2px; background:rgba(14,31,51,.10); }
-        .paso:last-child::before { display:none; }
-        .paso { position:relative; padding-left:2.4rem; }
-        .paso-dot { position:absolute; left:0; top:.1rem; width:1.4rem; height:1.4rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; }
+        .acc-body.open { max-height:6000px; }
+        .scroll-x { overflow-x:auto; }
+        .heat th.sticky-col, .heat td.sticky-col { position:sticky; left:0; background:#fff; z-index:1; }
+        .heat thead th { position:sticky; top:0; background:#f8fafc; z-index:2; }
+        .heat thead th.sticky-col { z-index:3; background:#f8fafc; }
         ::-webkit-scrollbar { width:8px; height:8px; }
         ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
         @media print { .no-print { display:none !important; } .acc-body { max-height:none !important; } }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 p-4 md:p-8">
+<div class="max-w-7xl mx-auto">
 
-<div class="max-w-6xl mx-auto">
-
-    <!-- Encabezado -->
     <div class="bg-gradient-to-r from-ink to-brand text-white rounded-2xl shadow-lg p-6 md:p-8 mb-4">
         <p class="text-white/70 text-xs font-bold uppercase tracking-widest mb-1">Mina Veladero · Iglesia y Jáchal, San Juan</p>
-        <h1 class="text-2xl md:text-3xl font-black">Estado del proveedor según lo declarado</h1>
-        <p class="text-white/70 text-sm mt-2 max-w-3xl">Lee las respuestas del formulario de intake directamente de Google Sheets y aplica la cascada de decisión de la Matriz Integral <strong class="text-white">usando únicamente lo declarado</strong>. No incluye la instancia de verificación presencial.</p>
+        <h1 class="text-2xl md:text-3xl font-black">Comparativa de proveedores según lo declarado</h1>
+        <p class="text-white/70 text-sm mt-2 max-w-3xl">Aplica la cascada de decisión de la Matriz Integral a <strong class="text-white">todas las respuestas del intake a la vez</strong>, usando únicamente lo declarado. Muestra qué empresas tienen No-Go, en qué paso corta cada una y qué motivos se repiten entre todas.</p>
+        <p class="text-white/50 text-xs mt-3">Mismo motor de cálculo que <a href="estado_declarado.html" class="underline hover:text-white">estado_declarado.html</a>, que muestra una empresa en detalle.</p>
     </div>
 
-    <!-- Barra de conexión -->
-    <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-center justify-between gap-4 mb-4">
+    <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
         <div>
-            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                <i data-lucide="cloud" class="w-4 h-4 text-brand-2"></i> Respuestas del formulario (Google Sheets, en vivo)
-            </h2>
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2"><i data-lucide="cloud" class="w-4 h-4 text-brand-2"></i> Respuestas del formulario (Google Sheets, en vivo)</h2>
             <p class="text-xs text-slate-500" id="sheet-status">Conectando…</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
-            <select id="sel-empresa" onchange="mostrarEmpresa(this.value)" disabled
-                class="text-sm border border-slate-300 rounded-lg px-3 py-2 flex-1 xl:w-80 bg-white disabled:bg-slate-50 disabled:text-slate-400">
-                <option value="">Cargando…</option>
-            </select>
-            <button onclick="cargarHoja()" class="px-3 py-2 bg-brand hover:bg-brand-2 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-            </button>
-            <a id="link-hoja" href="#" target="_blank" rel="noopener"
-                class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg flex items-center gap-1.5">
-                <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver hoja
-            </a>
+        <div class="flex items-center gap-2">
+            <button onclick="cargarHoja()" class="px-3 py-2 bg-brand hover:bg-brand-2 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar</button>
+            <a id="link-hoja" href="#" target="_blank" rel="noopener" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg flex items-center gap-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver hoja</a>
         </div>
     </div>
 
-    <!-- Ficha + dictamen -->
-    <div id="wrap-dictamen" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div id="ficha-empresa"></div>
-        </div>
-        <div id="card-dictamen" class="rounded-2xl shadow-sm border p-6 flex flex-col justify-center text-center">
-            <h3 class="text-[10px] uppercase tracking-widest font-bold mb-2 opacity-70">Dictamen declarado</h3>
-            <div id="dictamen-txt" class="text-3xl font-black leading-tight mb-3"></div>
-            <div class="flex items-end justify-center gap-1">
-                <span id="dictamen-pts" class="text-5xl font-black mono leading-none"></span>
-                <span id="dictamen-max" class="text-sm font-bold opacity-60 mb-1"></span>
-            </div>
-            <div class="text-[10px] uppercase tracking-wide opacity-60 mt-1">Puntaje declarado</div>
-        </div>
+    <div id="kpis" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4"></div>
+
+    <div id="wrap-tabla" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 mb-1">Estado de cada proveedor</h2>
+        <p class="text-xs text-slate-500 mb-4">Ordenado por puntaje declarado. <strong>"Corta en"</strong> es el primer paso de la cascada que falla — el que define el dictamen. Los demás motivos igual se listan, porque habría que resolverlos todos.</p>
+        <div class="scroll-x"><table class="w-full text-sm border-collapse" id="tabla"></table></div>
     </div>
 
-    <!-- Motivos de No-Go -->
-    <div id="wrap-motivos" class="hidden mb-4"></div>
+    <div id="wrap-patrones" class="hidden mb-4"></div>
 
-    <!-- Verificación final: tablas T1-T6 -->
-    <div id="wrap-tablas" class="hidden bg-white rounded-2xl shadow-sm border-2 border-brand-2/30 p-6 mb-4">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-brand-2"></i> Verificación final — tablas de conversión T1 a T6</h2>
-            <button onclick="restaurarAjustes()" class="no-print px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg flex items-center gap-1.5 flex-shrink-0">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Volver a lo declarado
-            </button>
-        </div>
-        <p class="text-xs text-slate-500 mb-4">Seis subcriterios no se puntúan por proporción de respuestas sino con una tabla de la hoja <span class="mono">Config</span>, que convierte un dato numérico en puntaje. Donde el formulario pregunta por bandas o por sí/no en vez del número exacto, el valor queda marcado <strong class="text-amber-700">estimado</strong>: cargá el dato real de la visita y el dictamen se recalcula al instante.</p>
-        <div id="tablas-panel" class="space-y-3"></div>
-
-        <h3 class="text-sm font-bold text-slate-700 mt-6 mb-1 flex items-center gap-1.5"><i data-lucide="list-tree" class="w-4 h-4 text-slate-400"></i> T7 · Escalas cualitativas — Dimensiones IV y V</h3>
-        <p class="text-xs text-slate-500 mb-3">Seis subcriterios se puntúan promediando el nivel de cada respuesta y convirtiéndolo con T7. Es la fórmula que ya usa la planilla (<span class="mono">MAX(1; ROUND(promedio/máximo×5; 0))</span>), acá expresada como tabla. Podés ajustar el % resultante si la visita cambia alguna respuesta.</p>
-        <div id="escalas-panel" class="space-y-3"></div>
-
-        <div id="tablas-impacto" class="mt-4"></div>
+    <div id="wrap-heat" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 mb-1">Gate Nivel 1 — ítems excluyentes, empresa por empresa</h2>
+        <p class="text-xs text-slate-500 mb-4">Un solo "No" en cualquiera de estos ítems produce No-Go. Las filas sin ningún ✕ son las que ninguna empresa tiene en problema; las que están casi todas en rojo suelen indicar un problema de la pregunta, no de las empresas.</p>
+        <div class="scroll-x max-h-[36rem]"><table class="heat w-full text-xs border-collapse" id="heat"></table></div>
     </div>
 
-    <!-- Cascada -->
-    <div id="wrap-cascada" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="git-branch" class="w-5 h-5 text-slate-400"></i> Cascada de decisión</h2>
-        <p class="text-xs text-slate-500 mb-5">Se evalúa en orden fijo y el dictamen lo define el <strong>primer paso que corta</strong>. Igualmente se muestran todos los pasos, para ver todo lo que habría que resolver.</p>
-        <div id="cascada" class="space-y-4 text-sm"></div>
-    </div>
-
-    <!-- Puntaje por dimensión -->
-    <div id="wrap-dim" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 mb-1">Puntaje declarado por dimensión y subcriterio</h2>
-        <p class="text-xs text-slate-500 mb-4">Cada subcriterio puntúa 0-5 según la proporción de sus preguntas declaradas como cumplidas; aporta <span class="mono">(puntaje/5) × peso</span> al total. <strong>Cualquier subcriterio en 0 es piso → No-Go.</strong></p>
-        <div id="tabla-dim" class="space-y-3"></div>
-    </div>
-
-    <!-- Detalle declarado -->
     <div id="wrap-detalle" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 mb-1">Detalle de lo declarado</h2>
-        <p class="text-xs text-slate-500 mb-4">El texto de cada pregunta se toma <strong>en vivo del encabezado de la hoja de respuestas</strong>, no de una copia local: si el formulario se reedita, acá se ve el texto nuevo. Debajo de cada pregunta figura la respuesta literal cargada por la empresa.</p>
+        <h2 class="text-lg font-bold text-slate-800 mb-1">Detalle de motivos por empresa</h2>
+        <p class="text-xs text-slate-500 mb-4">Cada motivo con las preguntas concretas y la respuesta literal que cargó la empresa.</p>
         <div id="detalle" class="space-y-3"></div>
     </div>
 
-    <!-- Control de correspondencia -->
-    <div id="wrap-control" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="scan-search" class="w-5 h-5 text-brand-2"></i> Control de correspondencia formulario ↔ matriz</h2>
-        <p class="text-xs text-slate-500 mb-4">Verificación automática de que cada pregunta de la Matriz sigue existiendo con el mismo texto en la hoja de respuestas. Se ejecuta en cada carga.</p>
-        <div id="control"></div>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="list-ordered" class="w-5 h-5 text-slate-400"></i> Cómo se lee esta tabla</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-slate-600">
+            <div>
+                <h3 class="font-bold text-slate-800 text-[13px] mb-1">Orden de la cascada</h3>
+                <ol class="list-decimal pl-5 space-y-0.5 text-[13px]">
+                    <li>Consentimiento de auditoría</li>
+                    <li>Elegibilidad geográfica (Iglesia / Jáchal)</li>
+                    <li>Gate Nivel 1 — 22 ítems excluyentes (G.26, G.27 y G.35 pasaron a Nivel 2)</li>
+                    <li>Salud financiera — promedio 2.1 a 2.3 ≥ 2</li>
+                    <li>Piso 2.2 — situación BCRA fuera de la banda 4-5</li>
+                    <li>SSMA excluyente — mínimo de 6.1 / 6.2 / 6.3 &gt; 1</li>
+                    <li>Ningún subcriterio en 0 puntos</li>
+                    <li>Puntaje ≥ 55 · <span class="text-slate-400">9. Puntaje ≥ 70</span></li>
+                </ol>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800 text-[13px] mb-1">Qué significa el dictamen</h3>
+                <p class="text-[13px] mb-2"><span class="font-bold text-red-700">No-Go</span>: se activó al menos una condición excluyente. El puntaje no lo revierte — una empresa puede tener más de 90/100 y ser No-Go igual, porque la cascada corta antes de mirar el puntaje.</p>
+                <p class="text-[13px] mb-2"><span class="font-bold text-amber-600">Go con Plan de Acción</span>: sin excluyentes, puntaje entre 55 y 69,9.</p>
+                <p class="text-[13px]"><span class="font-bold text-emerald-700">Go</span>: sin excluyentes, puntaje 70 o más.</p>
+            </div>
+        </div>
+        <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-[13px] text-amber-900">
+            <strong>Esto es lo declarado, no lo verificado.</strong> Sale del formulario de intake, sin visita presencial. La verificación puede confirmar o desmentir cada punto: un ítem declarado en "Sí" que no se acredita en la visita pasa a "No" y puede agregar un No-Go que acá no aparece.
+        </div>
     </div>
 
-    <p class="text-center text-xs text-slate-400 mt-6 pb-4">Vista de <strong>estado declarado</strong>: refleja lo que la empresa respondió en el intake. La verificación presencial puede confirmar o desmentir cada punto y cambiar el dictamen.</p>
+    <p class="text-center text-xs text-slate-400 mt-6 pb-4">Generado en vivo desde "Respuestas de formulario 1". Los números se recalculan en cada carga.</p>
 </div>
 
 <script>
 // =====================================================================
-//  Datos estructurales de la Matriz (idénticos a ejemplo_con_form.html)
+//  Motor de evaluación — extraído textualmente de estado_declarado.html
+//  (no editar acá: se regenera desde aquel archivo)
 // =====================================================================
 const DATA = {"dimensiones":{"I":{"nombre":"GOBERNANZA, CUMPLIMIENTO E INTEGRIDAD","peso":10,"subs":[{"id":"1.1","nombre":"Conformación legal, radicación y arraigo provincial","peso":4,"piso":null,"items":[{"id":"J.1","texto":"¿Presenta el estatuto o contrato social inscripto?","gate":null,"entregable":"contrato social/estatuto inscripto"},{"id":"J.2","texto":"¿Presenta el acta de designación de autoridades vigente y el DNI de los socios?","gate":null,"entregable":"acta de designación de socios + DNI"},{"id":"J.3","texto":"¿Presenta la constancia de inscripción ante ARCA (ex AFIP)?","gate":null,"entregable":"constancia de inscripción AFIP"},{"id":"J.35","texto":"¿Tiene domicilio legal, fiscal y establecimiento operativo habilitado en San Juan, con al menos 12 meses de antigüedad?","gate":null,"entregable":"constancia de domicilio fiscal AFIP y habilitación municipal/provincial del establecimiento"}]},{"id":"1.2","nombre":"Estructura de gobierno, roles y decisión","peso":3,"piso":null,"items":[{"id":"J.4","texto":"¿Cuenta con un organigrama de la empresa?","gate":null,"entregable":"organigrama institucional"},{"id":"J.5","texto":"¿Tiene definida una matriz de contactos y puntos de escalamiento para el proyecto?","gate":null,"entregable":"listado formal de contactos"},{"id":"J.6","texto":"¿Tiene un poder de representación o una matriz de responsabilidades?","gate":null,"entregable":"declaración jurada, anexo técnico o copia de poderes firmados"}]},{"id":"1.3","nombre":"Integridad, cumplimiento laboral-sindical y libre conflictividad","peso":3,"piso":"0 = No-Go","items":[{"id":"J.7","texto":"¿Presenta el Certificado de Libre Deuda Previsional emitido por ARCA?","gate":null,"entregable":"Certificado de Libre Deuda Previsional"},{"id":"J.8","texto":"¿Presenta el Certificado de Libre Conflictividad de la Subsecretaría de Trabajo de San Juan?","gate":null,"entregable":"certificado original"},{"id":"J.9","texto":"¿Presenta el último Formulario 931 con su constancia de pago?","gate":null,"entregable":"último pago del F.931"},{"id":"J.37","texto":"¿Presenta el Certificado de Libre Deuda Sindical?","gate":null,"entregable":"Certificado de Libre Deuda Sindical vigente"},{"id":"J.38","texto":"¿Presenta una declaración jurada de antecedentes de huelgas o bloqueos de los últimos 2 años, con el encuadre sindical al día?","gate":null,"entregable":"declaración jurada de antecedentes de huelgas/bloqueos de los últimos 2 años + constancia de encuadre sindical al día"},{"id":"J.39","texto":"¿Garantiza que al menos el 70 u 80% del personal del servicio es de comunidades y el resto radicado en San Juan (con DNI y residencia efectiva de 12 meses o más)?","gate":null,"entregable":"DNI y constancia de residencia efectiva (≥12 meses) del personal afectado"},{"id":"J.40","texto":"¿Da prioridad a contratar, en primer lugar, a personas de las comunidades de Iglesia y Jáchal?","gate":null,"entregable":"procedimiento o política de contratación que documente el orden de prioridad geográfica declarado"}]}]},"II":{"nombre":"SALUD FINANCIERA","peso":15,"subs":[{"id":"2.1","nombre":"Solvencia, liquidez y capital de trabajo","peso":5,"piso":"0 = No-Go","items":[{"id":"J.10","texto":"¿Presenta los últimos 2 estados contables legalizados por el Consejo Profesional de Ciencias Económicas?","gate":null,"entregable":"últimos 2 EECC legalizados por el CPCE"},{"id":"J.11","texto":"¿Presenta el detalle de ventas y compras posteriores al último balance (según libro IVA)?","gate":null,"entregable":"detalle de ventas y compras post-balance"},{"id":"J.12","texto":"¿Presenta las últimas 6 declaraciones juradas de IVA e IIBB?","gate":null,"entregable":"6 DDJJ de IVA e IIBB"}]},{"id":"2.2","nombre":"Capacidad de endeudamiento / financiamiento de flota","peso":6,"piso":"0 = No-Go","items":[{"id":"J.13","texto":"Situación en el BCRA (Central de Deudores) de la empresa y de los socios: indique la peor situación (del 1 al 5)","gate":null,"entregable":"informe del BCRA de la empresa y los socios individualmente"},{"id":"J.14","texto":"¿Cuenta con la manifestación de bienes de la sociedad, validada por el CPCE?","gate":null,"entregable":"manifestación de bienes de la sociedad/socios certificada por el CPCE"}]},{"id":"2.3","nombre":"Comportamiento de pago e historial crediticio","peso":4,"piso":null,"items":[{"id":"J.15","texto":"¿Presenta el último informe comercial tipo VERAZ o NOSIS de la empresa?","gate":null,"entregable":"informe tipo Veraz o Nosis"},{"id":"J.33","texto":"¿Acepta ser auditada (financiera, técnica y de flota) por la consultora designada?","gate":null,"entregable":"Aceptación expresa de auditoría financiera, técnica y de flota"}]}]},"III":{"nombre":"RRHH Y RÉGIMEN LABORAL","peso":15,"subs":[{"id":"3.1","nombre":"Dotación, estabilidad y escalabilidad a 45/17","peso":4,"piso":null,"items":[{"id":"J.16","texto":"¿Cuántos empleados tiene en relación de dependencia (según el último F.931)?","gate":null,"entregable":"Nómina del personal declarada en el último F.931"},{"id":"J.17","texto":"¿Presenta el libro de sueldos digital o la planilla de altas tempranas de ARCA?","gate":null,"entregable":"libro de sueldo digital del último mes"}]},{"id":"3.2","nombre":"Experiencia y habilitaciones del personal operativo","peso":4,"piso":null,"items":[{"id":"J.18","texto":"¿Tiene los CV de los operarios clave de maquinaria (motoniveladora, topadora, cargadora)?","gate":null,"entregable":"Curriculum Vitae de los operarios clave"},{"id":"J.19","texto":"¿Tiene el carnet de conducir profesional o la tarjeta IERIC del personal?","gate":null,"entregable":"Carnet de conducir profesional / Tarjeta de IERIC"}]},{"id":"3.3","nombre":"Liderazgo operativo en campo","peso":3,"piso":null,"items":[{"id":"J.20","texto":"¿Tiene los CV del jefe de obra, capataces y del supervisor que estará fijo en el lugar?","gate":null,"entregable":"CV del jefe de obra, capataces y supervisor que está fijo en sitio"}]},{"id":"3.4","nombre":"Roster 14x7 UOCRA y reemplazo en 24 h","peso":4,"piso":"0 = No-Go","items":[{"id":"J.21","texto":"Describa el esquema de turnos 14x7 y el sistema de relevos que propone","gate":null,"entregable":"Plan de Roster / diagrama de turnos propuestos"},{"id":"J.22","texto":"¿Tiene un procedimiento para trasladar al personal hasta el lugar de trabajo?","gate":null,"entregable":"Procedimiento logístico de transporte"},{"id":"J.23","texto":"¿Tiene un listado de personal de reemplazo (back-up) listo para ingresar?","gate":null,"entregable":"Listado de Personal de Back-up vigentes listos para ingresar"},{"id":"J.32","texto":"¿En cuántas horas puede cubrir una vacante de personal?","gate":null,"entregable":"Registro del tiempo de cobertura de una vacante (horas)"}]}]},"IV":{"nombre":"EXPERIENCIA TÉCNICA","peso":18,"subs":[{"id":"4.1","nombre":"Mantenimiento de caminos no pavimentados","peso":7,"piso":null,"items":[{"id":"Q4.1","texto":"¿Cuántos años de experiencia tiene la empresa en mantenimiento de caminos no pavimentados (de ripio/tierra)?","gate":null,"entregable":"Contratos o actas de recepción de mantenimiento vial o similar"},{"id":"Q4.2","texto":"¿Tiene experiencia en estabilización de suelos (bischofita, cloruro de calcio/sodio, cal, enzimas)? Indique cuántos proyectos.","gate":null,"entregable":"Contratos y fichas técnicas del producto o tratamiento aplicado"},{"id":"Q4.3","texto":"¿Cuántos kilómetros de caminos no pavimentados mantuvo en los últimos 5 años?","gate":null,"entregable":"Contratos con detalle de tramos y kilometraje"},{"id":"Q4.4","texto":"¿Tiene experiencia en perfilado con motoniveladora y control de polvo (riego o supresores)?","gate":null,"entregable":"Registros de obra, fotos, informes técnicos"}]},{"id":"4.2","nombre":"Industria minera y alta montaña","peso":5,"piso":"0 = No-Go","items":[{"id":"Q4.5","texto":"¿Tiene experiencia trabajando para la industria minera? Indique la antigüedad.","gate":null,"entregable":"Contratos u órdenes de compra con empresas mineras"},{"id":"Q4.6","texto":"¿A qué altura máxima (metros sobre el nivel del mar) operó la empresa de forma sostenida?","gate":null,"entregable":"Contratos, ubicación de obras, informes de operación"},{"id":"Q4.7","texto":"¿Cuántos contratos con empresas mineras ejecutó en los últimos 5 años?","gate":null,"entregable":"Listado de contratos con referencias verificables"}]},{"id":"4.3","nombre":"Vialidad invernal y operativos nocturnos","peso":2,"piso":null,"items":[{"id":"Q4.8","texto":"¿Tiene experiencia en vialidad invernal (despeje de nieve o control de hielo)?","gate":null,"entregable":"Contratos o actas de servicios invernales"},{"id":"Q4.9","texto":"¿Operó en nieve/hielo y temperaturas bajo cero, con guardias las 24 horas?","gate":null,"entregable":"Registros de operación invernal, planillas de guardia"}]},{"id":"4.4","nombre":"Experiencia del equipo humano (operadores y personal clave)","peso":4,"piso":null,"items":[{"id":"Q4.10","texto":"¿Cuántos años de experiencia promedio tienen sus operadores de equipos de movimiento de suelo?","gate":null,"entregable":"Legajos/CV de operadores, constancias laborales"},{"id":"Q4.11","texto":"¿Cuántos operadores certificados o habilitados para equipos de movimiento de suelo tiene?","gate":null,"entregable":"Certificados/licencias de habilitación vigentes"},{"id":"Q4.12","texto":"¿Cuántos años de experiencia tiene su responsable técnico o jefe de obra en caminos no pavimentados?","gate":null,"entregable":"CV + matrícula profesional (si aplica)"},{"id":"Q4.13","texto":"¿Tiene un programa de capacitación e inducción del personal (seguridad y técnica) documentado?","gate":null,"entregable":"Programa de capacitación + registros de asistencia"}]}]},"V":{"nombre":"FLOTA, CAPACIDAD MECÁNICA Y REPUESTOS","peso":20,"subs":[{"id":"5.1","nombre":"Flota disponible vs. flota mínima","peso":8,"piso":"0 = No-Go","items":[{"id":"Q5.2","texto":"¿Posee equipos para el mantenimiento del camino en la temporada estival (verano)?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo estival","scoreable":false},{"id":"Q5.36","texto":"¿Posee equipos para el mantenimiento del camino en la temporada invernal?","gate":null,"entregable":"Declaración de posesión de equipos para el operativo invernal","scoreable":false},{"id":"F.1-cant","texto":"Cargadora tipo CAT 938K — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."},{"id":"F.2-cant","texto":"Motoniveladora tipo CAT 140K — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."},{"id":"F.3-cant","texto":"Retroexcavadora tipo CAT 416E — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.4-cant","texto":"Vibrocompactador tipo CAT CS54B — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.5-cant","texto":"Camión volcador tipo IVECO 410 (14 m³) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.6-cant","texto":"Minicargadora tipo BobCat — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 1 unidad(es)."},{"id":"F.7-cant","texto":"Camión regador tipo IVECO 410 (18 m³) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.8-cant","texto":"Camioneta 4x4 tipo Toyota Hilux — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 5 unidad(es)."},{"id":"F.9-cant","texto":"Camión capilar/lubricador (4.000 l) — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.10-cant","texto":"Barredora tipo Fracchia N337 — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 2 unidad(es)."},{"id":"F.12-cant","texto":"Topadora tipo CAT D8T — Cantidad disponible","gate":null,"entregable":"Adjuntar título, cédula de registro o boleto de compra-venta. Mínimo requerido por el pliego: 3 unidad(es)."}]},{"id":"5.2","nombre":"Estado técnico, antigüedad y radicación de la flota","peso":5,"piso":null,"items":[{"id":"Q5.1","texto":"¿El 100% de su flota (propia o alquilada) está registrada y tributando en San Juan?","gate":null,"entregable":"Constancia de registro y tributación provincial de cada unidad"},{"id":"Q5.43","texto":"¿Bajo qué modalidad realiza el mantenimiento de sus equipos?","gate":null,"entregable":"Registro de mantenimiento de los vehículos"},{"id":"F.1-horas","texto":"Cargadora tipo CAT 938K — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.1-mant","texto":"Cargadora tipo CAT 938K — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.2-horas","texto":"Motoniveladora tipo CAT 140K — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.2-mant","texto":"Motoniveladora tipo CAT 140K — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.3-horas","texto":"Retroexcavadora tipo CAT 416E — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.3-mant","texto":"Retroexcavadora tipo CAT 416E — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.4-horas","texto":"Vibrocompactador tipo CAT CS54B — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.4-mant","texto":"Vibrocompactador tipo CAT CS54B — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.5-horas","texto":"Camión volcador tipo IVECO 410 (14 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.5-mant","texto":"Camión volcador tipo IVECO 410 (14 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.6-horas","texto":"Minicargadora tipo BobCat — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.6-mant","texto":"Minicargadora tipo BobCat — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.7-horas","texto":"Camión regador tipo IVECO 410 (18 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.7-mant","texto":"Camión regador tipo IVECO 410 (18 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.8-horas","texto":"Camioneta 4x4 tipo Toyota Hilux — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.8-mant","texto":"Camioneta 4x4 tipo Toyota Hilux — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.9-horas","texto":"Camión capilar/lubricador (4.000 l) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.9-mant","texto":"Camión capilar/lubricador (4.000 l) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.10-horas","texto":"Barredora tipo Fracchia N337 — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.10-mant","texto":"Barredora tipo Fracchia N337 — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.11-horas","texto":"Camión volcador tipo Scania 440 XT (20 m³) — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.11-mant","texto":"Camión volcador tipo Scania 440 XT (20 m³) — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.12-horas","texto":"Topadora tipo CAT D8T — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.12-mant","texto":"Topadora tipo CAT D8T — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."},{"id":"F.13-horas","texto":"Camión barrenieve — Horas de uso","gate":null,"entregable":"0 - 1.000 hs, 1.000 - 3.000 hs, más de 3.000 hs."},{"id":"F.13-mant","texto":"Camión barrenieve — ¿Tiene registro de mantenimiento?","gate":null,"entregable":"Adjuntar registro de mantenimiento del equipo."}]},{"id":"5.3","nombre":"Taller, repuestos en zona y respuesta 48 h","peso":5,"piso":null,"items":[{"id":"Q5.44","texto":"Disponibilidad de taller en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de taller en zona"},{"id":"Q5.45","texto":"Disponibilidad de repuestos en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de repuestos en zona"},{"id":"Q5.46","texto":"Disponibilidad de piezas de desgaste en zona (neumáticos, cuchillas, uñas, tren de rodaje): ¿cuántos presupuestos presenta?","gate":null,"entregable":"Presupuesto de piezas de desgaste en zona (neumáticos, cuchillas, orugas)"},{"id":"Q5.47","texto":"Disponibilidad de filtros y lubricantes en zona: ¿cuántos presupuestos de proveedores presenta?","gate":null,"entregable":"Presupuesto de filtros y lubricantes en zona"}]},{"id":"5.4","nombre":"Capacidad técnica-mecánica propia","peso":2,"piso":null,"items":[{"id":"Q5.48","texto":"¿Tiene servicio mecánico propio o un banco de mecánicos para el primer diagnóstico ante una falla?","gate":null,"entregable":"Legajos/CV de mecánicos, constancias laborales"}]}]},"VI":{"nombre":"SSMA OPERACIONAL","peso":14,"subs":[{"id":"6.1","nombre":"Responsabilidad profesional SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.3","texto":"¿Cuenta con un Profesional de Higiene y Seguridad matriculado en la provincia de San Juan?","gate":"n1","entregable":"matrícula profesional vigente emitida por el Consejo de Profesionales de Higiene y Seguridad en el Trabajo de San Juan"},{"id":"G.4","texto":"¿Ese profesional tiene al menos 4 años de experiencia en minería, obras viales o alta montaña?","gate":"n1","entregable":"CV y antecedentes laborales"},{"id":"G.5","texto":"¿Dispone de técnicos de Higiene y Seguridad para supervisión en el lugar de trabajo?","gate":"n1","entregable":"nómina del equipo HSE disponible y CV"},{"id":"G.6","texto":"Si hoy no tiene el equipo técnico completo, ¿se compromete formalmente a contratarlo antes de empezar?","gate":"n1","entregable":"nota de compromiso, propuesta de servicio, cotización, preacuerdo o planificación de incorporación del personal técnico"},{"id":"G.7","texto":"¿Tiene un Legajo Técnico de Obra actualizado y disponible?","gate":"n1","entregable":"índice del Legajo Técnico o evidencia de disponibilidad documental"}]},{"id":"6.2","nombre":"Sistema de gestión SSHyS","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.1","texto":"¿Tiene cobertura de ART vigente para el 100% del personal que trabajará en el servicio?","gate":"n1","entregable":"póliza o constancia de afiliación vigente de ART"},{"id":"G.2","texto":"¿Tiene los seguros vigentes que corresponden a la actividad (Responsabilidad Civil, automotor, equipos)?","gate":"n1","entregable":"pólizas vigentes y comprobantes de cobertura"},{"id":"G.8","texto":"¿Cuenta con un Programa de Seguridad acorde a las tareas a realizar?","gate":"n1","entregable":"Programa de Seguridad y constancia de presentación/aprobación si corresponde"},{"id":"G.9","texto":"¿Tiene una Política de Higiene, Seguridad, Salud Ocupacional y Ambiente?","gate":"n1","entregable":"política vigente, firmada y difundida"},{"id":"G.10","texto":"¿Tiene procedimientos de trabajo seguro para las tareas (al menos tres)?","gate":"n1","entregable":"como mínimo tres procedimientos aplicables a las actividades declaradas"},{"id":"G.11","texto":"¿Usa un checklist diario para revisar vehículos, maquinaria y equipos antes de operar?","gate":"n1","entregable":"modelos de checklist preoperacional y registros disponibles"},{"id":"G.12","texto":"¿Tiene una matriz de identificación de peligros y evaluación de riesgos (IPERC, IPER u otra)?","gate":"n1","entregable":"matriz de riesgos vigente"},{"id":"G.13","texto":"¿Tiene un procedimiento de señalización y control de tránsito para las tareas de mantenimiento vial?","gate":"n1","entregable":"procedimiento, croquis tipo, cartelería, conos, balizas, banderilleros y sistema de comunicación"},{"id":"G.14","texto":"¿Tiene un protocolo de trabajo para condiciones climáticas adversas?","gate":"n1","entregable":"protocolo por viento, nieve, hielo, tormenta eléctrica, baja visibilidad, frío extremo o crecidas"},{"id":"G.15","texto":"¿Tiene un plan de mantenimiento preventivo de vehículos, maquinaria y equipos críticos?","gate":"n1","entregable":"plan de mantenimiento, registros de servicios, inspecciones técnicas y control de fallas críticas"},{"id":"G.16","texto":"¿Tiene la documentación habilitante de vehículos, maquinaria y conductores/operadores?","gate":"n1","entregable":"licencia de conducir, habilitaciones, RTO/RTO minera si aplica, seguro, cédula, certificados de operador y aptos médicos"},{"id":"G.21","texto":"¿Tiene un Plan Anual de Capacitación en seguridad, salud y ambiente?","gate":"n1","entregable":"plan anual de capacitación"},{"id":"G.22","texto":"¿Tiene un Plan de Contingencias para emergencias (incendio, derrame, sismo, accidente, clima)?","gate":"n1","entregable":"Plan de Contingencia"},{"id":"G.23","texto":"¿Tiene un sistema de traslado médico o cobertura de asistencia ante emergencias?","gate":"n1","entregable":"contrato, convenio, cobertura médica, servicio de ambulancia o cotización vigente"},{"id":"G.25","texto":"¿Tiene un Servicio de Medicina Laboral vigente o cobertura equivalente?","gate":"n1","entregable":"contrato de servicio de Medicina Laboral o cotización del servicio"},{"id":"G.28","texto":"¿Realiza evaluaciones de aptitud médica al personal que trabaja en altura, conduce u opera equipos?","gate":"n1","entregable":"certificado de aptitud médica del personal expuesto"}]},{"id":"6.3","nombre":"Índice de siniestralidad","peso":3,"piso":"≤1 = No-Go","items":[{"id":"G.24","texto":"¿Tiene el Índice de Siniestralidad de los últimos 3 años emitido por la ART?","gate":"n1","entregable":"índice emitido por la ART"},{"id":"G.26","texto":"¿Tiene vigente la Nómina de Trabajadores Expuestos a Agentes de Riesgo (RAR)?","gate":"n2","entregable":"RAR/NTE vigente o constancia de presentación ante la ART"},{"id":"G.27","texto":"Si tiene personal expuesto en el RAR, ¿le realiza los monitoreos o estudios correspondientes?","gate":"n2","entregable":"mediciones o monitoreos"},{"id":"G.35","texto":"¿Cuenta con el Relevamiento General de Riesgos Laborales (RGRL) presentado ante la ART?","gate":"n2","entregable":"RGRL presentado ante la ART"}]},{"id":"6.4","nombre":"Gestión ambiental y legalidad de suministros","peso":3,"piso":null,"items":[{"id":"G.29","texto":"¿Cuenta con un Profesional Ambiental o asesoramiento ambiental competente?","gate":"n2","entregable":"CV, contrato o cotización del servicio"},{"id":"G.34","texto":"¿Cuenta con un Proyecto de Economía Circular y/o Plan de minimización de residuos?","gate":"n2","entregable":"proyecto de economía circular o plan de minimización de residuos"},{"id":"G.30","texto":"¿Tiene un plan de gestión de residuos, incluidos los peligrosos?","gate":"n2","entregable":"procedimiento de gestión de residuos, manifiestos, registros de retiro o contrato con operador habilitado, si corresponde"},{"id":"G.33","texto":"¿El ripio y los áridos que usa provienen de canteras habilitadas (fuentes 100% legales)?","gate":"n2","entregable":"Listado de canteras habilitadas utilizadas y constancia de habilitación de cada una"}]},{"id":"6.5","nombre":"Equipamiento (EPP, extintores, kit antiderrame, operativo invierno)","peso":2,"piso":null,"items":[{"id":"G.17","texto":"¿Tiene registros de entrega de Elementos de Protección Personal (EPP)?","gate":"n2","entregable":"registros de entrega de EPP"},{"id":"G.18","texto":"¿Los EPP cuentan con certificación, ficha técnica o respaldo del fabricante?","gate":"n2","entregable":"certificados, declaraciones de conformidad, fichas técnicas o documentación del proveedor"},{"id":"G.19","texto":"¿Tiene EPP y ropa de trabajo adecuados para operar en invierno en alta montaña?","gate":"n2","entregable":"stock, registros de entrega, fichas técnicas o cotización de EPP y ropa de invierno"},{"id":"G.20","texto":"¿Valora comprar EPP y ropa de trabajo a proveedores locales?","gate":"n2","entregable":"cotización de dos proveedores locales"},{"id":"G.31","texto":"¿Tiene equipamiento para responder a contingencias (kit antiderrame, extintores, botiquín, señalización)?","gate":"n2","entregable":"inventario, registro de inspección o evidencia del equipamiento"},{"id":"G.32","texto":"¿Dispone de medios de comunicación para zonas de alta montaña (radio, VHF, Starlink, satelital)?","gate":"n2","entregable":"registro de equipos de comunicación disponibles"}]}]},"VII":{"nombre":"DESARROLLO COMUNITARIO Y ASOCIATIVISMO","peso":8,"subs":[{"id":"7.1","nombre":"Empleo local y plan de calificación","peso":3,"piso":null,"items":[{"id":"J.39","texto":"¿Garantiza que al menos el 70 u 80% del personal del servicio es de comunidades y el resto radicado en San Juan (con DNI y residencia efectiva de 12 meses o más)?","gate":null,"entregable":"DNI y constancia de residencia efectiva (≥12 meses) del personal afectado"},{"id":"J.40","texto":"¿Da prioridad a contratar, en primer lugar, a personas de las comunidades de Iglesia y Jáchal?","gate":null,"entregable":"procedimiento o política de contratación que documente el orden de prioridad geográfica declarado"},{"id":"J.25","texto":"¿Tiene un plan de capacitación o formación técnica para personal de la comunidad?","gate":null,"entregable":"Plan anual de capacitación o programa de formación/calificación técnica destinado al personal de la comunidad o zonas de influencia directa"}]},{"id":"7.2","nombre":"Compre local y subproveedores","peso":1,"piso":null,"items":[{"id":"J.26","texto":"¿Tiene una política o procedimiento de compra y contratación de bienes y servicios locales?","gate":null,"entregable":"Política interna o procedimiento documentado de abastecimiento y contratación de bienes/servicios locales"},{"id":"J.27","texto":"¿Tiene un listado de subproveedores, talleres o comercios locales que planea integrar?","gate":null,"entregable":"Listado de subproveedores, talleres, comercios o servicios logísticos de la zona que planea integrar en su cadena de suministro"}]},{"id":"7.3","nombre":"Asociativismo / UTE","peso":2,"piso":null,"items":[{"id":"J.28","texto":"Si se presenta como consorcio o alianza, ¿tiene el contrato de Unión Transitoria o acuerdo inscripto, con el % de cada firma?","gate":null,"entregable":"Contrato de Unión Transitoria (UT) o acuerdo de colaboración empresarial inscripto"},{"id":"J.29","texto":"Si se presenta como empresa individual, ¿tiene convenios vigentes con cámaras, cooperativas, universidades u organizaciones de la comunidad?","gate":null,"entregable":"Registro de convenios vigentes con cámaras comerciales locales, cooperativas de trabajo, universidades u organizaciones de la comunidad"}]},{"id":"7.4","nombre":"Apertura al acompañamiento y velocidad de mejora","peso":2,"piso":null,"items":[{"id":"J.30","texto":"¿Presenta historial de auditorías o evaluaciones de desempeño previas, con los Planes de Acción o Mejora implementados ante desvíos?","gate":null,"entregable":"Historial de auditorías o evaluaciones de desempeño previas y los correspondientes Planes de Acción o Planes de Mejora implementados"},{"id":"J.31","texto":"¿Presenta carta de compromiso gerencial firmada aceptando los procesos de auditoría social, ambiental y operativa?","gate":null,"entregable":"Carta de compromiso gerencial firmada donde acepte los procesos de auditoría social, ambiental y operativa que disponga la organización"}]}]}}};
 
@@ -242,74 +215,6 @@ function cellText(cell) {
     return v === null || v === undefined ? "" : String(v);
 }
 
-function cargarHoja() {
-    const status = document.getElementById("sheet-status");
-    const sel = document.getElementById("sel-empresa");
-    status.textContent = `Conectando con "${GOOGLE_SHEET_NAME}"…`;
-    sel.disabled = true;
-
-    const cb = "__cb_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    const timer = setTimeout(() => { status.textContent = "No se pudo conectar (tiempo agotado). Reintentá con 'Actualizar'."; limpiar(); }, 15000);
-    const limpiar = () => { delete window[cb]; script.remove(); clearTimeout(timer); };
-
-    window[cb] = res => {
-        limpiar();
-        try { procesarHoja(res); }
-        catch (e) { console.error(e); status.textContent = `Error al leer "${GOOGLE_SHEET_NAME}": ` + e.message; }
-    };
-    script.onerror = () => { limpiar(); status.textContent = "No se pudo conectar. Verificá que la hoja siga compartida como 'Cualquiera con el enlace → Lector'."; };
-    script.src = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&gid=${GOOGLE_SHEET_GID}&headers=1`;
-    document.body.appendChild(script);
-}
-
-function procesarHoja(res) {
-    if (res.status !== "ok") throw new Error((res.errors && res.errors[0] && res.errors[0].detailed_message) || "la hoja no devolvió datos válidos");
-
-    SHEET_COLS = res.table.cols.map(c => c.label);
-    SHEET_ROWS = res.table.rows.map(r => {
-        const o = {};
-        res.table.cols.forEach((c,i) => { o[c.label] = cellText(r.c[i]); });
-        return o;
-    });
-
-    // metadata por encabezado normalizado
-    const byNorm = new Map();
-    SHEET_COLS.forEach(c => { const n = norm(c); if (!byNorm.has(n)) byNorm.set(n,c); });
-    META_COLS = {};
-    Object.entries(META_ALIASES).forEach(([k,alias]) => {
-        const hit = alias.map(a => byNorm.get(norm(a))).find(Boolean);
-        if (hit) META_COLS[k] = hit;
-    });
-
-    resolverEncabezados();
-    renderControl();
-
-    const sel = document.getElementById("sel-empresa");
-    const status = document.getElementById("sheet-status");
-    document.getElementById("link-hoja").href =
-        `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/edit#gid=${GOOGLE_SHEET_GID}`;
-
-    if (!SHEET_ROWS.length) {
-        sel.innerHTML = '<option value="">— Todavía no hay respuestas —</option>';
-        status.textContent = `Conectado a "${GOOGLE_SHEET_NAME}". Todavía no hay respuestas cargadas.`;
-        return;
-    }
-    sel.disabled = false;
-    sel.innerHTML = SHEET_ROWS.map((r,i) => {
-        const n = metaVal(r,"nombre") || `Respuesta ${i+1}`;
-        const f = metaVal(r,"timestamp");
-        return `<option value="${i}">${esc(n)}${f ? " · " + esc(f) : ""}</option>`;
-    }).join("");
-    status.textContent = `Conectado. ${SHEET_ROWS.length} respuesta(s) en "${GOOGLE_SHEET_NAME}".`;
-    mostrarEmpresa(SHEET_ROWS.length - 1);
-}
-
-// Resuelve, para cada ítem, qué columna de la hoja usar.
-// 1) coincidencia exacta con el encabezado mapeado;
-// 2) si esa columna no existe o quedó vacía en todas las filas, busca columnas con
-//    el mismo sentido y se queda con la que efectivamente tiene datos.
-// Todo reemplazo queda registrado y se muestra en el control de correspondencia.
 function resolverEncabezados() {
     const conDato = c => SHEET_ROWS.filter(r => String(r[c] ?? "").trim() !== "").length;
     const candidatos = new Map();
@@ -724,529 +629,274 @@ function formatoEntrada(sid, v) {
 }
 
 // =====================================================================
-//  Render
+//  Carga de la hoja
 // =====================================================================
-// Ajustes que carga el evaluador antes del resultado definitivo. Se guardan por
-// empresa (CUIT o razón social) para que sobrevivan a un refresco de la página.
-let IDX_ACTUAL = null, AJUSTES = {};
-
-const claveAjustes = row => "ajustes_veladero_" + (metaVal(row,"cuit") || metaVal(row,"nombre") || "sin_id").replace(/\s+/g,"_");
-function cargarAjustes(row) {
-    try { return JSON.parse(localStorage.getItem(claveAjustes(row))) || {}; } catch (e) { return {}; }
-}
-function guardarAjustes(row) {
-    try {
-        if (Object.keys(AJUSTES).length) localStorage.setItem(claveAjustes(row), JSON.stringify(AJUSTES));
-        else localStorage.removeItem(claveAjustes(row));
-    } catch (e) { /* modo privado: se pierde al recargar, no rompe nada */ }
-}
-
-function mostrarEmpresa(idx) {
-    const row = SHEET_ROWS[idx];
-    if (!row) return;
-    IDX_ACTUAL = idx;
-    AJUSTES = cargarAjustes(row);
-    repintar();
-    const sel = document.getElementById("sel-empresa");
-    if (sel) sel.value = String(idx);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+function cargarHoja() {
+    const status = document.getElementById("sheet-status");
+    status.textContent = `Conectando con "${GOOGLE_SHEET_NAME}"…`;
+    const cb = "__cb_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    const timer = setTimeout(() => { status.textContent = "No se pudo conectar (tiempo agotado). Reintentá con 'Actualizar'."; limpiar(); }, 15000);
+    const limpiar = () => { delete window[cb]; script.remove(); clearTimeout(timer); };
+    window[cb] = res => {
+        limpiar();
+        try { procesarHoja(res); }
+        catch (e) { console.error(e); status.textContent = `Error al leer "${GOOGLE_SHEET_NAME}": ` + e.message; }
+    };
+    script.onerror = () => { limpiar(); status.textContent = "No se pudo conectar. Verificá que la hoja siga compartida como 'Cualquiera con el enlace → Lector'."; };
+    script.src = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&gid=${GOOGLE_SHEET_GID}&headers=1`;
+    document.body.appendChild(script);
 }
 
-// Recalcula todo con los ajustes actuales. Es lo único que se llama al tocar un input.
-function repintar() {
-    const row = SHEET_ROWS[IDX_ACTUAL];
-    if (!row) return;
-    const R = evaluar(row, AJUSTES);
-    const base = evaluar(row);                    // sin ajustes, para mostrar el contraste
+function procesarHoja(res) {
+    if (res.status !== "ok") throw new Error((res.errors && res.errors[0] && res.errors[0].detailed_message) || "la hoja no devolvió datos válidos");
+    SHEET_COLS = res.table.cols.map(c => c.label);
+    SHEET_ROWS = res.table.rows.map(r => {
+        const o = {}; res.table.cols.forEach((c,i) => { o[c.label] = cellText(r.c[i]); }); return o;
+    });
+    const byNorm = new Map();
+    SHEET_COLS.forEach(c => { const n = norm(c); if (!byNorm.has(n)) byNorm.set(n,c); });
+    META_COLS = {};
+    Object.entries(META_ALIASES).forEach(([k,alias]) => {
+        const hit = alias.map(a => byNorm.get(norm(a))).find(Boolean);
+        if (hit) META_COLS[k] = hit;
+    });
+    resolverEncabezados();
 
-    ["wrap-dictamen","wrap-motivos","wrap-tablas","wrap-cascada","wrap-dim","wrap-detalle","wrap-control"]
-        .forEach(id => document.getElementById(id).classList.remove("hidden"));
+    document.getElementById("link-hoja").href = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/edit#gid=${GOOGLE_SHEET_GID}`;
+    const status = document.getElementById("sheet-status");
+    if (!SHEET_ROWS.length) { status.textContent = `Conectado a "${GOOGLE_SHEET_NAME}". Todavía no hay respuestas cargadas.`; return; }
+    status.textContent = `Conectado. ${SHEET_ROWS.length} respuesta(s) en "${GOOGLE_SHEET_NAME}".`;
 
-    renderFicha(row, R);
-    renderDictamen(R);
-    renderMotivos(R);
-    renderTablas(R, base);
-    renderCascada(R);
-    renderDimensiones(R);
-    renderDetalle(R);
+    const evs = SHEET_ROWS.map((row,i) => {
+        const R = evaluar(row);
+        R.nombre = metaVal(row,"nombre") || `Respuesta ${i+1}`;
+        R.localidad = [metaVal(row,"localidad"), metaVal(row,"departamento")].filter(Boolean).join(", ");
+        R.fecha = metaVal(row,"timestamp");
+        R.idx = i;
+        return R;
+    }).sort((a,b) => b.global100 - a.global100);
+
+    ["kpis","wrap-tabla","wrap-patrones","wrap-heat","wrap-detalle"].forEach(id => document.getElementById(id).classList.remove("hidden"));
+    renderKpis(evs); renderTabla(evs); renderPatrones(evs); renderHeat(evs); renderDetalle(evs);
     lucide.createIcons();
 }
 
-function setAjuste(sid, valor) {
-    if (valor === "" || valor === null || !isFinite(Number(valor))) delete AJUSTES[sid];
-    else AJUSTES[sid] = Number(valor);
-    guardarAjustes(SHEET_ROWS[IDX_ACTUAL]);
-    repintar();
-}
+// =====================================================================
+//  Render de la comparativa
+// =====================================================================
+const NOMBRE_TIPO = { go:"Go", pai:"Go con Plan de Acción", nogo:"No-Go" };
+const CLS_TIPO = {
+    go:  "bg-emerald-100 text-emerald-800 border-emerald-300",
+    pai: "bg-amber-100 text-amber-800 border-amber-300",
+    nogo:"bg-red-100 text-red-800 border-red-300",
+};
+const corto = n => { const p = String(n).trim().split(/\s+/); return p.slice(0, 2).join(" ") + (p.length > 2 ? "…" : ""); };
 
-function restaurarAjustes() {
-    AJUSTES = {};
-    guardarAjustes(SHEET_ROWS[IDX_ACTUAL]);
-    repintar();
-}
-
-function renderTablas(R, base) {
-    const orden = ["3.1","3.4","5.1","7.1","2.2"];
-    document.getElementById("tablas-panel").innerHTML = orden.map(sid => {
-        const t = TABLAS[sid], e = R.entradas[sid], si = R.subInfo[sid], sub = findSub(sid);
-        const der = e.derivado;
-        const sinDato = e.valor === null;
-        // Sin dato para la tabla, el subcriterio no queda sin puntaje: cae a la
-        // proporción de respuestas, igual que los otros 21. Se muestra ese número.
-        const porTabla = !!(si && si.tabla);
-        const pts = si && si.evaluable ? si.score : null;
-
-        const escala = t.tramos.map(([desde, p], k) => {
-            const sig = t.tramos[k+1];
-            const rango = sig ? `${desde}–${sig[0] - (t.paso < 1 ? t.paso : 1)}` : `${desde} o más`;
-            const activo = pts !== null && !sinDato && lookupTabla(sid, e.valor) === p && e.valor >= desde && (!sig || e.valor < sig[0]);
-            return `<span class="px-1.5 py-0.5 rounded ${activo ? "bg-brand text-white font-bold" : "bg-slate-100 text-slate-500"}">${rango} → ${p}</span>`;
-        }).join(" ");
-
-        const estado = sinDato
-            ? `<span class="text-[10px] font-bold uppercase text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">sin dato · no se aplica la tabla</span>`
-            : e.ajustado
-                ? `<span class="text-[10px] font-bold uppercase text-brand bg-brand/10 border border-brand/30 px-1.5 py-0.5 rounded">ajustado</span>`
-                : der && der.exacto
-                    ? `<span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">del formulario</span>`
-                    : `<span class="text-[10px] font-bold uppercase text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">estimado · confirmar</span>`;
-
-        const cambio = (base.subInfo[sid] && base.subInfo[sid].score !== null && pts !== null && base.subInfo[sid].score !== pts)
-            ? `<span class="text-[11px] text-brand font-bold ml-1.5">(era ${base.subInfo[sid].score})</span>` : "";
-
-        return `
-        <div class="border ${e.ajustado ? "border-brand/40 bg-brand/5" : der && !der.exacto ? "border-amber-200 bg-amber-50/40" : "border-slate-200"} rounded-xl p-4">
-            <div class="flex flex-col lg:flex-row lg:items-center gap-3">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="mono text-[10px] font-black text-white bg-slate-700 px-1.5 py-0.5 rounded">${t.id}</span>
-                        <span class="font-bold text-slate-800 text-[13px]">${esc(t.titulo)}</span>
-                        <span class="text-[11px] text-slate-400">→ subcriterio <span class="mono font-bold">${sid}</span> ${esc(sub.nombre)}</span>
-                        ${estado}
-                    </div>
-                    <p class="text-[11px] text-slate-500 mt-1">${der ? esc(der.fuente) : "El formulario no trae el dato que necesita esta tabla."}${!porTabla && pts !== null ? ` <strong class="text-slate-600">Mientras tanto ${sid} puntúa ${pts}/5 por proporción de respuestas; cargá el valor real para que aplique ${t.id}.</strong>` : ""}</p>
-                    <div class="flex flex-wrap gap-1 mt-2 text-[10px] mono">${escala}</div>
-                    ${t.notaPiso ? `<p class="text-[10px] text-red-700 mt-1.5">${esc(t.notaPiso)}</p>` : ""}
-                </div>
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <div class="no-print">
-                        <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Valor real</label>
-                        <input type="number" step="${t.paso}" value="${e.valor === null ? "" : (Math.round(e.valor*10)/10)}"
-                            oninput="setAjuste('${sid}', this.value)" placeholder="—"
-                            class="w-24 text-sm border border-slate-300 rounded-lg px-2 py-1.5 mono focus:outline-none focus:ring-2 focus:ring-brand-2/40">
-                        <div class="text-[9px] text-slate-400 mt-0.5">${esc(t.unidad)}</div>
-                    </div>
-                    <div class="text-center w-16">
-                        <div class="text-[9px] uppercase font-bold text-slate-400">Puntaje</div>
-                        <div class="text-3xl font-black mono leading-none ${pts === null ? "text-slate-300" : colorPts(pts)}">${pts === null ? "—" : pts}</div>
-                        <div class="text-[9px] text-slate-400">sobre 5${cambio}</div>
-                    </div>
-                </div>
-            </div>
+function renderKpis(evs) {
+    const nogo = evs.filter(e => e.tipo === "nogo").length;
+    const pai  = evs.filter(e => e.tipo === "pai").length;
+    const go   = evs.filter(e => e.tipo === "go").length;
+    const prom = evs.reduce((a,e) => a + e.global100, 0) / (evs.length || 1);
+    const alto = evs.filter(e => e.tipo === "nogo" && e.global100 >= 70).length;
+    const kpi = (v,l,sub,cls) => `
+        <div class="border ${cls} rounded-xl p-4">
+            <div class="text-3xl font-black mono leading-none">${v}</div>
+            <div class="text-[11px] uppercase font-bold tracking-wide mt-1.5 leading-tight">${l}</div>
+            ${sub ? `<div class="text-[11px] opacity-70 mt-1 leading-snug">${sub}</div>` : ""}
         </div>`;
+    document.getElementById("kpis").innerHTML =
+        kpi(evs.length, "Respuestas evaluadas", "", "bg-white border-slate-200 text-slate-700") +
+        kpi(nogo, "Con No-Go declarado", nogo === evs.length ? "Todas las respuestas" : `${go} Go · ${pai} con Plan de Acción`, "bg-red-50 border-red-200 text-red-800") +
+        kpi(prom.toFixed(1), "Puntaje promedio", "sobre 100", "bg-white border-slate-200 text-slate-700") +
+        kpi(alto, "No-Go con 70+ puntos", "El puntaje alto no revierte un excluyente", "bg-slate-800 border-slate-900 text-white");
+}
+
+function resumenMotivo(p) {
+    if (p.n === 3) return `Gate N1 · ${p.items.length} ítem(s): ${p.items.join(", ")}`;
+    if (p.n === 7) return `Subcriterio(s) en 0: ${p.detalle.replace(/^.*?: /, "").replace(/\.$/, "")}`;
+    if (p.n === 2) return "Fuera del área del programa";
+    if (p.n === 1) return "No acepta auditoría";
+    if (p.n === 4) return "Salud financiera bajo el piso";
+    if (p.n === 5) return "Situación BCRA en banda 4-5";
+    if (p.n === 6) return "SSMA excluyente ≤ 1";
+    if (p.n === 8) return "Puntaje bajo 55";
+    return p.label;
+}
+
+function renderTabla(evs) {
+    const filas = evs.map(e => {
+        const primero = e.cortes[0];
+        const motivos = e.cortes.length
+            ? `<ul class="space-y-1">${e.cortes.map(p => `<li class="flex gap-1.5"><span class="text-red-500 font-bold flex-shrink-0">✕</span><span>${esc(resumenMotivo(p))}</span></li>`).join("")}</ul>`
+            : `<span class="text-emerald-700">Ninguna condición excluyente activa.</span>`;
+        return `
+        <tr class="border-b border-slate-100 align-top hover:bg-slate-50">
+            <td class="py-3 pr-3">
+                <a href="#emp-${e.idx}" class="font-bold text-slate-800 text-[13px] hover:text-brand hover:underline">${esc(e.nombre)}</a>
+                <div class="text-[11px] text-slate-400 mt-0.5">${esc(e.localidad || "—")}</div>
+            </td>
+            <td class="py-3 px-2 text-right whitespace-nowrap">
+                <span class="text-xl font-black mono ${e.global100 >= 70 ? "text-emerald-600" : e.global100 >= 55 ? "text-amber-500" : "text-red-600"}">${e.global100.toFixed(1)}</span>
+                <span class="text-[10px] text-slate-400">/100</span>
+            </td>
+            <td class="py-3 px-2 whitespace-nowrap">
+                <span class="text-[10px] font-black uppercase px-2 py-1 rounded border ${CLS_TIPO[e.tipo]}">${NOMBRE_TIPO[e.tipo]}</span>
+            </td>
+            <td class="py-3 px-2 text-[12px] text-slate-600 whitespace-nowrap">
+                ${primero ? `<span class="mono font-bold text-red-700">Paso ${primero.n}</span><div class="text-[11px] text-slate-400 leading-tight max-w-[13rem] whitespace-normal">${esc(primero.label)}</div>` : "<span class='text-slate-300'>—</span>"}
+            </td>
+            <td class="py-3 pl-2 text-[12px] text-slate-600">${motivos}</td>
+        </tr>`;
     }).join("");
+    document.getElementById("tabla").innerHTML = `
+        <thead><tr class="border-b-2 border-slate-200 text-left">
+            <th class="pb-2 pr-3 text-[10px] uppercase tracking-wide text-slate-500 font-bold">Empresa</th>
+            <th class="pb-2 px-2 text-[10px] uppercase tracking-wide text-slate-500 font-bold text-right">Puntaje</th>
+            <th class="pb-2 px-2 text-[10px] uppercase tracking-wide text-slate-500 font-bold">Dictamen</th>
+            <th class="pb-2 px-2 text-[10px] uppercase tracking-wide text-slate-500 font-bold">Corta en</th>
+            <th class="pb-2 pl-2 text-[10px] uppercase tracking-wide text-slate-500 font-bold">Motivos declarados</th>
+        </tr></thead><tbody>${filas}</tbody>`;
+}
 
-    renderEscalas(R, base);
+function renderPatrones(evs) {
+    const n = evs.length;
+    // Ítems del Gate N1 que más se repiten como "No"
+    const cuenta = {};
+    evs.forEach(e => e.gateFail.forEach(i => { cuenta[i.id] = (cuenta[i.id] || 0) + 1; }));
+    const rank = Object.entries(cuenta).sort((a,b) => b[1] - a[1]);
 
-    // Contraste declarado vs. ajustado
-    const box = document.getElementById("tablas-impacto");
-    const nAj = Object.keys(AJUSTES).length;
-    if (!nAj) {
-        const estimados = ["3.1","3.4","5.1","7.1","2.2"].filter(s => R.entradas[s].derivado && !R.entradas[s].derivado.exacto);
-        box.innerHTML = (estimados.length
-            ? `<div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[13px] text-amber-900 mb-3">
-                 <strong>${estimados.length} de ${orden.length} tablas numéricas usan un valor estimado</strong> (${estimados.map(s => TABLAS[s].id).join(", ")}): el formulario pregunta por bandas o por sí/no, no por el número que pide la tabla. Cargá el dato real de la visita antes de dar el resultado por definitivo.</div>`
-            : `<div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-[13px] text-emerald-800 mb-3">Las ${orden.length} tablas numéricas se resolvieron con datos exactos del formulario.</div>`)
-            + notaPiso0() + notaT3();
-        return;
-    }
-    const cambioDictamen = base.tipo !== R.tipo;
-    box.innerHTML = `
-    <div class="bg-brand/5 border-2 border-brand/30 rounded-xl p-4">
-        <h3 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-1.5"><i data-lucide="git-compare-arrows" class="w-4 h-4 text-brand"></i> Resultado definitivo con ${nAj} valor(es) ajustado(s)</h3>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white rounded-lg border border-slate-200 p-3">
-                <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Solo con lo declarado</div>
-                <div class="text-lg font-black ${base.tipo === "nogo" ? "text-red-700" : base.tipo === "pai" ? "text-amber-600" : "text-emerald-700"}">${NOMBRE_DICTAMEN[base.tipo]}</div>
-                <div class="mono text-sm text-slate-500">${base.global100.toFixed(1)} / 100</div>
+    // Subcriterios en 0 más frecuentes
+    const cuentaSub = {};
+    evs.forEach(e => e.enCero.forEach(s => { cuentaSub[s.id] = cuentaSub[s.id] || { nombre:s.nombre, n:0 }; cuentaSub[s.id].n++; }));
+    const rankSub = Object.entries(cuentaSub).sort((a,b) => b[1].n - a[1].n);
+
+    const barra = (k, total, cls) => `<div class="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1"><div class="h-full ${cls}" style="width:${(k/total*100).toFixed(0)}%"></div></div>`;
+
+    const generalizados = rank.filter(([,k]) => k >= n * 0.7);
+    const aviso = generalizados.length ? `
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
+            <h3 class="font-bold text-amber-900 text-sm flex items-center gap-1.5 mb-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Motivos que afectan a casi todas las empresas</h3>
+            <p class="text-[13px] text-amber-900 mb-2">${generalizados.map(([id,k]) => `<strong class="mono">${esc(id)}</strong> (${k} de ${n})`).join(", ")} — cuando un ítem falla en casi toda la muestra, suele ser un problema de cómo está formulada o interpretada la pregunta, no de las empresas. Conviene revisarlo antes de descartar a nadie por ese motivo.</p>
+            ${generalizados.filter(([id]) => CONDICIONALES[id]).map(([id]) => `<p class="text-[12px] text-amber-800 bg-white border border-amber-200 rounded px-2 py-1.5 mt-1"><strong class="mono">${esc(id)}</strong> es condicional: ${esc(CONDICIONALES[id])}</p>`).join("")}
+        </div>` : "";
+
+    document.getElementById("wrap-patrones").innerHTML = `
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-1">Qué motivos se repiten</h2>
+        <p class="text-xs text-slate-500 mb-4">Cuántas de las ${n} empresas fallan en cada ítem. Sirve para separar el problema individual del problema del formulario.</p>
+        ${aviso}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-bold text-slate-700 text-[13px] mb-2">Ítems del Gate Nivel 1 declarados en "No"</h3>
+                ${rank.length ? `<div class="space-y-2">${rank.map(([id,k]) => `
+                    <div>
+                        <div class="flex items-baseline justify-between gap-2">
+                            <span class="text-[12px] text-slate-600 truncate"><span class="mono font-bold text-slate-800">${esc(id)}</span> ${esc((ITEM_INFO[id]||{}).texto || "")}</span>
+                            <span class="mono text-[11px] font-bold ${k >= n*0.7 ? "text-red-600" : "text-slate-500"} flex-shrink-0">${k}/${n}</span>
+                        </div>
+                        ${barra(k, n, k >= n*0.7 ? "bg-red-500" : "bg-slate-400")}
+                    </div>`).join("")}</div>` : `<p class="text-[13px] text-emerald-700">Ninguna empresa falla en el Gate Nivel 1.</p>`}
             </div>
-            <div class="bg-white rounded-lg border-2 ${cambioDictamen ? "border-brand" : "border-slate-200"} p-3">
-                <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Con los valores verificados</div>
-                <div class="text-lg font-black ${R.tipo === "nogo" ? "text-red-700" : R.tipo === "pai" ? "text-amber-600" : "text-emerald-700"}">${NOMBRE_DICTAMEN[R.tipo]}</div>
-                <div class="mono text-sm text-slate-500">${R.global100.toFixed(1)} / 100
-                    <span class="font-bold ${R.global100 >= base.global100 ? "text-emerald-600" : "text-red-600"}">${R.global100 >= base.global100 ? "▲" : "▼"} ${Math.abs(R.global100 - base.global100).toFixed(1)}</span></div>
+            <div>
+                <h3 class="font-bold text-slate-700 text-[13px] mb-2">Subcriterios que quedaron en 0 puntos</h3>
+                ${rankSub.length ? `<div class="space-y-2">${rankSub.map(([id,o]) => `
+                    <div>
+                        <div class="flex items-baseline justify-between gap-2">
+                            <span class="text-[12px] text-slate-600 truncate"><span class="mono font-bold text-slate-800">${esc(id)}</span> ${esc(o.nombre)}</span>
+                            <span class="mono text-[11px] font-bold ${o.n >= n*0.7 ? "text-red-600" : "text-slate-500"} flex-shrink-0">${o.n}/${n}</span>
+                        </div>
+                        ${barra(o.n, n, o.n >= n*0.7 ? "bg-red-500" : "bg-slate-400")}
+                    </div>`).join("")}</div>` : `<p class="text-[13px] text-emerald-700">Ningún subcriterio quedó en 0.</p>`}
+                <div class="mt-4 text-[12px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    <strong>7.4 no aparece acá a propósito.</strong> Sus dos ítems (J.30 y J.31) no existen en el formulario, así que no se puede evaluar por declaración: se marca "sin dato" y se excluye del piso, en vez de contarse como 0 y dar No-Go a todas.
+                </div>
             </div>
         </div>
-        ${cambioDictamen ? `<p class="text-[13px] font-bold text-brand mt-3">El dictamen cambia: ${NOMBRE_DICTAMEN[base.tipo]} → ${NOMBRE_DICTAMEN[R.tipo]}.</p>` : `<p class="text-[13px] text-slate-500 mt-3">El dictamen se mantiene en ${NOMBRE_DICTAMEN[R.tipo]}.</p>`}
-    </div>` + notaPiso0() + notaT3();
+    </div>`;
 }
 
-// Regla del piso: el mínimo de 1 punto solo corre si la empresa contestó algo.
-function notaPiso0() {
-    return `<div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-600 mb-3">
-        <strong>Sobre el mínimo de 1 punto.</strong> Las tablas T7, y las fórmulas de la planilla que reproduce,
-        nunca bajan de 1 punto — pero eso vale solo cuando la empresa <strong>respondió algo</strong>.
-        Si no declaró ninguna de las preguntas de un subcriterio, no se aplica la tabla: el subcriterio da
-        <strong>0</strong> y dispara el piso de No-Go.</div>`;
-}
-
-// T3 quedó huérfana en Config: se documenta para que nadie la reconecte por error.
-function notaT3() {
-    return `<details class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-slate-600">
-        <summary class="cursor-pointer font-semibold text-slate-700">Por qué T3 no aparece en este panel</summary>
-        <p class="mt-2"><strong>${esc(T3_HUERFANA.id)} · ${esc(T3_HUERFANA.titulo)}</strong> — ${esc(T3_HUERFANA.motivo)}</p>
-        <p class="mt-1.5 text-slate-500">Tramos que Config le asigna: ${T3_HUERFANA.tramos.map(([d,p]) => `${d}+ → ${p}`).join(" · ")}.
-        Si se conectara, 4.1 dependería únicamente de Q4.1 y dejaría de contar la estabilización de suelos (Q4.2),
-        los kilómetros mantenidos (Q4.3) y el perfilado (Q4.4).</p>
-    </details>`;
-}
-
-const NOMBRE_DICTAMEN = { go:"GO", pai:"GO con Plan de Acción", nogo:"NO-GO" };
-
-function renderEscalas(R, base) {
-    const orden = ["4.1","4.2","4.3","4.4","5.2","5.3"];
-    document.getElementById("escalas-panel").innerHTML = orden.map(sid => {
-        const e = R.escalas[sid], si = R.subInfo[sid], sub = findSub(sid);
-        const der = e.derivado;
-        const pts = si && si.evaluable ? si.score : null;
-        const cambio = (base.subInfo[sid] && base.subInfo[sid].score !== null && pts !== null && base.subInfo[sid].score !== pts)
-            ? `<span class="text-[11px] text-brand font-bold ml-1.5">(era ${base.subInfo[sid].score})</span>` : "";
-
-        const escala = T7_TRAMOS.map(([desde, p], k) => {
-            const sig = T7_TRAMOS[k+1];
-            const rango = sig ? `${desde}–${sig[0]-1}` : `${desde} o más`;
-            const activo = e.pct !== null && lookupT7(e.pct) === p && e.pct >= desde && (!sig || e.pct < sig[0]);
-            return `<span class="px-1.5 py-0.5 rounded ${activo ? "bg-brand text-white font-bold" : "bg-slate-100 text-slate-500"}">${rango}% → ${p}</span>`;
-        }).join(" ");
-
-        const items = der ? der.detalle.map(d => {
-            const color = d.nivel === d.max ? "text-emerald-700" : d.nivel === 0 ? "text-red-600" : "text-amber-600";
-            return `<div class="flex items-baseline justify-between gap-2 py-0.5 border-b border-slate-100 last:border-0">
-                <span class="text-[11px] text-slate-600 truncate"><span class="mono font-bold text-slate-400">${esc(d.id)}</span> ${esc(String(d.val).slice(0,44))}</span>
-                <span class="mono text-[10px] font-bold ${color} flex-shrink-0">${d.nivel}/${d.max} <span class="text-slate-300">${esc(d.tabla)}</span></span>
-            </div>`;
-        }).join("") : "";
-
-        return `
-        <div class="border ${e.ajustado ? "border-brand/40 bg-brand/5" : "border-slate-200"} rounded-xl p-4">
-            <div class="flex flex-col lg:flex-row lg:items-start gap-3">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="mono text-[10px] font-black text-white bg-slate-700 px-1.5 py-0.5 rounded">T7</span>
-                        <span class="font-bold text-slate-800 text-[13px]"><span class="mono">${sid}</span> ${esc(sub.nombre)}</span>
-                        ${e.ajustado ? `<span class="text-[10px] font-bold uppercase text-brand bg-brand/10 border border-brand/30 px-1.5 py-0.5 rounded">ajustado</span>` : ""}
-                    </div>
-                    <p class="text-[11px] text-slate-500 mt-1">${der ? esc(der.nota) : "Sin respuestas: no se aplica la tabla y el subcriterio queda en 0."}</p>
-                    ${der && der.aclaracion ? `<p class="text-[11px] text-brand-2 mt-1">${esc(der.aclaracion)}</p>` : ""}
-                    <div class="flex flex-wrap gap-1 mt-2 text-[10px] mono">${escala}</div>
-                    <details class="mt-2"><summary class="text-[11px] text-brand-2 cursor-pointer font-semibold">Ver nivel de cada respuesta (${der ? der.detalle.length : 0})</summary>
-                        <div class="mt-1.5 bg-slate-50 rounded-lg px-2 py-1 max-h-56 overflow-y-auto">${items || '<span class="text-[11px] text-slate-400">sin datos</span>'}</div>
-                    </details>
-                </div>
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <div class="no-print">
-                        <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">% del máx.</label>
-                        <input type="number" step="1" min="0" max="100" value="${e.pct === null ? "" : Math.round(e.pct)}"
-                            oninput="setAjuste('${sid}', this.value)" placeholder="—"
-                            class="w-24 text-sm border border-slate-300 rounded-lg px-2 py-1.5 mono focus:outline-none focus:ring-2 focus:ring-brand-2/40">
-                        <div class="text-[9px] text-slate-400 mt-0.5">%</div>
-                    </div>
-                    <div class="text-center w-16">
-                        <div class="text-[9px] uppercase font-bold text-slate-400">Puntaje</div>
-                        <div class="text-3xl font-black mono leading-none ${pts === null ? "text-slate-300" : colorPts(pts)}">${pts === null ? "—" : pts}</div>
-                        <div class="text-[9px] text-slate-400">sobre 5${cambio}</div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
+function renderHeat(evs) {
+    const gate = [];
+    DIM_ORDER.forEach(d => DATA.dimensiones[d].subs.forEach(s => s.items.forEach(i => { if (i.gate === "n1") gate.push(i); })));
+    const cab = evs.map(e => `<th class="px-1.5 py-2 text-[10px] font-bold text-slate-600 align-bottom" title="${esc(e.nombre)}"><div class="w-16 leading-tight">${esc(corto(e.nombre))}</div></th>`).join("");
+    const filas = gate.map(it => {
+        const celdas = evs.map(e => {
+            const est = e.ev[it.id].est;
+            const cls = est === "ok" ? "text-emerald-600" : est === "sindato" ? "text-slate-300" : "text-red-600 bg-red-50";
+            const ico = est === "ok" ? "✓" : est === "vacio" ? "·" : est === "sindato" ? "—" : "✕";
+            return `<td class="px-1.5 py-1 text-center font-bold ${cls}" title="${esc(e.nombre)} — ${esc(e.ev[it.id].val || est)}">${ico}</td>`;
+        }).join("");
+        const fallos = evs.filter(e => e.ev[it.id].est !== "ok").length;
+        return `<tr class="border-b border-slate-50">
+            <td class="sticky-col pr-3 py-1 whitespace-nowrap">
+                <span class="mono text-[10px] font-bold ${fallos ? "text-red-700" : "text-slate-400"}">${esc(it.id)}</span>
+                <span class="text-[11px] text-slate-500 ml-1.5">${esc(((ITEM_INFO[it.id]||{}).texto || "").slice(0, 62))}${((ITEM_INFO[it.id]||{}).texto || "").length > 62 ? "…" : ""}</span>
+            </td>${celdas}</tr>`;
     }).join("");
+    document.getElementById("heat").innerHTML = `
+        <thead><tr class="border-b-2 border-slate-200">
+            <th class="sticky-col pr-3 pb-2 text-left text-[10px] uppercase tracking-wide text-slate-500 font-bold">Ítem excluyente</th>${cab}
+        </tr></thead><tbody>${filas}</tbody>`;
 }
 
-function renderFicha(row, R) {
-    const f = (l,v) => `<div><div class="text-[10px] uppercase tracking-wide text-slate-400 font-bold">${l}</div><div class="text-sm text-slate-700 font-semibold">${esc(v || "—")}</div></div>`;
-    document.getElementById("ficha-empresa").innerHTML = `
-        <h2 class="text-xl font-black text-ink mb-1">${esc(metaVal(row,"nombre") || "Sin razón social")}</h2>
-        <p class="text-xs text-slate-400 mb-4">Presentado el ${esc(metaVal(row,"timestamp") || "—")}</p>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            ${f("CUIT", metaVal(row,"cuit"))}
-            ${f("Departamento", metaVal(row,"departamento"))}
-            ${f("Localidad", metaVal(row,"localidad"))}
-            ${f("Representante legal", metaVal(row,"representante"))}
-            ${f("Email", metaVal(row,"email"))}
-            ${f("Teléfono", metaVal(row,"telefono"))}
-            ${f("Antigüedad", metaVal(row,"antiguedad"))}
-        </div>`;
-}
-
-function renderDictamen(R) {
-    const cfg = {
-        go:   ["bg-emerald-600 border-emerald-700 text-white", "GO"],
-        pai:  ["bg-amber-500 border-amber-600 text-white",     "GO CON PLAN DE ACCIÓN"],
-        nogo: ["bg-red-700 border-red-800 text-white",         "NO-GO"],
-    }[R.tipo];
-    document.getElementById("card-dictamen").className = `rounded-2xl shadow-sm border p-6 flex flex-col justify-center text-center ${cfg[0]}`;
-    document.getElementById("dictamen-txt").textContent = cfg[1];
-    document.getElementById("dictamen-pts").textContent = R.global100.toFixed(1);
-    document.getElementById("dictamen-max").textContent = "/100";
-}
-
-function renderMotivos(R) {
-    const wrap = document.getElementById("wrap-motivos");
-    if (R.tipo !== "nogo") {
-        const extra = R.tipo === "pai"
-            ? `<p class="text-sm text-amber-800 mt-1">El puntaje declarado (${R.global100.toFixed(1)}) cae en la banda 55 - 69,9: habilita <strong>GO con Plan de Acción</strong>, no GO pleno.</p>` : "";
-        wrap.innerHTML = `
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
-                <h2 class="text-lg font-bold text-emerald-900 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-5 h-5"></i> Sin No-Go declarado</h2>
-                <p class="text-sm text-emerald-800 mt-1">Ninguna de las condiciones excluyentes de la cascada se activa con lo declarado en el formulario.</p>
+function renderDetalle(evs) {
+    document.getElementById("detalle").innerHTML = evs.map(e => {
+        const cuerpo = e.cortes.length ? e.cortes.map(p => {
+            let extra = "";
+            if (p.items.length) {
+                extra = `<div class="mt-2 space-y-1.5">${p.items.map(id => {
+                    const cond = CONDICIONALES[id];
+                    return `<div class="bg-white border border-red-200 rounded px-2.5 py-1.5">
+                        <span class="mono text-[10px] font-bold text-red-600">${esc(id)}</span>
+                        <span class="text-[12px] text-slate-700 ml-1">${esc(RESUELTO[id] || (ITEM_INFO[id]||{}).texto || "")}</span>
+                        <div class="text-[11px] mt-0.5"><span class="text-slate-400">Declaró:</span> <span class="font-bold text-red-700">${esc(e.ev[id].val || "sin responder")}</span></div>
+                        ${cond ? `<div class="text-[10px] text-amber-700 mt-1"><strong>Condicional:</strong> ${esc(cond)}</div>` : ""}
+                    </div>`;
+                }).join("")}</div>`;
+            }
+            if (p.n === 7) {
+                extra = `<div class="mt-2 space-y-1.5">${e.enCero.map(s => `
+                    <div class="bg-white border border-red-200 rounded px-2.5 py-1.5">
+                        <span class="mono text-[10px] font-bold text-red-600">${esc(s.id)}</span>
+                        <span class="text-[12px] text-slate-700 ml-1">${esc(s.nombre)}</span>
+                        <span class="text-[10px] text-slate-400"> · peso ${s.peso} pts</span>
+                        <div class="text-[11px] text-slate-500 mt-0.5">0 de ${e.subInfo[s.id].total} preguntas declaradas como cumplidas.</div>
+                    </div>`).join("")}</div>`;
+            }
+            return `<div class="border-l-4 border-red-500 bg-red-50/50 rounded-r-lg p-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="mono text-[9px] font-black text-white bg-red-600 px-1.5 py-0.5 rounded">PASO ${p.n}</span>
+                    <span class="font-bold text-slate-800 text-[13px]">${esc(p.label)}</span>
+                </div>
+                <p class="text-[12px] text-slate-600">${esc(p.detalle)}</p>
                 ${extra}
             </div>`;
-        return;
-    }
+        }).join("") : `<div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-[13px] text-emerald-800">Ninguna condición excluyente activa con lo declarado.</div>`;
 
-    const bloques = R.cortes.map(p => {
-        let cuerpo = `<p class="text-sm text-slate-700">${esc(p.detalle)}</p>`;
-        if (p.items.length) {
-            cuerpo += `<div class="mt-3 space-y-2">` + p.items.map(id => {
-                const it = ITEM_INFO[id], e = R.ev[id];
-                const pregunta = RESUELTO[id] || (it ? it.texto : id);
-                const cond = CONDICIONALES[id];
-                return `<div class="bg-white border border-red-200 rounded-lg px-3 py-2">
-                    <div class="flex items-start gap-2">
-                        <span class="mono text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded flex-shrink-0 mt-0.5">${esc(id)}</span>
-                        <div class="flex-1">
-                            <div class="text-[13px] text-slate-700 leading-snug">${esc(pregunta)}</div>
-                            <div class="text-[11px] mt-1"><span class="text-slate-400">Declaró:</span>
-                                <span class="font-bold ${e.est === "vacio" ? "text-slate-400 italic" : "text-red-700"}">${esc(e.est === "vacio" ? "sin responder" : e.val)}</span></div>
-                            ${cond ? `<div class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mt-1.5"><strong>Pregunta condicional:</strong> ${esc(cond)}</div>` : ""}
-                        </div>
-                    </div></div>`;
-            }).join("") + `</div>`;
-        }
-        if (p.n === 7) {
-            cuerpo += `<div class="mt-3 space-y-2">` + R.enCero.map(s => {
-                const si = R.subInfo[s.id];
-                const fallan = s.items.filter(i => i.scoreable !== false && R.ev[i.id].est !== "ok" && R.ev[i.id].est !== "sindato");
-                return `<div class="bg-white border border-red-200 rounded-lg px-3 py-2">
-                    <div class="font-bold text-sm text-slate-800"><span class="mono">${esc(s.id)}</span> ${esc(s.nombre)} <span class="text-[10px] font-normal text-slate-400">· peso ${s.peso} pts</span></div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">0 de ${si.total} preguntas declaradas como cumplidas.</div>
-                    <ul class="mt-1.5 space-y-1">${fallan.map(i => `<li class="text-[11px] text-slate-600"><span class="mono text-red-600 font-bold">${esc(i.id)}</span> ${esc(RESUELTO[i.id] || i.texto)} → <span class="font-bold text-red-700">${esc(R.ev[i.id].val || "sin responder")}</span></li>`).join("")}</ul>
-                </div>`;
-            }).join("") + `</div>`;
-        }
         return `
-        <div class="border-l-4 border-red-600 bg-red-50/60 rounded-r-xl p-4">
-            <div class="flex items-center gap-2 mb-1.5">
-                <span class="mono text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded">PASO ${p.n}</span>
-                <h3 class="font-bold text-slate-900 text-[15px]">${esc(p.label)}</h3>
-            </div>
-            ${cuerpo}
-        </div>`;
-    }).join("");
-
-    const primero = R.cortes[0];
-    wrap.innerHTML = `
-        <div class="bg-white border-2 border-red-600 rounded-2xl overflow-hidden">
-            <div class="bg-red-700 text-white px-6 py-4">
-                <h2 class="text-xl font-black flex items-center gap-2"><i data-lucide="octagon-x" class="w-6 h-6"></i> Tiene NO-GO declarado</h2>
-                <p class="text-sm text-red-100 mt-1">${R.cortes.length === 1 ? "Se activa 1 condición excluyente." : `Se activan ${R.cortes.length} condiciones excluyentes.`}
-                El dictamen lo define la primera en el orden de la cascada: <strong class="text-white">paso ${primero.n} — ${esc(primero.label)}</strong>.</p>
-            </div>
-            <div class="p-6 space-y-4">${bloques}</div>
-        </div>`;
-}
-
-function renderCascada(R) {
-    let yaCorto = false;
-    document.getElementById("cascada").innerHTML = R.pasos.map(p => {
-        let est;
-        if (yaCorto) est = "skip";
-        else { est = p.ok ? "ok" : (p.corta ? "fail" : "warn"); if (p.corta) yaCorto = true; }
-        const dot = {
-            ok:   '<div class="paso-dot bg-emerald-100 text-emerald-600"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>',
-            fail: '<div class="paso-dot bg-red-100 text-red-600"><i data-lucide="x" class="w-3.5 h-3.5"></i></div>',
-            warn: '<div class="paso-dot bg-amber-100 text-amber-600"><i data-lucide="alert-triangle" class="w-3 h-3"></i></div>',
-            skip: '<div class="paso-dot bg-slate-100 text-slate-300"><i data-lucide="minus" class="w-3.5 h-3.5"></i></div>',
-        }[est];
-        const tit = est === "skip" ? "text-slate-300" : "text-slate-800";
-        const det = est === "skip" ? "text-slate-300" : (est === "fail" ? "text-red-700 font-semibold" : "text-slate-500");
-        return `<div class="paso">${dot}
-            <div class="font-bold ${tit} text-[13px]">${p.n}. ${esc(p.label)}</div>
-            <div class="${det} text-xs mt-0.5">${est === "skip" ? "No se evalúa: la cascada ya cortó antes." : esc(p.detalle)}</div>
-        </div>`;
-    }).join("");
-}
-
-function colorPts(v) { return v >= 4 ? "text-emerald-600" : v >= 2 ? "text-amber-500" : "text-red-600"; }
-
-function renderDimensiones(R) {
-    const nota = R.pesoSinDato > 0
-        ? `<div class="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 mb-3">
-             <strong>${R.pesoSinDato} de 100 puntos no son evaluables por declaración</strong> — ${R.noEvaluables.map(s=>`${s.id} ${s.nombre}`).join(", ")}: sus preguntas no existen en el formulario. Se excluyen del total en vez de contarse como 0, para no producir un No-Go falso. El puntaje mostrado reescala los ${R.pesoEvaluable} puntos evaluables a 100.</div>`
-        : "";
-    document.getElementById("tabla-dim").innerHTML = nota + DIM_ORDER.map(dim => {
-        const d = DATA.dimensiones[dim];
-        const filas = d.subs.map(s => {
-            const si = R.subInfo[s.id];
-            if (!si.evaluable) return `
-                <div class="flex items-center justify-between gap-3 py-1.5 border-b border-slate-50 last:border-0">
-                    <div class="text-[13px] text-slate-400 flex-1"><span class="mono font-bold">${esc(s.id)}</span> ${esc(s.nombre)}</div>
-                    <span class="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded whitespace-nowrap">sin dato en el Form</span>
-                </div>`;
-            const piso = si.score === 0;
-            return `
-                <div class="flex items-center justify-between gap-3 py-1.5 border-b border-slate-50 last:border-0">
-                    <div class="text-[13px] flex-1 ${piso ? "text-red-800 font-semibold" : "text-slate-600"}">
-                        <span class="mono font-bold">${esc(s.id)}</span> ${esc(s.nombre)}
-                        <span class="text-[10px] text-slate-400 font-normal">· peso ${s.peso}</span>
-                        ${piso ? '<span class="ml-1.5 text-[9px] uppercase font-black text-white bg-red-600 px-1.5 py-0.5 rounded align-middle">piso · no-go</span>' : ""}
-                    </div>
-                    <div class="text-[11px] text-slate-400 mono whitespace-nowrap">${si.fuente ? esc(si.fuente) : `${si.cumplidos}/${si.total}`}</div>
-                    <div class="w-10 text-right"><span class="text-lg font-black mono ${colorPts(si.score)}">${si.score}</span><span class="text-[10px] text-slate-400">/5</span></div>
-                </div>`;
-        }).join("");
-        const obt = d.subs.reduce((a,s) => a + (R.subInfo[s.id].evaluable ? (R.subInfo[s.id].score/5)*s.peso : 0), 0);
-        const pes = d.subs.reduce((a,s) => a + (R.subInfo[s.id].evaluable ? s.peso : 0), 0);
-        return `
-        <div class="border border-slate-200 rounded-xl overflow-hidden">
-            <div class="bg-slate-50 px-4 py-2.5 flex items-center justify-between gap-3 border-b border-slate-200">
-                <h3 class="font-bold text-slate-800 text-[13px] font-display">${dim}. ${esc(d.nombre)}</h3>
-                <span class="mono text-xs font-bold text-slate-600 whitespace-nowrap">${obt.toFixed(1)} / ${pes}${pes !== d.peso ? ` <span class="text-slate-400 font-normal">(de ${d.peso})</span>` : ""}</span>
-            </div>
-            <div class="px-4 py-1">${filas}</div>
-        </div>`;
-    }).join("");
-}
-
-function badgeEstado(e) {
-    if (e.est === "ok")      return `<span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded whitespace-nowrap">cumple</span>`;
-    if (e.est === "no")      return `<span class="text-[10px] font-bold uppercase text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded whitespace-nowrap">no cumple</span>`;
-    if (e.est === "vacio")   return `<span class="text-[10px] font-bold uppercase text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded whitespace-nowrap">sin responder</span>`;
-    return `<span class="text-[10px] font-bold uppercase text-slate-400 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded whitespace-nowrap">sin dato</span>`;
-}
-
-function renderDetalle(R) {
-    document.getElementById("detalle").innerHTML = DIM_ORDER.map(dim => {
-        const d = DATA.dimensiones[dim];
-        const cuerpo = d.subs.map(s => {
-            const si = R.subInfo[s.id];
-            const items = s.items.map(it => {
-                const e = R.ev[it.id];
-                const pregunta = RESUELTO[it.id] || it.texto;
-                const distinto = RESUELTO[it.id] && normSentido(RESUELTO[it.id]) !== normSentido(it.texto);
-                const cond = CONDICIONALES[it.id];
-                const gate = it.gate === "n1" ? `<span class="text-[9px] font-bold uppercase bg-accent/10 text-accent px-1.5 py-0.5 rounded whitespace-nowrap">N1 excluyente</span>`
-                           : it.gate === "n2" ? `<span class="text-[9px] font-bold uppercase bg-brand-2/10 text-brand-2 px-1.5 py-0.5 rounded whitespace-nowrap">N2 brecha</span>` : "";
-                const fondo = e.est === "no" ? "bg-red-50/50" : e.est === "sindato" ? "bg-slate-50/60" : "";
-                return `
-                <div class="flex flex-col sm:flex-row sm:items-start gap-2 px-3 py-2 border-b border-slate-100 last:border-0 ${fondo}">
-                    <span class="mono text-[10px] font-bold text-slate-400 pt-0.5 w-14 flex-shrink-0">${esc(it.id)}</span>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-[13px] text-slate-700 leading-snug">${esc(pregunta)}</div>
-                        <div class="text-[12px] mt-1">
-                            <span class="text-slate-400">Declaró:</span>
-                            <span class="font-bold ${e.est === "ok" ? "text-emerald-700" : e.est === "no" ? "text-red-700" : "text-slate-400 italic"}">${esc(e.val || (e.est === "sindato" ? (e.nota || "sin dato") : "sin responder"))}</span>
-                            ${e.atencion ? `<span class="ml-1.5 text-[10px] font-bold uppercase text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">banda baja</span>` : ""}
-                        </div>
-                        ${cond ? `<div class="text-[10px] text-amber-700 mt-1"><strong>Condicional:</strong> ${esc(cond)}</div>` : ""}
-                        ${distinto ? `<div class="text-[10px] text-slate-400 italic mt-1">Texto en la Matriz: ${esc(it.texto)}</div>` : ""}
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">${gate}${badgeEstado(e)}</div>
-                </div>`;
-            }).join("");
-            const cab = si.evaluable
-                ? `<span class="mono text-xs font-black ${colorPts(si.score)}">${si.score}<span class="text-[10px] text-slate-400 font-normal">/5</span></span>`
-                : `<span class="text-[10px] uppercase font-bold text-slate-400">sin dato</span>`;
-            return `
-            <div class="border border-slate-200 rounded-lg mb-2 overflow-hidden">
-                <div class="bg-slate-50 px-3 py-2 flex items-center justify-between gap-2 border-b border-slate-200">
-                    <span class="text-[13px] font-bold text-slate-700"><span class="mono">${esc(s.id)}</span> ${esc(s.nombre)}</span>
-                    ${cab}
+        <div id="emp-${e.idx}" class="border border-slate-200 rounded-xl overflow-hidden scroll-mt-4">
+            <button onclick="toggleEmp(${e.idx})" class="w-full px-4 py-3 text-left bg-white hover:bg-slate-50 flex justify-between items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="text-[10px] font-black uppercase px-2 py-1 rounded border flex-shrink-0 ${CLS_TIPO[e.tipo]}">${NOMBRE_TIPO[e.tipo]}</span>
+                    <span class="font-bold text-slate-800 text-sm truncate">${esc(e.nombre)}</span>
+                    <span class="mono text-xs text-slate-400 flex-shrink-0">${e.global100.toFixed(1)}/100</span>
                 </div>
-                ${items}
-            </div>`;
-        }).join("");
-        return `
-        <div class="border border-slate-200 rounded-xl overflow-hidden">
-            <button onclick="toggleAcc('${dim}')" class="w-full px-4 py-3 text-left font-black text-slate-800 bg-white hover:bg-slate-50 flex justify-between items-center gap-3">
-                <span class="text-sm font-display">${dim}. ${esc(d.nombre)}</span>
-                <i data-lucide="chevron-down" id="ico-${dim}" class="w-5 h-5 text-slate-400 transition-transform flex-shrink-0"></i>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-[11px] text-slate-400">${e.cortes.length} motivo(s)</span>
+                    <i data-lucide="chevron-down" id="ico-emp-${e.idx}" class="w-4 h-4 text-slate-400 transition-transform"></i>
+                </div>
             </button>
-            <div id="acc-${dim}" class="acc-body bg-slate-50/50 border-t border-slate-100"><div class="p-3">${cuerpo}</div></div>
+            <div id="acc-emp-${e.idx}" class="acc-body bg-slate-50/60 border-t border-slate-100"><div class="p-3 space-y-2">${cuerpo}</div></div>
         </div>`;
     }).join("");
 }
 
-function toggleAcc(dim) {
-    const b = document.getElementById("acc-" + dim), i = document.getElementById("ico-" + dim);
+function toggleEmp(i) {
+    const b = document.getElementById("acc-emp-" + i), ic = document.getElementById("ico-emp-" + i);
     const abierto = b.classList.contains("open");
     b.classList.toggle("open", !abierto);
-    i.style.transform = abierto ? "rotate(0deg)" : "rotate(180deg)";
-}
-
-function renderControl() {
-    const C = CONTROL;
-    const okTotal = C.exactos, problemas = C.reasignados.length + C.faltantes.length;
-    const kpi = (v,l,cls) => `<div class="border ${cls} rounded-lg p-3 text-center"><div class="text-2xl font-black mono">${v}</div><div class="text-[10px] uppercase font-bold tracking-wide leading-tight mt-0.5">${l}</div></div>`;
-
-    let html = `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        ${kpi(C.columnas, "Columnas en la hoja", "border-slate-200 text-slate-600")}
-        ${kpi(`${okTotal}/${C.total}`, "Preguntas con texto idéntico", "border-emerald-200 bg-emerald-50 text-emerald-700")}
-        ${kpi(C.reasignados.length, "Reasignadas automáticamente", C.reasignados.length ? "border-amber-200 bg-amber-50 text-amber-700" : "border-slate-200 text-slate-400")}
-        ${kpi(C.faltantes.length + ITEMS_SIN_PREGUNTA_EN_FORM.length, "Sin pregunta en el Form", "border-red-200 bg-red-50 text-red-700")}
-    </div>`;
-
-    if (!problemas) {
-        html += `<div class="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 text-sm text-emerald-800 mb-3">
-            <strong>Todas las preguntas de la Matriz coinciden con el texto de la hoja de respuestas.</strong> No hubo que reasignar ninguna columna.</div>`;
-    }
-
-    if (C.reasignados.length) {
-        html += `<div class="mb-4">
-            <h3 class="text-sm font-bold text-amber-800 mb-1.5 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Reasignadas automáticamente</h3>
-            <p class="text-xs text-slate-500 mb-2">El formulario cambió el texto de estas preguntas. Se detectó la columna equivalente por sentido y se usó la que tiene datos.</p>
-            <div class="space-y-2">${C.reasignados.map(r => `
-                <div class="border border-amber-200 bg-amber-50/60 rounded-lg px-3 py-2 text-xs">
-                    <div class="font-bold text-slate-800 mono mb-1">${esc(r.id)}</div>
-                    <div class="text-slate-500">Esperaba: <span class="text-slate-700">${esc(r.esperado)}</span></div>
-                    <div class="text-slate-500">Usa: <span class="text-emerald-800 font-semibold">${esc(r.usado)}</span></div>
-                    <div class="text-amber-700 mt-0.5">Motivo: ${esc(r.motivo)}</div>
-                </div>`).join("")}</div>
-        </div>`;
-    }
-
-    if (C.faltantes.length) {
-        html += `<div class="mb-4">
-            <h3 class="text-sm font-bold text-red-800 mb-1.5 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-4 h-4"></i> Preguntas de la Matriz que no se encontraron</h3>
-            <div class="space-y-1.5">${C.faltantes.map(f => `
-                <div class="border border-red-200 bg-red-50/60 rounded-lg px-3 py-2 text-xs">
-                    <span class="font-bold mono text-red-700">${esc(f.id)}</span>
-                    <span class="text-slate-600"> — esperaba la columna: ${esc(f.esperado)}</span>
-                </div>`).join("")}</div>
-        </div>`;
-    }
-
-    html += `<div class="mb-4">
-        <h3 class="text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5"><i data-lucide="file-question" class="w-4 h-4"></i> Ítems de la Matriz sin pregunta en el formulario</h3>
-        <div class="space-y-1.5">${ITEMS_SIN_PREGUNTA_EN_FORM.map(id => `
-            <div class="border border-slate-200 bg-slate-50 rounded-lg px-3 py-2 text-xs">
-                <span class="font-bold mono text-slate-600">${esc(id)}</span>
-                <span class="text-slate-600"> — ${esc((ITEM_INFO[id] || {}).texto || "")}</span>
-            </div>`).join("")}</div>
-        <p class="text-[11px] text-slate-500 mt-2">Son los dos ítems del subcriterio <strong>7.4 · Apertura al acompañamiento</strong>. Como el formulario no los pregunta, 7.4 queda sin puntaje declarado: se excluye del total y del piso de "subcriterio en 0", en vez de contarse como 0.</p>
-    </div>`;
-
-    if (CONTROL.sinItem.length) {
-        html += `<div>
-            <h3 class="text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-4 h-4"></i> Preguntas del formulario sin ítem en la Matriz (${CONTROL.sinItem.length})</h3>
-            <p class="text-xs text-slate-500 mb-2">Se responden en el intake pero no puntúan en ninguna dimensión.</p>
-            <div class="space-y-1.5">${CONTROL.sinItem.map(c => `
-                <div class="border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600">${esc(c.length > 180 ? c.slice(0,180) + "…" : c)}</div>`).join("")}</div>
-        </div>`;
-    }
-
-    document.getElementById("control").innerHTML = html;
+    ic.style.transform = abierto ? "rotate(0deg)" : "rotate(180deg)";
 }
 
 // ---------- Arranque ----------
