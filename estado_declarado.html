@@ -42,6 +42,12 @@
         <p class="text-white/70 text-sm mt-2 max-w-3xl">Lee las respuestas del formulario de intake directamente de Google Sheets y aplica la cascada de decisión de la Matriz Integral <strong class="text-white">usando únicamente lo declarado</strong>. No incluye la instancia de verificación presencial.</p>
     </div>
 
+    <!-- KPI de dictámenes sobre el total de respuestas -->
+    <div id="wrap-kpi" class="hidden mb-4">
+        <div id="kpi-dictamenes" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        <p id="kpi-nota" class="text-xs text-slate-500 mt-2"></p>
+    </div>
+
     <!-- Barra de conexión -->
     <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-center justify-between gap-4 mb-4">
         <div>
@@ -323,6 +329,7 @@ function procesarHoja(res) {
         return `<option value="${i}">${esc(n)}${f ? " · " + esc(f) : ""}</option>`;
     }).join("");
     status.textContent = `Conectado. ${SHEET_ROWS.length} respuesta(s) en "${GOOGLE_SHEET_NAME}".`;
+    renderKPI();
     mostrarEmpresa(SHEET_ROWS.length - 1);
 }
 
@@ -1204,6 +1211,37 @@ function toggleAcc(dim) {
     const abierto = b.classList.contains("open");
     b.classList.toggle("open", !abierto);
     i.style.transform = abierto ? "rotate(0deg)" : "rotate(180deg)";
+}
+
+// Conteo de dictámenes sobre TODAS las respuestas de la hoja. Usa el estado
+// declarado puro (evaluar sin ajustes): el panel de ajustes es por empresa y no
+// debe desbalancear un KPI que resume al conjunto.
+function renderKPI() {
+    const conteo = { go:0, pai:0, nogo:0 };
+    SHEET_ROWS.forEach(row => { conteo[evaluar(row).tipo]++; });
+
+    const tarjetas = [
+        { k:"go",   label:"GO",                  sub:"Aptos sin condiciones",       cls:"border-emerald-300 bg-emerald-50", num:"text-emerald-700", txt:"text-emerald-800", ico:"circle-check-big" },
+        { k:"pai",  label:"GO con Plan de Acción", sub:"Banda 55 - 69,9",           cls:"border-amber-300 bg-amber-50",     num:"text-amber-600",   txt:"text-amber-800",   ico:"clipboard-list" },
+        { k:"nogo", label:"NO-GO",               sub:"Piso incumplido o < 55",      cls:"border-red-300 bg-red-50",         num:"text-red-700",     txt:"text-red-800",     ico:"circle-x" },
+    ];
+
+    document.getElementById("kpi-dictamenes").innerHTML = tarjetas.map(t => `
+        <div class="border-2 ${t.cls} rounded-xl px-4 py-3 flex items-center gap-4">
+            <i data-lucide="${t.ico}" class="w-8 h-8 ${t.num} flex-shrink-0"></i>
+            <div class="min-w-0">
+                <div class="flex items-baseline gap-1.5">
+                    <span class="text-3xl font-black mono leading-none ${t.num}">${conteo[t.k]}</span>
+                    <span class="text-xs text-slate-400 font-bold">de ${SHEET_ROWS.length}</span>
+                </div>
+                <div class="text-[13px] font-bold ${t.txt} leading-tight mt-1">${t.label}</div>
+                <div class="text-[11px] text-slate-500 leading-tight">${t.sub}</div>
+            </div>
+        </div>`).join("");
+
+    document.getElementById("kpi-nota").textContent =
+        `Sobre las ${SHEET_ROWS.length} respuestas cargadas, según lo declarado en el formulario. La verificación presencial puede cambiar cualquiera de estos dictámenes.`;
+    document.getElementById("wrap-kpi").classList.remove("hidden");
 }
 
 function renderPisosGrid() {
