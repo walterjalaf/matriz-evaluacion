@@ -100,12 +100,14 @@ Los ítems `J.39` (¿garantiza 70-80% de personal de comunidades y el resto radi
 
 ## 8. El Gate HSE — cuando un solo "No" tira abajo todo, sin importar el puntaje
 
-35 ítems `G.` en dos niveles (22 excluyentes + 13 de brecha), evaluados en paralelo a los 26 subcriterios:
+35 ítems `G.` en dos niveles (24 excluyentes + 11 de brecha), evaluados en paralelo a los 26 subcriterios. El reparto sale de la columna **"Alimenta"** de la hoja Intake, que declara el nivel y el subcriterio de cada ítem:
 
-- **Nivel 1 — excluyente (22 ítems)**: un solo "No" verificado en cualquiera de ellos produce **No-Go inmediato**, sin promediar con nada más. Alimentan 6.1 (5 ítems: `G.3`–`G.7`), 6.2 (16 ítems) y 6.3 (1 ítem: `G.24`).
-- **Nivel 2 — brecha (13 ítems)**: un "No" no excluye, pero queda como discrepancia y limita el puntaje de 6.3 (3 ítems: `G.26`, `G.27` y `G.35` — RGRL, agregado cuando el Form sumó esa pregunta), 6.4 (4 ítems: `G.29`, `G.30`, `G.33` y `G.34` — Economía circular, también agregado con el Form) y 6.5 (6 ítems).
+- **Nivel 1 — excluyente (24 ítems)**: un solo "No" verificado en cualquiera de ellos produce **No-Go inmediato**, sin promediar con nada más. Alimentan 6.1 (5 ítems: `G.3`–`G.7`), 6.2 (15 ítems) y 6.3 completo (4 ítems: `G.24`, `G.26`, `G.27` y `G.35`).
+- **Nivel 2 — brecha (11 ítems)**: un "No" no excluye, pero queda como discrepancia y limita el puntaje de 6.4 (5 ítems: `G.28`, `G.29`, `G.30`, `G.33` y `G.34`) y 6.5 (6 ítems).
 
-Los dos contadores del encabezado del simulador salen de `itemsGate("n1")` e `itemsGate("n2")`, no de números fijos: si el reparto cambia, la cabecera acompaña sola.
+> **`G.28` (aptitud médica) es la única excepción a la planilla.** Su fila dice `"N1 → 6.4"`, pero está ubicada dentro del bloque *"GATE HSE NIVEL 2"* de la hoja. Se resolvió tratarla como **brecha de Nivel 2**: un "No" limita el puntaje de 6.4 y entra al Plan de Acción, en vez de frenar el proceso. El subcriterio destino (6.4) sí sigue a la planilla — antes estaba en 6.2.
+
+Los dos contadores del encabezado del simulador y el detalle del panel de pisos salen de `itemsGate("n1")` e `itemsGate("n2")`, no de números fijos: el reparto entre niveles ya se movió varias veces y los números escritos a mano quedaban desfasados sin que nada avisara.
 
 **Ejemplo real — Constructora Cordillera SRL**: en el Intake declaró tener ART vigente (`G.1`). En la visita presencial, la póliza exhibida estaba **vencida hacía 40 días** → `declarado: Sí` / `verificado: No`. Como `G.1` es Gate Nivel 1, esto solo alcanza para dictaminar **No-Go** — y de hecho, si se recalculan sus 26 subcriterios con el resto de la evidencia (todo marcado), Cordillera llega a un puntaje global de **100/100**. No importa: el Gate se revisa *antes* que el puntaje en la cascada de decisión (Sección 10), así que el 100 nunca llega a evaluarse.
 
@@ -292,6 +294,14 @@ T6 se aplica distinto según qué puntaje se esté mirando:
   `verificarTextos()`, hermana de `verificarPesos()` en el arranque, avisa por consola si alguien reedita el Form y los textos se vuelven a separar. Lleva una lista de divergencias aceptadas, hoy con **6 entradas**: en `F.5`, `F.7`, `F.8`, `F.9`, `F.11` y `F.13` el formulario pregunta *"Modelo del vehículo/equipo"* mientras la Matriz evalúa *"Horas de uso"*. Es una divergencia deliberada; el `kind` de esos ítems es `text`, así que solo cambia el rótulo, no el puntaje.
 
   Los campos `entregable` **no** salen del formulario: son las indicaciones del evaluador sobre qué documentación pedir y se mantienen escritas por el equipo.
+- **La hoja arrastra columnas viejas vacías, y eso rompió `J.1` y `J.2`.** Cuando el Form reformula una pregunta, Google crea una columna nueva y deja la vieja en su lugar, sin respuestas. `J.1` (estatuto) y `J.2` (acta de designación) pasaron de *"¿Presenta…"* a *"¿Cuenta con…"* y el mapeo se quedó apuntando a las columnas viejas: durante un tiempo el simulador **descartó esas dos respuestas en cada carga**, y el subcriterio 1.1 llegaba topeado con 2 de sus 4 ítems siempre en falso. Ya está corregido.
+
+  Cuidado al editar `FORM_ITEM_MAP`: la clave de `J.1` lleva un **espacio inicial**, porque así está el encabezado en la hoja y la búsqueda es por texto exacto.
+
+  `G.32` y `G.35` tienen el mismo problema de columna duplicada, pero con encabezado **idéntico** entre la vieja y la nueva. Como el loader arma cada fila con `obj[col.label] = valor`, la última columna homónima pisa a la primera y termina ganando la que tiene datos. Funcionan bien, pero por el orden de las columnas: si alguien las reordena en la hoja, se invierte.
+
+  Para que esto no vuelva a pasar inadvertido, `procesarRespuestasSheet()` avisa —por consola y en la línea de estado de la conexión— cuando una pregunta mapeada no tiene **ninguna** respuesta en toda la hoja. El aviso que ya existía sólo detectaba encabezados que desaparecen, no columnas que existen pero están vacías, que es exactamente como se coló este bug.
+- **Dos columnas respondidas que la Matriz descarta a propósito**: las cantidades declaradas de *Camión volcador Scania 440 XT* y *Camión barrenieve*. Son los dos equipos fuera del mínimo del pliego (uno opcional, el otro lo provee Veladero), así que no existen como ítems ni entran en 5.1.
 
 ## 14. Cómo verificar el simulador
 
@@ -308,3 +318,4 @@ T6 se aplica distinto según qué puntaje se esté mirando:
 8. En la Dimensión VII: `7.1 · 3 pts`, `7.2 · 5 pts` y `7.3` con el badge ámbar **No puntúa**. Destildar `J.28` y `J.29` con todo lo demás en verde: 7.3 baja a 0/5, pero el dictamen sigue GO y el puntaje global no se mueve.
 9. Cargar *Luky S.R.L* (responde Sí a ISO y Sí a alianzas) → 7.2 = 5/5. Cargar *Iglesia Movimientos SRL* (No a ISO) → 7.2 = 4/5. Si ambas dieran 3/5 es que `J.30`/`J.31` volvieron a descartarse.
 10. Forzar `J.13` a 4 → No-Go por piso BCRA; a 3 → 2.2 = 1 pt y sigue en carrera; verificar `J.13` sin ningún número de BCRA → 2.2 = 0.
+11. La línea de estado de la conexión debe decir sólo `Conectado. N respuesta(s)…`, sin el `⚠` de preguntas mapeadas sin respuestas. Si aparece, alguna columna de la hoja quedó apuntada a un encabezado viejo — el detalle sale en la consola.
