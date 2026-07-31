@@ -701,6 +701,61 @@
             const v = (cell.f !== undefined && cell.f !== null) ? cell.f : cell.v;
             return v === null || v === undefined ? "" : String(v);
         }
+
+        // ---------- CUIT: los que gviz descarta ----------
+        // gviz le asigna UN tipo a cada columna —el de la mayoría de sus celdas— y devuelve
+        // null en las que no encajan. La columna CUIT quedó tipada como número, así que los
+        // CUIT escritos con guiones (30-71888345-4) llegaban vacíos y la ficha mostraba "—",
+        // aunque la empresa los había cargado.
+        // Arreglo: volver a pedir esas celdas de a UNA. En un rango de una sola celda el tipo
+        // lo define esa celda, así que el texto llega tal cual. Se pide por JSONP, igual que
+        // la carga principal, porque el CSV de exportación no habilita CORS cuando la página
+        // se abre como archivo local (file://), que es como se usa esta herramienta.
+        function colLetra(n) {                  // 1 → A, 27 → AA, 208 → GZ
+            let s = "";
+            while (n > 0) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = (n - r - 1) / 26; }
+            return s;
+        }
+
+        // Pide un rango por JSONP. Devuelve la tabla, o null si falla (nunca rechaza: un CUIT
+        // que no se pueda recuperar deja la ficha como estaba, no rompe la página).
+        function pedirRango(rango) {
+            return new Promise(resolve => {
+                const cb = "__rango_" + Math.random().toString(36).slice(2);
+                const script = document.createElement("script");
+                const limpiar = () => { delete window[cb]; script.remove(); clearTimeout(timer); };
+                const timer = setTimeout(() => { limpiar(); resolve(null); }, 15000);
+                window[cb] = res => { limpiar(); resolve(res && res.status === "ok" ? res.table : null); };
+                script.onerror = () => { limpiar(); resolve(null); };
+                script.src = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&gid=${GOOGLE_SHEET_GID}&headers=0&range=${rango}`;
+                document.body.appendChild(script);
+            });
+        }
+
+        // Completa, celda por celda, los CUIT que la carga principal trajo vacíos.
+        // Devuelve cuántos recuperó.
+        async function completarCuits(cols, filas) {
+            const label = META_COLS["cuit"];
+            const j = cols.findIndex(c => c.label === label);
+            if (!label || j < 0 || cols[j].type === "string") return 0;   // si ya viene como texto, no falta nada
+            const letra = colLetra(j + 1);
+            const faltan = filas.map((f, i) => String(f[label] ?? "").trim() ? -1 : i).filter(i => i >= 0);
+            if (!faltan.length) return 0;
+
+            let n = 0;
+            // De a 8 por vez, para no disparar decenas de pedidos juntos a medida que el
+            // formulario acumule respuestas.
+            for (let k = 0; k < faltan.length; k += 8) {
+                const tablas = await Promise.all(faltan.slice(k, k + 8).map(i =>
+                    pedirRango(`${letra}${i + 2}:${letra}${i + 2}`).then(t => [i, t])));   // +2: la fila 1 son los encabezados
+                tablas.forEach(([i, tabla]) => {
+                    const texto = tabla && tabla.rows.length ? cellText((tabla.rows[0].c || [])[0]) : "";
+                    if (texto.trim()) { filas[i][label] = texto; n++; }
+                });
+            }
+            return n;
+        }
+
         function parseSiNo(v) {
             const s = String(v ?? "").trim().toLowerCase();
             if (!s) return false;
@@ -737,12 +792,10 @@
 
             window[cbName] = function (res) {
                 cleanup();
-                try {
-                    procesarRespuestasSheet(res);
-                } catch (e) {
+                procesarRespuestasSheet(res).catch(e => {
                     console.error(e);
                     status.textContent = `Error al leer "${GOOGLE_SHEET_NAME}": ` + e.message;
-                }
+                });
             };
             script.onerror = () => {
                 cleanup();
@@ -752,7 +805,7 @@
             document.body.appendChild(script);
         }
 
-        function procesarRespuestasSheet(res) {
+        async function procesarRespuestasSheet(res) {
             if (res.status !== "ok") {
                 throw new Error((res.errors && res.errors[0] && res.errors[0].detailed_message) || "la hoja no devolvió datos válidos");
             }
@@ -792,6 +845,10 @@
                 cols.forEach((col, i) => { obj[col.label] = cellText(row.c[i]); });
                 return obj;
             });
+
+            // Los CUIT que gviz descartó por tipo se piden aparte (ver completarCuits).
+            const cuits = await completarCuits(cols, SHEET_RESPONSES);
+            if (cuits > 0) console.info(`${cuits} CUIT recuperado(s): gviz los había descartado por no coincidir con el tipo que le asignó a la columna.`);
 
             // Una columna puede existir con el texto esperado y aun así no traer una sola
             // respuesta: es lo que pasa cuando el Form reformula una pregunta, crea una columna
