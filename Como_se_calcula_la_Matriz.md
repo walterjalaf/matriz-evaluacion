@@ -81,7 +81,7 @@ puntaje_global = Σ obtenido_dim   (de las 7 dimensiones)
 | IV | 18 | 4.1=3 · 4.2=3 · 4.3=3 · 4.4=3 | 10.8 | 3.0 |
 | V | 20 | 5.1=3 · 5.2=3 · 5.3=3 · 5.4=5 | 12.8 | 3.2 |
 | VI | 14 | 6.1=5 · 6.2=5 · 6.3=5 · 6.4=3 · 6.5=3 | 12.0 | 4.3 |
-| VII | 8 | 7.1=2 · 7.2=3 · 7.3=3 · 7.4=3 | 4.2 | 2.6 |
+| VII | 8 | 7.1=3 · 7.2=2 · 7.3=3 | 4.2 | 2.6 |
 | **Total** | **100** | | **68.4** | |
 
 ```
@@ -100,16 +100,16 @@ Los ítems `J.39` (¿garantiza 70-80% de personal de comunidades y el resto radi
 
 ## 8. El Gate HSE — cuando un solo "No" tira abajo todo, sin importar el puntaje
 
-35 ítems en dos niveles, evaluados en paralelo a los 27 subcriterios:
+35 ítems en dos niveles (22 excluyentes + 13 de brecha), evaluados en paralelo a los 26 subcriterios:
 
 - **Nivel 1 — excluyente (25 ítems, prefijo `G.`)**: un solo "No" verificado en cualquiera de ellos produce **No-Go inmediato**, sin promediar con nada más. Alimentan 6.1 (5 ítems), 6.2 (16 ítems) y 6.3 (4 ítems, incluye `G.35` — RGRL, agregado cuando el Form sumó esa pregunta).
 - **Nivel 2 — brecha (10 ítems)**: un "No" no excluye, pero queda como discrepancia y limita el puntaje de 6.4 (4 ítems, incluye `G.34` — Economía circular, agregado cuando el Form sumó esa pregunta) y 6.5 (6 ítems).
 
-**Ejemplo real — Constructora Cordillera SRL**: en el Intake declaró tener ART vigente (`G.1`). En la visita presencial, la póliza exhibida estaba **vencida hacía 40 días** → `declarado: Sí` / `verificado: No`. Como `G.1` es Gate Nivel 1, esto solo alcanza para dictaminar **No-Go** — y de hecho, si se recalculan sus 27 subcriterios con el resto de la evidencia (todo marcado), Cordillera llega a un puntaje global de **100/100**. No importa: el Gate se revisa *antes* que el puntaje en la cascada de decisión (Sección 10), así que el 100 nunca llega a evaluarse.
+**Ejemplo real — Constructora Cordillera SRL**: en el Intake declaró tener ART vigente (`G.1`). En la visita presencial, la póliza exhibida estaba **vencida hacía 40 días** → `declarado: Sí` / `verificado: No`. Como `G.1` es Gate Nivel 1, esto solo alcanza para dictaminar **No-Go** — y de hecho, si se recalculan sus 26 subcriterios con el resto de la evidencia (todo marcado), Cordillera llega a un puntaje global de **100/100**. No importa: el Gate se revisa *antes* que el puntaje en la cascada de decisión (Sección 10), así que el 100 nunca llega a evaluarse.
 
 ## 9. Los pisos — cuando un subcriterio en 0 tira abajo todo, sin importar el promedio
 
-Un **piso** es una condición excluyente: si un subcriterio llega a 0/5, el dictamen es No-Go aunque el resto de la matriz esté perfecto. La versión actual del motor de `ejemplo.html` aplica esto de forma **general a los 27 subcriterios** (cualquiera que llegue a 0 frena todo), no solo a una lista corta — aunque hay 6 que son los que históricamente se destacan porque son los más fáciles de perder por completo:
+Un **piso** es una condición excluyente: si un subcriterio llega a 0/5, el dictamen es No-Go aunque el resto de la matriz esté perfecto. La versión actual del motor de `ejemplo.html` aplica esto de forma **general a los 26 subcriterios** (cualquiera que llegue a 0 frena todo), no solo a una lista corta — aunque hay 6 que son los que históricamente se destacan porque son los más fáciles de perder por completo:
 
 | Subcriterio | Motivo |
 |---|---|
@@ -142,16 +142,16 @@ El motor revisa las condiciones en un orden fijo y **se detiene en la primera qu
 
 1. **Consentimiento de auditoría** (declarado = No → No-Go)
 2. **Elegibilidad geográfica** (fuera de Iglesia/Jáchal → No-Go)
-3. **Gate Nivel 1** (25 ítems — un "No" verificado → No-Go)
+3. **Gate Nivel 1** (22 ítems — un "No" verificado → No-Go)
 4. **Salud Financiera** (promedio 2.1–2.3 `< 2` → No-Go)
 5. **Piso 2.2 · Situación BCRA** (situación declarada 3, 4 o 5 de empresa o socios → No-Go, independiente del puntaje 0-5 del subcriterio)
 6. **SSMA excluyente** (mínimo 6.1/6.2/6.3 `≤ 1` → No-Go)
-7. **Cualquier subcriterio en 0** (de los 27 — un solo 0/5 → No-Go)
+7. **Cualquier subcriterio en 0** (de los 26 — un solo 0/5 → No-Go)
 8. **Puntaje global `< 55`** → No-Go
 9. **Puntaje global 55 a 69,9** → GO con Plan de Acción
 10. **Puntaje global `≥ 70`** → GO
 
-> Nota: versiones anteriores de este documento describían varios de los pasos 7+ como chequeos separados y nombrados (5.1, 4.2, 3.4, 2.2, 2.1, 1.3, en ese orden). El motor real de `ejemplo_con_form.html` los generalizó en un solo paso que cubre los 27 subcriterios — el efecto práctico es el mismo (esos 6 siguen frenando todo si llegan a 0), pero ya no hace falta nombrarlos uno por uno: alcanza con "¿algún subcriterio quedó en 0?". El paso 5 (piso BCRA de 2.2) es la excepción: es un chequeo aparte porque no mira el puntaje 0-5 del subcriterio, sino el dato crudo declarado en `J.13`.
+> Nota: versiones anteriores de este documento describían varios de los pasos 7+ como chequeos separados y nombrados (5.1, 4.2, 3.4, 2.2, 2.1, 1.3, en ese orden). El motor real de `ejemplo_con_form.html` los generalizó en un solo paso que cubre los 26 subcriterios — el efecto práctico es el mismo (esos 6 siguen frenando todo si llegan a 0), pero ya no hace falta nombrarlos uno por uno: alcanza con "¿algún subcriterio quedó en 0?". El paso 5 (piso BCRA de 2.2) es la excepción: es un chequeo aparte porque no mira el puntaje 0-5 del subcriterio, sino el dato crudo declarado en `J.13`.
 
 **Los 4 casos reales, trazados paso a paso por la cascada:**
 
@@ -202,7 +202,7 @@ El simulador usa una aproximación **lineal** (`round(cumplen/11×5)`) porque no
 
 ## 12. Tablas de conversión T1-T8 — documentadas; T6 activa en el motor, el resto no
 
-5 de los 27 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en la planilla real una **tabla de conversión propia** a partir de un dato numérico declarado (cantidad de empleados, horas de cobertura, % verificado, etc.) en vez de la proporción simple de checkboxes. La hoja "Conversiones" que contenía los valores originales de esas tablas **no existe** en ninguna de las dos planillas compartidas — todas las fórmulas `VLOOKUP` que la referencian devuelven `#REF!`. Lo que sigue para esos 5 es una reconstrucción aproximada a partir de las bandas cualitativas que sí describe el Marco Metodológico v4.1, no los valores originales exactos.
+5 de los 26 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en la planilla real una **tabla de conversión propia** a partir de un dato numérico declarado (cantidad de empleados, horas de cobertura, % verificado, etc.) en vez de la proporción simple de checkboxes. Esas tablas **sí existen**, en la hoja `Config` de la Matriz: T1, T2, T3, T4, T5 y T6, y el motor las implementa con sus tramos reales. La inconsistencia que queda es de nombre: las fórmulas hacen `VLOOKUP` contra una hoja llamada **"Conversiones"** que no existe, así que en la planilla devuelven `#REF!` aunque los valores estén cargados. Falta además el rango `B46:C50` que invocan 6.4 y 6.5, reconstruido como 0→1 · 25→2 · 50→3 · 75→4 · 100→5.
 
 **2.2 — Situación BCRA (peor situación, empresa y socios, 1 a 5) — tabla T6, activa en el motor:**
 | BCRA | Puntaje |
@@ -216,7 +216,7 @@ A diferencia de las otras 5 tablas de esta sección, **T6 sí está implementada
 
 T6 se aplica distinto según qué puntaje se esté mirando:
 - **"Declarado"** (KPI de la derecha, refleja el Excel sin esperar la visita): T6 aplica apenas hay un `J.13` con valor de BCRA cargado, sin exigir nada más.
-- **Puntaje oficial** (cascada, dictamen, cajas del acordeón) y **"Declarado y verificado"**: T6 solo aplica una vez que el evaluador tildó "Verificado" en `J.13` — igual que el resto de los 27 subcriterios, que arrancan en 0 hasta la visita. Sin eso, 2.2 cae a la aproximación genérica de checkboxes (`verificados/total×5` sobre J.13+J.14), que da 0 mientras nada esté tildado.
+- **Puntaje oficial** (cascada, dictamen, cajas del acordeón) y **"Declarado y verificado"**: T6 solo aplica una vez que el evaluador tildó "Verificado" en `J.13` — igual que el resto de los 26 subcriterios, que arrancan en 0 hasta la visita. Sin eso, 2.2 cae a la aproximación genérica de checkboxes (`verificados/total×5` sobre J.13+J.14), que da 0 mientras nada esté tildado.
 
 **3.1 — Cantidad de empleados en relación de dependencia:**
 | Empleados | Puntaje |
@@ -262,9 +262,9 @@ T6 se aplica distinto según qué puntaje se esté mirando:
 
 ## 13. Limitaciones conocidas
 
-- 5 de 27 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en el simulador la proporción simple de checkboxes en vez de su tabla de conversión real; 5.1 tiene una aproximación lineal (con divergencias documentadas en la Sección 11); 2.2 es el único que tiene su tabla de conversión real (T6) implementada sin aproximar.
+- 5 de 26 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en el simulador la proporción simple de checkboxes en vez de su tabla de conversión real; 5.1 tiene una aproximación lineal (con divergencias documentadas en la Sección 11); 2.2 es el único que tiene su tabla de conversión real (T6) implementada sin aproximar.
 - El puntaje que da el simulador para "Vialidad Cuyana" con todo marcado (100) no reproduce el 86,2 real de la planilla — es la misma simplificación checkbox-a-score, no una regresión nueva.
-- El peso de la Dimensión VII se mantiene en 8% (3+1+2+2) pese a que la hoja "Intake" de la planilla marca "5 — REVISAR" en una tabla de referencia cruzada — inconsistencia de la fuente, no una decisión de este documento.
+- El peso de la Dimensión VII se mantiene en 8%, ahora repartido 3+2+3 entre sus tres subcriterios. El antiguo 7.4 (Apertura al acompañamiento y velocidad de mejora) se fusionó en 7.3, que pasó a llamarse "Asociativismo / UTE, Apertura al acompañamiento y velocidad de mejora" y se alimenta de J.28, J.29, J.30 y J.31. La hoja "Intake" marca "5 — REVISAR" para VII en una tabla de referencia cruzada; es una inconsistencia de la fuente, no una decisión de este documento.
 
 ## 14. Cómo verificar el simulador
 
