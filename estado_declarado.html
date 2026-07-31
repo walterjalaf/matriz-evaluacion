@@ -123,11 +123,11 @@
         <div id="detalle" class="space-y-3"></div>
     </div>
 
-    <!-- Control de correspondencia -->
-    <div id="wrap-control" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="scan-search" class="w-5 h-5 text-brand-2"></i> Control de correspondencia formulario ↔ matriz</h2>
-        <p class="text-xs text-slate-500 mb-4">Verificación automática de que cada pregunta de la Matriz sigue existiendo con el mismo texto en la hoja de respuestas. Se ejecuta en cada carga.</p>
-        <div id="control"></div>
+    <!-- Panel explicativo de pisos -->
+    <div id="wrap-pisos" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-600"></i> ¿Qué es un piso?</h2>
+        <p class="text-sm text-slate-500 mb-4 max-w-3xl">Un <strong>piso</strong> es una condición excluyente: si no se cumple, el dictamen es No-Go sin importar qué tan alto sea el puntaje global. <strong>Regla general: cualquier subcriterio que llegue a 0/5 puntos produce No-Go</strong>, no solo los 6 destacados históricamente (1.3, 2.1, 2.2, 3.4, 4.2 y 5.1). A esto se suma el bloque de Salud Financiera (promedio &lt; 2), el piso propio de 2.2 (situación BCRA en banda 4-5) y los 3 subcriterios SSMA excluyentes (≤ 1 = No-Go), que en conjunto viven dentro del Gate Nivel 1.</p>
+        <div id="pisos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"></div>
     </div>
 
     <p class="text-center text-xs text-slate-400 mt-6 pb-4">Vista de <strong>estado declarado</strong>: refleja lo que la empresa respondió en el intake. La verificación presencial puede confirmar o desmentir cada punto y cambiar el dictamen.</p>
@@ -167,6 +167,23 @@ const CONDICIONALES = {
     "J.28": "Solo aplica si se presenta como consorcio o UTE.",
     "J.29": "Solo aplica si se presenta como empresa individual.",
 };
+
+// Pisos de la Matriz, el mismo cuadro que ejemplo_con_form.html. Acá el disparador
+// es lo declarado, no lo verificado en la visita.
+const PISOS_INFO = [
+    { id: "ANY0",  label: "Cualquier subcriterio (26/27)", regla: "Puntaje = 0", detalle: "Regla general: si CUALQUIER subcriterio de la Matriz —no solo los 6 destacados abajo— llega a 0/5, el dictamen es No-Go automático. Queda afuera 7.4, que el formulario no pregunta: se marca sin dato en vez de contarse como 0." },
+    { id: "1.3",   label: "1.3 · Integridad y libre conflictividad", regla: "Puntaje = 0", detalle: "Dimensión I. Sin certificados de conflictividad/deuda sindical en regla." },
+    { id: "2.1",   label: "2.1 · Solvencia, liquidez y capital de trabajo", regla: "Puntaje = 0", detalle: "Dimensión II. Sin estados contables ni información contable verificable." },
+    { id: "2.2",   label: "2.2 · Endeudamiento / financiamiento de flota", regla: "Puntaje = 0", detalle: "Dimensión II. Sin capacidad demostrable de financiar la flota exigida." },
+    { id: "3.4",   label: "3.4 · Roster 14x7 y reemplazo 24 h", regla: "Puntaje = 0", detalle: "Dimensión III. Sin esquema de turnos ni back-up ante ausencias. La tabla T4 convierte las horas declaradas para cubrir una vacante: hasta 24 h → 5 pts, 25-48 h → 3 pts, 49 h o más → 1 pt." },
+    { id: "4.2",   label: "4.2 · Industria minera y alta montaña", regla: "Puntaje = 0", detalle: "Dimensión IV. Sin experiencia previa en minería o alta montaña." },
+    { id: "5.1",   label: "5.1 · Flota disponible vs. mínima", regla: "Puntaje = 0", detalle: "Dimensión V. No alcanza la flota mínima exigida por el pliego. La tabla T2 convierte el % de flota cubierta: menos de 40 % → 1 pt, 40-69 % → 3, 70-89 % → 4, 90 % o más → 5." },
+    { id: "FIN",   label: "Salud Financiera (2.1–2.3)", regla: "Promedio < 2", detalle: "Dimensión II completa. Insolvencia estructural, no un único documento." },
+    { id: "BCRA",  label: "2.2 · Situación BCRA (empresa y socios)", regla: "Situación 4 o 5", detalle: "Dimensión II. La tabla T6 convierte la peor situación BCRA declarada (escala real 1-5) en el puntaje 0-5 de 2.2: Situación 1 → 5 pts, 2 → 3 pts, 3 → 1 pt (mínimo que alcanza, no es piso). Situación 4 o 5 sí es piso — No-Go inmediato. Situación 5 = Irrecuperable (atrasos >1 año o insolvencia/instancia judicial)." },
+    { id: "SSMA",  label: "SSMA excluyente (6.1 / 6.2 / 6.3)", regla: "Puntaje ≤ 1", detalle: "Dimensión VI, alimentados por el Gate Nivel 1. Higiene y seguridad por debajo del mínimo aceptable." },
+    { id: "GATE1", label: "Gate Nivel 1 completo (22 ítems)", regla: "1 solo 'No' declarado", detalle: "Cualquier ítem de los 22 excluyentes produce No-Go inmediato, sin promediar con nada. G.26, G.27 y G.35 dejaron de ser excluyentes: pasaron a Nivel 2 (brecha) y ahora solo limitan el puntaje de 6.3." },
+    { id: "SINRTA",label: "Subcriterio sin ninguna respuesta", regla: "Puntaje = 0", detalle: "Si la empresa no declara nada en un subcriterio, este da 0 y dispara el piso. El mínimo de 1 punto de las tablas de conversión solo aplica cuando hay al menos una respuesta cargada." },
+];
 
 // Opciones de respuesta que significan "no cumple". El resto de las opciones con
 // contenido se toman como cumplidas: sin las tablas de conversión originales de la
@@ -283,7 +300,6 @@ function procesarHoja(res) {
     });
 
     resolverEncabezados();
-    renderControl();
 
     const sel = document.getElementById("sel-empresa");
     const status = document.getElementById("sheet-status");
@@ -759,7 +775,7 @@ function repintar() {
     const R = evaluar(row, AJUSTES);
     const base = evaluar(row);                    // sin ajustes, para mostrar el contraste
 
-    ["wrap-dictamen","wrap-motivos","wrap-tablas","wrap-cascada","wrap-dim","wrap-detalle","wrap-control"]
+    ["wrap-dictamen","wrap-motivos","wrap-tablas","wrap-cascada","wrap-dim","wrap-detalle","wrap-pisos"]
         .forEach(id => document.getElementById(id).classList.remove("hidden"));
 
     renderFicha(row, R);
@@ -1184,72 +1200,19 @@ function toggleAcc(dim) {
     i.style.transform = abierto ? "rotate(0deg)" : "rotate(180deg)";
 }
 
-function renderControl() {
-    const C = CONTROL;
-    const okTotal = C.exactos, problemas = C.reasignados.length + C.faltantes.length;
-    const kpi = (v,l,cls) => `<div class="border ${cls} rounded-lg p-3 text-center"><div class="text-2xl font-black mono">${v}</div><div class="text-[10px] uppercase font-bold tracking-wide leading-tight mt-0.5">${l}</div></div>`;
-
-    let html = `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        ${kpi(C.columnas, "Columnas en la hoja", "border-slate-200 text-slate-600")}
-        ${kpi(`${okTotal}/${C.total}`, "Preguntas con texto idéntico", "border-emerald-200 bg-emerald-50 text-emerald-700")}
-        ${kpi(C.reasignados.length, "Reasignadas automáticamente", C.reasignados.length ? "border-amber-200 bg-amber-50 text-amber-700" : "border-slate-200 text-slate-400")}
-        ${kpi(C.faltantes.length + ITEMS_SIN_PREGUNTA_EN_FORM.length, "Sin pregunta en el Form", "border-red-200 bg-red-50 text-red-700")}
-    </div>`;
-
-    if (!problemas) {
-        html += `<div class="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 text-sm text-emerald-800 mb-3">
-            <strong>Todas las preguntas de la Matriz coinciden con el texto de la hoja de respuestas.</strong> No hubo que reasignar ninguna columna.</div>`;
-    }
-
-    if (C.reasignados.length) {
-        html += `<div class="mb-4">
-            <h3 class="text-sm font-bold text-amber-800 mb-1.5 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Reasignadas automáticamente</h3>
-            <p class="text-xs text-slate-500 mb-2">El formulario cambió el texto de estas preguntas. Se detectó la columna equivalente por sentido y se usó la que tiene datos.</p>
-            <div class="space-y-2">${C.reasignados.map(r => `
-                <div class="border border-amber-200 bg-amber-50/60 rounded-lg px-3 py-2 text-xs">
-                    <div class="font-bold text-slate-800 mono mb-1">${esc(r.id)}</div>
-                    <div class="text-slate-500">Esperaba: <span class="text-slate-700">${esc(r.esperado)}</span></div>
-                    <div class="text-slate-500">Usa: <span class="text-emerald-800 font-semibold">${esc(r.usado)}</span></div>
-                    <div class="text-amber-700 mt-0.5">Motivo: ${esc(r.motivo)}</div>
-                </div>`).join("")}</div>
-        </div>`;
-    }
-
-    if (C.faltantes.length) {
-        html += `<div class="mb-4">
-            <h3 class="text-sm font-bold text-red-800 mb-1.5 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-4 h-4"></i> Preguntas de la Matriz que no se encontraron</h3>
-            <div class="space-y-1.5">${C.faltantes.map(f => `
-                <div class="border border-red-200 bg-red-50/60 rounded-lg px-3 py-2 text-xs">
-                    <span class="font-bold mono text-red-700">${esc(f.id)}</span>
-                    <span class="text-slate-600"> — esperaba la columna: ${esc(f.esperado)}</span>
-                </div>`).join("")}</div>
-        </div>`;
-    }
-
-    html += `<div class="mb-4">
-        <h3 class="text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5"><i data-lucide="file-question" class="w-4 h-4"></i> Ítems de la Matriz sin pregunta en el formulario</h3>
-        <div class="space-y-1.5">${ITEMS_SIN_PREGUNTA_EN_FORM.map(id => `
-            <div class="border border-slate-200 bg-slate-50 rounded-lg px-3 py-2 text-xs">
-                <span class="font-bold mono text-slate-600">${esc(id)}</span>
-                <span class="text-slate-600"> — ${esc((ITEM_INFO[id] || {}).texto || "")}</span>
-            </div>`).join("")}</div>
-        <p class="text-[11px] text-slate-500 mt-2">Son los dos ítems del subcriterio <strong>7.4 · Apertura al acompañamiento</strong>. Como el formulario no los pregunta, 7.4 queda sin puntaje declarado: se excluye del total y del piso de "subcriterio en 0", en vez de contarse como 0.</p>
-    </div>`;
-
-    if (CONTROL.sinItem.length) {
-        html += `<div>
-            <h3 class="text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-4 h-4"></i> Preguntas del formulario sin ítem en la Matriz (${CONTROL.sinItem.length})</h3>
-            <p class="text-xs text-slate-500 mb-2">Se responden en el intake pero no puntúan en ninguna dimensión.</p>
-            <div class="space-y-1.5">${CONTROL.sinItem.map(c => `
-                <div class="border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600">${esc(c.length > 180 ? c.slice(0,180) + "…" : c)}</div>`).join("")}</div>
-        </div>`;
-    }
-
-    document.getElementById("control").innerHTML = html;
+function renderPisosGrid() {
+    document.getElementById("pisos-grid").innerHTML = PISOS_INFO.map(p => `
+        <div class="border border-slate-200 rounded-lg p-3">
+            <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="font-bold text-slate-700 text-xs">${esc(p.label)}</span>
+                <span class="text-[10px] font-black text-red-600 bg-red-50 px-1.5 py-0.5 rounded whitespace-nowrap">${esc(p.regla)}</span>
+            </div>
+            <p class="text-slate-500 text-xs">${esc(p.detalle)}</p>
+        </div>`).join("");
 }
 
 // ---------- Arranque ----------
+renderPisosGrid();
 cargarHoja();
 lucide.createIcons();
 </script>
