@@ -4,7 +4,7 @@
 
 ## 1. La idea en un párrafo
 
-Cada empresa se evalúa marcando evidencia (documentos, certificados, checklists) en 27 preguntas-grupo llamadas **subcriterios**, agrupadas en 7 **dimensiones**. Cada subcriterio saca un puntaje de 0 a 5, ese puntaje se pondera por el peso del subcriterio, se suman todos y da un **puntaje global sobre 100**. Aparte, hay una lista de condiciones excluyentes (**Gate HSE** y **pisos**) que puede frenar todo el proceso con un **No-Go**, sin importar cuán alto sea el puntaje. Al final, una **cascada de decisión** revisa esas condiciones en un orden fijo y entrega el dictamen: **GO**, **GO con Plan de Acción**, o **No-Go**.
+Cada empresa se evalúa marcando evidencia (documentos, certificados, checklists) en 26 preguntas-grupo llamadas **subcriterios**, agrupadas en 7 **dimensiones**. De esos 26, **25 puntúan**: el subcriterio 7.3 (Asociativismo / UTE) tiene peso 0,0 en la planilla, así que se releva como evidencia pero no aporta al puntaje. Cada subcriterio saca un puntaje de 0 a 5, ese puntaje se pondera por el peso del subcriterio, se suman todos y da un **puntaje global sobre 100**. Aparte, hay una lista de condiciones excluyentes (**Gate HSE** y **pisos**) que puede frenar todo el proceso con un **No-Go**, sin importar cuán alto sea el puntaje. Al final, una **cascada de decisión** revisa esas condiciones en un orden fijo y entrega el dictamen: **GO**, **GO con Plan de Acción**, o **No-Go**.
 
 
 ## 3. Paso 1 — puntaje de cada subcriterio (0 a 5)
@@ -13,7 +13,7 @@ Cada empresa se evalúa marcando evidencia (documentos, certificados, checklists
 puntaje_sub = round((preguntas_verificadas / preguntas_totales) × 5)
 ```
 
-Solo cuentan las preguntas marcadas `scoreable` (todas, salvo dos preguntas declarativas de la Sección V que no puntúan). **Excepción: 2.2** no usa esta fórmula — su puntaje sale de la tabla de conversión real T6 aplicada a la situación BCRA declarada (ver Sección 12).
+Solo cuentan las preguntas marcadas `scoreable` — todas, salvo tres: las dos preguntas declarativas de la Sección V (`Q5.2` y `Q5.36`) y `J.14` (manifestación de bienes), que queda como evidencia dentro de 2.2 sin mover su puntaje. **Excepción: 2.2** no usa esta fórmula — su puntaje sale entero de la tabla de conversión real T6 aplicada a la situación BCRA declarada en `J.13` (ver Sección 12).
 
 **Ejemplo real — subcriterio 1.1 de Transportes del Norte** ("Conformación legal, radicación y arraigo provincial"):
 
@@ -81,7 +81,7 @@ puntaje_global = Σ obtenido_dim   (de las 7 dimensiones)
 | IV | 18 | 4.1=3 · 4.2=3 · 4.3=3 · 4.4=3 | 10.8 | 3.0 |
 | V | 20 | 5.1=3 · 5.2=3 · 5.3=3 · 5.4=5 | 12.8 | 3.2 |
 | VI | 14 | 6.1=5 · 6.2=5 · 6.3=5 · 6.4=3 · 6.5=3 | 12.0 | 4.3 |
-| VII | 8 | 7.1=3 · 7.2=2 · 7.3=3 | 4.2 | 2.6 |
+| VII | 8 | 7.1=2 · 7.2=3 · 7.3=3 *(peso 0, no suma)* | 4.2 | 2.6 |
 | **Total** | **100** | | **68.4** | |
 
 ```
@@ -100,16 +100,20 @@ Los ítems `J.39` (¿garantiza 70-80% de personal de comunidades y el resto radi
 
 ## 8. El Gate HSE — cuando un solo "No" tira abajo todo, sin importar el puntaje
 
-35 ítems en dos niveles (22 excluyentes + 13 de brecha), evaluados en paralelo a los 26 subcriterios:
+35 ítems `G.` en dos niveles (22 excluyentes + 13 de brecha), evaluados en paralelo a los 26 subcriterios:
 
-- **Nivel 1 — excluyente (25 ítems, prefijo `G.`)**: un solo "No" verificado en cualquiera de ellos produce **No-Go inmediato**, sin promediar con nada más. Alimentan 6.1 (5 ítems), 6.2 (16 ítems) y 6.3 (4 ítems, incluye `G.35` — RGRL, agregado cuando el Form sumó esa pregunta).
-- **Nivel 2 — brecha (10 ítems)**: un "No" no excluye, pero queda como discrepancia y limita el puntaje de 6.4 (4 ítems, incluye `G.34` — Economía circular, agregado cuando el Form sumó esa pregunta) y 6.5 (6 ítems).
+- **Nivel 1 — excluyente (22 ítems)**: un solo "No" verificado en cualquiera de ellos produce **No-Go inmediato**, sin promediar con nada más. Alimentan 6.1 (5 ítems: `G.3`–`G.7`), 6.2 (16 ítems) y 6.3 (1 ítem: `G.24`).
+- **Nivel 2 — brecha (13 ítems)**: un "No" no excluye, pero queda como discrepancia y limita el puntaje de 6.3 (3 ítems: `G.26`, `G.27` y `G.35` — RGRL, agregado cuando el Form sumó esa pregunta), 6.4 (4 ítems: `G.29`, `G.30`, `G.33` y `G.34` — Economía circular, también agregado con el Form) y 6.5 (6 ítems).
+
+Los dos contadores del encabezado del simulador salen de `itemsGate("n1")` e `itemsGate("n2")`, no de números fijos: si el reparto cambia, la cabecera acompaña sola.
 
 **Ejemplo real — Constructora Cordillera SRL**: en el Intake declaró tener ART vigente (`G.1`). En la visita presencial, la póliza exhibida estaba **vencida hacía 40 días** → `declarado: Sí` / `verificado: No`. Como `G.1` es Gate Nivel 1, esto solo alcanza para dictaminar **No-Go** — y de hecho, si se recalculan sus 26 subcriterios con el resto de la evidencia (todo marcado), Cordillera llega a un puntaje global de **100/100**. No importa: el Gate se revisa *antes* que el puntaje en la cascada de decisión (Sección 10), así que el 100 nunca llega a evaluarse.
 
 ## 9. Los pisos — cuando un subcriterio en 0 tira abajo todo, sin importar el promedio
 
-Un **piso** es una condición excluyente: si un subcriterio llega a 0/5, el dictamen es No-Go aunque el resto de la matriz esté perfecto. La versión actual del motor de `ejemplo.html` aplica esto de forma **general a los 26 subcriterios** (cualquiera que llegue a 0 frena todo), no solo a una lista corta — aunque hay 6 que son los que históricamente se destacan porque son los más fáciles de perder por completo:
+Un **piso** es una condición excluyente: si un subcriterio llega a 0/5, el dictamen es No-Go aunque el resto de la matriz esté perfecto. La versión actual del motor aplica esto de forma **general a los 25 subcriterios que puntúan** (cualquiera que llegue a 0 frena todo), no solo a una lista corta — aunque hay 6 que son los que históricamente se destacan porque son los más fáciles de perder por completo:
+
+> **7.3 queda fuera del piso.** Con peso 0,0 no aporta al puntaje global, así que un 0 ahí no puede frenar el proceso — y de hecho es el resultado esperable, porque sus dos preguntas son mutuamente excluyentes: `J.28` aplica si la empresa se presenta como consorcio y `J.29` si se presenta individualmente. `subcriteriosEnCeroCampo()` filtra por `sub.peso > 0`.
 
 | Subcriterio | Motivo |
 |---|---|
@@ -126,7 +130,7 @@ Más dos pisos "de bloque" (no de un solo subcriterio):
 
 Y un piso adicional específico de **2.2** que usa el dato crudo declarado en `J.13` (situación BCRA, escala real 1-5 del Central de Deudores de empresa y socios): **situación 4 o 5 → No-Go**. Situación 5 = Irrecuperable (atrasos superiores a un año o insolvencia/instancia judicial). Situación 3 **no** es piso — es la banda mínima que alcanza para seguir en carrera (ver tabla T6, Sección 12).
 
-Igual que el Gate Nivel 1, este piso solo corta una vez que el evaluador tildó "Verificado" en `J.13` durante la visita — no apenas se carga la respuesta del Form. Antes de verificar, el puntaje **oficial** de 2.2 (el que alimenta la cascada, el dictamen y el KPI "Declarado y verificado") es 0, igual que los otros 26 subcriterios; el puntaje según T6 solo se ve reflejado en el KPI **"Declarado"**, que sí muestra lo que dice el Excel sin esperar la visita.
+Igual que el Gate Nivel 1, este piso solo corta una vez que el evaluador tildó "Verificado" en `J.13` durante la visita — no apenas se carga la respuesta del Form. Antes de verificar, el puntaje **oficial** de 2.2 (el que alimenta la cascada, el dictamen y el KPI "Declarado y verificado") es 0, igual que los demás subcriterios; el puntaje según T6 solo se ve reflejado en el KPI **"Declarado"**, que sí muestra lo que dice el Excel sin esperar la visita.
 
 **Ejemplo real — Servicios Viales del Oeste SA**: no marcó ninguno de los 11 equipos "core" de flota exigidos por el pliego (cargadora, motoniveladora, retro, etc. — ver Sección 11). Eso hace que:
 
@@ -144,14 +148,18 @@ El motor revisa las condiciones en un orden fijo y **se detiene en la primera qu
 2. **Elegibilidad geográfica** (fuera de Iglesia/Jáchal → No-Go)
 3. **Gate Nivel 1** (22 ítems — un "No" verificado → No-Go)
 4. **Salud Financiera** (promedio 2.1–2.3 `< 2` → No-Go)
-5. **Piso 2.2 · Situación BCRA** (situación declarada 3, 4 o 5 de empresa o socios → No-Go, independiente del puntaje 0-5 del subcriterio)
+5. **Piso 2.2 · Situación BCRA** (situación 4 o 5 de empresa o socios → No-Go, independiente del puntaje 0-5 del subcriterio)
 6. **SSMA excluyente** (mínimo 6.1/6.2/6.3 `≤ 1` → No-Go)
-7. **Cualquier subcriterio en 0** (de los 26 — un solo 0/5 → No-Go)
+7. **Cualquier subcriterio en 0** (de los 25 que puntúan — un solo 0/5 → No-Go)
 8. **Puntaje global `< 55`** → No-Go
 9. **Puntaje global 55 a 69,9** → GO con Plan de Acción
 10. **Puntaje global `≥ 70`** → GO
 
-> Nota: versiones anteriores de este documento describían varios de los pasos 7+ como chequeos separados y nombrados (5.1, 4.2, 3.4, 2.2, 2.1, 1.3, en ese orden). El motor real de `ejemplo_con_form.html` los generalizó en un solo paso que cubre los 26 subcriterios — el efecto práctico es el mismo (esos 6 siguen frenando todo si llegan a 0), pero ya no hace falta nombrarlos uno por uno: alcanza con "¿algún subcriterio quedó en 0?". El paso 5 (piso BCRA de 2.2) es la excepción: es un chequeo aparte porque no mira el puntaje 0-5 del subcriterio, sino el dato crudo declarado en `J.13`.
+> Nota: versiones anteriores de este documento describían varios de los pasos 7+ como chequeos separados y nombrados (5.1, 4.2, 3.4, 2.2, 2.1, 1.3, en ese orden). El motor real de `ejemplo_con_form.html` los generalizó en un solo paso que cubre los subcriterios que puntúan — el efecto práctico es el mismo (esos 6 siguen frenando todo si llegan a 0), pero ya no hace falta nombrarlos uno por uno: alcanza con "¿algún subcriterio quedó en 0?". El paso 5 (piso BCRA de 2.2) es la excepción: es un chequeo aparte porque no mira el puntaje 0-5 del subcriterio, sino el dato crudo declarado en `J.13`.
+>
+> Versiones anteriores de este mismo documento también describían el paso 5 como "situación 3, 4 o 5", contradiciendo a la Sección 9. Vale lo que dice la planilla y lo que implementa el motor: **solo 4 y 5 son piso**; la situación 3 puntúa 1 según T6 y sigue en carrera.
+>
+> Desde esta versión la cascada se puede correr sobre tres campos distintos (`declarado`, `verificado` y `ambos`). El dictamen oficial —el badge grande— es el de `verificado`; los otros dos alimentan los dictámenes chicos que acompañan a cada KPI.
 
 **Los 4 casos reales, trazados paso a paso por la cascada:**
 
@@ -212,11 +220,13 @@ El simulador usa una aproximación **lineal** (`round(cumplen/11×5)`) porque no
 | 3 | 1 |
 | 4 o 5 | 0 (además, piso → No-Go — ver Sección 9) |
 
-A diferencia de las otras 5 tablas de esta sección, **T6 sí está implementada tal cual**: `ejemplo_con_form.html` la usa directamente (`scoreT6Bcra()`) para calcular el puntaje 0-5 de 2.2 a partir del valor crudo declarado en `J.13`, no de una proporción de checkboxes. `J.14` (manifestación de bienes) queda dentro de 2.2 como ítem de evidencia/checklist — el Marco Metodológico v4.1 la describe como refuerzo cualitativo de la misma banda BCRA, no como un eje de puntaje separado — pero ya no mueve el puntaje del subcriterio de forma independiente.
+A diferencia de las otras 5 tablas de esta sección, **T6 sí está implementada tal cual**: `ejemplo_con_form.html` la usa directamente (`scoreT6Bcra()`) para calcular el puntaje 0-5 de 2.2 a partir del valor crudo declarado en `J.13`, no de una proporción de checkboxes. La tabla A de la planilla confirma que **2.2 se alimenta solo de `J.13`**: `J.14` (manifestación de bienes) queda dentro del subcriterio como ítem de evidencia/checklist —el Marco Metodológico v4.1 la describe como refuerzo cualitativo de la misma banda BCRA, no como un eje de puntaje separado— y por eso está marcada `scoreable: false`: se releva en la visita pero no mueve el puntaje.
 
 T6 se aplica distinto según qué puntaje se esté mirando:
 - **"Declarado"** (KPI de la derecha, refleja el Excel sin esperar la visita): T6 aplica apenas hay un `J.13` con valor de BCRA cargado, sin exigir nada más.
-- **Puntaje oficial** (cascada, dictamen, cajas del acordeón) y **"Declarado y verificado"**: T6 solo aplica una vez que el evaluador tildó "Verificado" en `J.13` — igual que el resto de los 26 subcriterios, que arrancan en 0 hasta la visita. Sin eso, 2.2 cae a la aproximación genérica de checkboxes (`verificados/total×5` sobre J.13+J.14), que da 0 mientras nada esté tildado.
+- **Puntaje oficial** (cascada, dictamen, cajas del acordeón) y **"Declarado y verificado"**: T6 solo aplica una vez que el evaluador tildó "Verificado" en `J.13` — igual que el resto de los subcriterios, que arrancan en 0 hasta la visita.
+
+**Sin situación BCRA cargada, 2.2 vale 0.** El motor no cae a un conteo de checkboxes cuando falta el dato: con `J.13` tildado a mano pero sin número de BCRA detrás, el subcriterio da 0 y (por la regla general de pisos) frena el dictamen. Es deliberado — 2.2 sin situación declarada no es evaluable.
 
 **3.1 — Cantidad de empleados en relación de dependencia:**
 | Empleados | Puntaje |
@@ -262,9 +272,26 @@ T6 se aplica distinto según qué puntaje se esté mirando:
 
 ## 13. Limitaciones conocidas
 
-- 5 de 26 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en el simulador la proporción simple de checkboxes en vez de su tabla de conversión real; 5.1 tiene una aproximación lineal (con divergencias documentadas en la Sección 11); 2.2 es el único que tiene su tabla de conversión real (T6) implementada sin aproximar.
+- 5 de los 26 subcriterios (3.1, 3.4, 6.4, 6.5, 7.1) usan en el simulador la proporción simple de checkboxes en vez de su tabla de conversión real; 5.1 tiene una aproximación lineal (con divergencias documentadas en la Sección 11); 2.2 es el único que tiene su tabla de conversión real (T6) implementada sin aproximar.
 - El puntaje que da el simulador para "Vialidad Cuyana" con todo marcado (100) no reproduce el 86,2 real de la planilla — es la misma simplificación checkbox-a-score, no una regresión nueva.
-- El peso de la Dimensión VII se mantiene en 8%, ahora repartido 3+2+3 entre sus tres subcriterios. El antiguo 7.4 (Apertura al acompañamiento y velocidad de mejora) se fusionó en 7.3, que pasó a llamarse "Asociativismo / UTE, Apertura al acompañamiento y velocidad de mejora" y se alimenta de J.28, J.29, J.30 y J.31. La hoja "Intake" marca "5 — REVISAR" para VII en una tabla de referencia cruzada; es una inconsistencia de la fuente, no una decisión de este documento.
+- **Dimensión VII — estructura vigente** (tabla A de la planilla maestra, hoja `Config`): el peso se mantiene en 8%, repartido **3 + 5 + 0**.
+
+  | ID | Subcriterio | Peso | Ítems |
+  |---|---|---|---|
+  | 7.1 | Empleo local y plan de calificación | 3,0 | J.39, J.40, J.25 |
+  | 7.2 | Compre local y subproveedores, apertura al acompañamiento y velocidad de mejora | 5,0 | J.26, J.27, J.30, J.31 |
+  | 7.3 | Asociativismo / UTE | 0,0 | J.28, J.29 |
+
+  El antiguo 7.4 (Apertura al acompañamiento y velocidad de mejora) ya no existe: su alcance se absorbió en el nombre de **7.2**, junto con sus dos preguntas `J.30` (certificaciones ISO) y `J.31` (alianzas estratégicas). **7.3 quedó en peso 0**: se releva como evidencia de la visita pero no suma al puntaje ni activa pisos. La hoja "Intake" marca "5 — REVISAR" para VII en una tabla de referencia cruzada y la hoja "Matriz E1" todavía arrastra una fila 7.4 con `#REF!`; ambas son inconsistencias de la fuente — vale la tabla A.
+- **`J.30` y `J.31` ya se cargan del formulario.** Estuvieron un tiempo en `ITEMS_SIN_PREGUNTA_EN_FORM`, una lista que fuerza a "sin evidencia declarada" los ítems sin columna en el Form. Cuando el Form sumó esas dos columnas se agregó el mapeo en `FORM_ITEM_MAP` pero no se sacó a los ítems de esa lista, así que las respuestas se descartaban y 7.2 quedaba topeada en 3/5. La lista hoy está vacía.
+- **Los otros dos simuladores quedaron atrás.** `estado_declarado.html` y `comparativa_proveedores.html` llevan su propia copia de la matriz, todavía con `7.2 = 2` / `7.3 = 3` y con `J.30`/`J.31` descartados. Hasta que se sincronicen, van a mostrar un puntaje distinto al de `ejemplo_con_form.html` para la misma empresa.
+- **Los textos de las preguntas se copian del formulario.** El `texto` de cada uno de los 133 ítems de `DATA` es el encabezado real de su columna en la hoja de respuestas, para que el evaluador verifique en la visita exactamente lo que se le preguntó a la empresa en el Intake. Antes estaban escritos a mano y 52 habían quedado desfasados (`"¿Presenta…"` donde el Form dice `"¿Cuenta con…"`, la sección de flota sin el `"o equivalente"`, y `J.32` todavía redactada como pregunta numérica cuando el Form la pasó a Sí/No).
+
+  Se aplica una limpieza cosmética, implementada en `textoDesdeForm()`: colapsar espacios múltiples (la sección de flota viene con espacios dobles), quitar el salto de línea final de `G.34`, sacar el espacio antes del signo de cierre en `J.3`, escribir "Economía Circular" en lugar de "ECONOMÍA CIRCULAR" y sacar el `el` repetido de `J.39` ("al menos el el 70 u 80%"). No cambia ni una palabra del contenido.
+
+  `verificarTextos()`, hermana de `verificarPesos()` en el arranque, avisa por consola si alguien reedita el Form y los textos se vuelven a separar. Lleva una lista de divergencias aceptadas, hoy con **6 entradas**: en `F.5`, `F.7`, `F.8`, `F.9`, `F.11` y `F.13` el formulario pregunta *"Modelo del vehículo/equipo"* mientras la Matriz evalúa *"Horas de uso"*. Es una divergencia deliberada; el `kind` de esos ítems es `text`, así que solo cambia el rótulo, no el puntaje.
+
+  Los campos `entregable` **no** salen del formulario: son las indicaciones del evaluador sobre qué documentación pedir y se mantienen escritas por el equipo.
 
 ## 14. Cómo verificar el simulador
 
@@ -273,3 +300,11 @@ T6 se aplica distinto según qué puntaje se esté mirando:
 3. Tildar/destildar `J.39` dentro del acordeón de la Dimensión I: el checkbox gemelo dentro de la Dimensión VII cambia solo, y 1.3 y 7.1 se recalculan juntos (Sección 7).
 4. Destildar "¿La empresa acepta ser sujeto de auditoría?": la cascada corta en el paso 1, sin importar el resto de los datos.
 5. Destildar todos los ítems de un subcriterio de peso conocido (ej. 1.3, peso 3) y confirmar que el puntaje global baja exactamente 3 puntos — no una fracción diluida por un promedio de dimensión.
+
+**Específico de `ejemplo_con_form.html`** (el que se conecta a la hoja de respuestas):
+
+6. El encabezado debe mostrar **26 subcriterios · 25 puntúan**, Gate **22+13** y **100** puntos totales. Los tres salen de `DATA`, así que si alguno no cuadra es porque la matriz quedó mal editada.
+7. La consola no debe emitir ninguno de los dos avisos de control: `[Matriz] Control de pesos` (lo tira `verificarPesos()` cuando los subcriterios de una dimensión no suman su peso, o cuando las 7 dimensiones no suman 100) ni `[Matriz] Textos que ya no coinciden con el formulario` (lo tira `verificarTextos()` cuando la redacción de un ítem se separó de la pregunta del Form).
+8. En la Dimensión VII: `7.1 · 3 pts`, `7.2 · 5 pts` y `7.3` con el badge ámbar **No puntúa**. Destildar `J.28` y `J.29` con todo lo demás en verde: 7.3 baja a 0/5, pero el dictamen sigue GO y el puntaje global no se mueve.
+9. Cargar *Luky S.R.L* (responde Sí a ISO y Sí a alianzas) → 7.2 = 5/5. Cargar *Iglesia Movimientos SRL* (No a ISO) → 7.2 = 4/5. Si ambas dieran 3/5 es que `J.30`/`J.31` volvieron a descartarse.
+10. Forzar `J.13` a 4 → No-Go por piso BCRA; a 3 → 2.2 = 1 pt y sigue en carrera; verificar `J.13` sin ningún número de BCRA → 2.2 = 0.
